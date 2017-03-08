@@ -22,16 +22,18 @@ import F_Classifier
 def execute_md(subject_key):
     ## md파일 생성
     ### db파일에서 게시글 리스트 추출
-    with sqlite3.connect('/Users/tansansu/Google Drive/Python/latent_info/board.db') as conn:
+    dir_db = '/Users/tansansu/Google Drive/Python/latent_info/board.db'
+    with sqlite3.connect(dir_db) as conn:
         query = 'select site, title, article_link, date_time from ' + subject[subject_key] + \
-        ' order by date_time desc limit 300;'
+        ' order by date_time desc limit 400;'
         df = pd.read_sql_query(query, conn)
     ### 날짜/시간 역순으로 ordering
     df.sort_values('date_time', ascending=False, inplace=True)
 
     ### 머신러닝 분류
-    df = F_Classifier.predict_Y(df)
-    df = df[df['result'] == 'Y']
+    if subject_key == '부동산':
+        df = F_Classifier.predict_Y(df)
+        df = df[df['result'] == 'Y']
 
     ### 데이터 프레임을 3개 페이지로 나누기
     df_1 = df.iloc[:60]
@@ -46,11 +48,12 @@ def execute_md(subject_key):
 
 
 
-subject = {'부동산':'estate'}, '찌라시':'tabloid'}
+# 콘텐츠 업데이트
+subject = {'부동산':'estate', '찌라시':'tabloid'}
 
 site_link = {'클리앙':'clien', '딴지일보':'ddan', \
     '루리웹':'ruli', '엠팍':'mlb', '웃대':'HuU', '이토렌트':'Eto', '뽐뿌':'ppom', \
-    'SLR':'slr'}
+    'SLR':'slr', '82cook':'82cook'}
 
 for j in subject:
     for s in site_link:
@@ -67,4 +70,3 @@ for j in subject:
             pass
 
     execute_md(j)
-

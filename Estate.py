@@ -1,4 +1,4 @@
-# 2017.01.07
+# 2017.03.07
 # 부동산 글 수집
 
 import sqlite3
@@ -141,7 +141,7 @@ except:
 
 
 try:
-    # 뽐뿌
+    # SLR
     site = 'SLR'
     slr_url = {'부동산':\
         '%EB%B6%80%EB%8F%99%EC%82%B0', \
@@ -160,9 +160,31 @@ except:
     pass
 
 
+try:
+    # 82쿡
+    site = '82cook'
+    cook82_url = {'부동산':\
+        '%EB%B6%80%EB%8F%99%EC%82%B0', \
+        '전월세':\
+        '%EC%A0%84%EC%9B%94%EC%84%B8', \
+        '재건축':\
+        '%EC%9E%AC%EA%B1%B4%EC%B6%95', \
+        '집값':\
+        '%EC%A7%91%EA%B0%92'\
+        }
+    ## Get articles
+    result = F_common.scrapper(site, cook82_url)
+    ## DB에 게시글 저장
+    F_common.store_db(subject, site, result)
+except:
+    pass
+
+
+
 ## md파일 생성
 ### db파일에서 게시글 리스트 추출
-with sqlite3.connect('/Users/tansansu/Google Drive/Python/latent_info/board.db') as conn:
+dir_db = '/Users/tansansu/Google Drive/Python/latent_info/board.db'
+with sqlite3.connect(dir_db) as conn:
     query = 'select site, title, article_link, date_time from ' + subject + \
     ' order by date_time desc limit 300;'
     estate = pd.read_sql_query(query, conn)
@@ -183,3 +205,4 @@ directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject
 F_common.to_md(estate_1, '부동산', directory, 1)
 F_common.to_md(estate_2, '부동산', directory, 2)
 F_common.to_md(estate_3, '부동산', directory, 3)
+

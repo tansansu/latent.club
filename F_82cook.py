@@ -13,6 +13,8 @@ from bs4 import BeautifulSoup
 # cleansing a article title
 def mod_title(char):
     result = char.replace('\r', '').replace('\n', '').replace('\t', '')
+    # Removing a number of replies
+    result = re.sub(r"\[[0-9]+\]", '', result)
     return(result)
 
 
@@ -28,7 +30,7 @@ def sess(url):
 
 # 게시글 수집
 def get_article(url):
-    base_url = 'http://starboard.kr/ppomppu'
+    base_url = 'http://starboard.kr/82cook'
     search_url = 'http://starboard.kr/conn/board/search'
     # Get a html
     s = sess('http://starboard.kr/')
@@ -37,10 +39,10 @@ def get_article(url):
     # Extracting articles from the html
     payload = {'search_text':url}
     s_result = s.post(search_url, data=payload)
-    
+
     soup = BeautifulSoup(s_result.text)
     articles = soup.findAll('div', attrs={'class':'ItemContent Discussion'})
-    
+
     a_list = []
     for a in articles:
         l = []
@@ -63,12 +65,11 @@ def get_article(url):
         l.append(content)
         a_list.append(l)
         time.sleep(.5)
-        
+
     result = pd.DataFrame(a_list)
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content']
     result['date_time'] = pd.to_datetime(result['date_time'])
     result.set_index('article_id')
-    
-    return(result)
 
+    return(result)
