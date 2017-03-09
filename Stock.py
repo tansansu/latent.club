@@ -144,9 +144,9 @@ with sqlite3.connect(dir_db) as conn:
 stock.sort_values('date_time', ascending=False, inplace=True)
 
 ### Splitting of the dataframe for 3 pages
-stock_1 = tabloid.iloc[:60]
-stock_2 = tabloid.iloc[60:120]
-stock_3 = tabloid.iloc[120:]
+stock_1 = stock.iloc[:60]
+stock_2 = stock.iloc[60:120]
+stock_3 = stock.iloc[120:]
 
 ### Making the markdown file
 directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject
