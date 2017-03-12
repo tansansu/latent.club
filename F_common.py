@@ -1,4 +1,5 @@
-# 2017.03.07
+# 2017.03.12
+
 import pickle
 import pandas as pd
 import sqlite3
@@ -22,14 +23,15 @@ def make_pageview_comment(md, category, foot_padding):
     # 헤더 생성
     if category == '부동산':
         meta = '---\ntitle: ' + category + '\nweight: 10\n---\n\n'
-    elif category == '찌라시':
+    elif category == '주식':
         meta = '---\ntitle: ' + category + '\nweight: 20\n---\n\n'
+    elif category == '찌라시':
+        meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
     # md 파일에 추가
     with open(md, 'r+') as f:
         content = f.read()
         f.seek(0, 0)
         f.write(meta.rstrip('\r\n') + '\n' + content + '\n' + foot_padding)
-
 
 
 # 함수: 데이터 프레임을 markdown파일로 변환
@@ -38,23 +40,23 @@ def to_md(dataframe, category, directory, page_num):
     html_table = "<table>\n"
     html_title = "<tr class='title_link'>"
     html_info = "<tr class='title_info'>"
-    # loading the color dictionary for coloring of each site
+    # 사이트명에 다른 컬러를 입히기 위한 사이트-컬러명 dictionary
     with open('/Users/tansansu/Google Drive/Python/latent_info/site_col.pickle', 'rb') as f:
         site_col = pickle.load(f)
 
     content = '\n' + html_table
     for i in range(len(dataframe)):
-        # Making title rows
+        # 제목 줄 생성
         con_title = "<td><a href='" + dataframe.iloc[i]['article_link'] + "'>" + \
         "<font color='dimgray'>" + \
         dataframe.iloc[i]['title'] + "</font></a></td></tr>\n"
-        # Appending title rows into the html content
+        # 제목 줄에 html 코드 추가
         content += html_title + con_title
-        # Making info rows
+        # 사이트명, 날짜_시간 정보 줄 생성
         con_info = "<td><font color='" + site_col[dataframe.iloc[i]['site']] + "'><b>" + \
         dataframe.iloc[i]['site'] + \
         "</b></font>&nbsp;&nbsp;&nbsp;" + dataframe.iloc[i]['date_time'] + "</td></tr>\n"
-        # Appending info rows into the html content
+        # 정보 줄에 html 코드 삽입
         content += html_info + con_info
 
     content += "</table>\n\n"
@@ -64,7 +66,7 @@ def to_md(dataframe, category, directory, page_num):
     # md 파일로 데이터 프레임 저장
     if page_num == 3:
         md = directory + '/page' + str(page_num) + '.md'
-        # Savging the final file
+        # 최종 md 파일 생성
         with open(md, 'w') as f:
             f.write(content)
         # 3번째 페이지는 더보기가 없음
@@ -72,7 +74,7 @@ def to_md(dataframe, category, directory, page_num):
         make_pageview_comment(md, category, foot_padding)
     elif page_num == 2:
         md = directory + '/page' + str(page_num) + '.md'
-        # Savging the final file
+        # 최종 md 파일 생성
         with open(md, 'w') as f:
             f.write(content)
         # 마지막 더보기 문구
@@ -80,7 +82,7 @@ def to_md(dataframe, category, directory, page_num):
         make_pageview_comment(md, category, foot_padding)
     else:
         md = directory + '/index.md'
-        # Savging the final file
+        # 최종 md 파일 생성
         with open(md, 'w') as f:
             f.write(content)
         # 마지막 더보기 문구
@@ -109,17 +111,16 @@ def compare_article(category, site, dataframe):
     return(dataframe)
 
 
-
 # 함수: 스크랩한 게시물 db에 저장
 def store_db(subject, site, dataframe):
     # 수집한 게시물이 db에 이미 있는 것인지 비교
     new_d = compare_article(subject, site, dataframe)
     if len(dataframe) != 0:
         ## 신규 자료는 DB에 저장
-        conn = sqlite3.connect('/Users/tansansu/Google Drive/Python/latent_info/board.db')
+        directory = '/Users/tansansu/Google Drive/Python/latent_info/'
+        conn = sqlite3.connect(directory + 'board.db')
         new_d.to_sql(subject, conn, if_exists='append', index=False)
         conn.close()
-
 
 
 # 함수: 사이트 스크래핑
@@ -193,3 +194,44 @@ def scrapper(site, url):
 
     return(result)
 
+
+# 함수: 검색 url에 키워드 추가
+def add_keyword(subject, word):
+    # 사이트별 추가할 url 패딩 캐릭터
+    clien_pad = 'http://m.clien.net/cs3/board?bo_table=park&bo_style=lists&sca=&sfl=wr_subject_content&stx='
+    ddan_pad_1 = 'http://www.ddanzi.com/index.php?mid=free&act=IS&search_target=all&is_keyword='
+    ddan_pad_2 =  '&m=1'
+    eto_pad_1 = 'http://etorrent.co.kr/plugin/mobile/board.php?bo_table=eboard&sca=&sfl=wr_subject%7C%7Cwr_content&stx='
+    eto_pad_2 = '&x=0&y=0'
+    mlb_pad_1 = 'http://mlbpark.donga.com/mp/b.php?select=sct&m=search&b=bullpen&select=sct&query='
+    mlb_pad_2 = '&x=0&y=0'
+    ruli_pad = 'http://m.ruliweb.com/community/board/300148?search_type=subject_content&search_key='
+    humor_pad = 'http://m.humoruniv.com/board/list.html?table=pdswait&st=subject&searchday=1year&sk='
+
+    b_word = word.encode('utf-8')
+    import re
+    b_word = str(b_word).replace('\\x', '%').replace("\'", '').upper()
+    b_word = re.sub(r'^B', '', b_word)
+    print(b_word)
+
+    import json
+    # 저장된 url json 파일 열기
+    directory = '/Users/tansansu/Google Drive/Python/latent_info/links/'
+    with open(directory + subject + '.json','r') as f:
+        url = json.load(f)
+    
+    # 사이트에 키워드 검색 url 추가하기
+    url['82cook'][word] = b_word
+    url['HuU'][word] = humor_pad + b_word
+    url['clien'][word] = clien_pad + b_word
+    url['ddan'][word] = ddan_pad_1 + b_word + ddan_pad_2
+    url['eto'][word] = eto_pad_1 + b_word + eto_pad_2
+    url['mlb'][word] = mlb_pad_1 + b_word + mlb_pad_2
+    url['ppom'][word] = b_word
+    url['ruli'][word] = ruli_pad + b_word
+    url['slr'][word] = b_word
+    print(url)
+
+    # url json 파일 저장하기
+    with open(directory + subject + '.json','w') as f:
+        json.dump(url, f)

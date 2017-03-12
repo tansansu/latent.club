@@ -1,6 +1,7 @@
-# 2017.03.01
+# 2017.03.12
 
 import pickle
+import json
 import os
 import sqlite3
 import pandas as pd
@@ -18,7 +19,7 @@ import F_Classifier
 # f.close()
 
 
-# 함수: 게시판 md 파일 생성
+# 함수: 게시판 md 파일 생성 작업 실행
 def execute_md(subject_key):
     ## md파일 생성
     ### db파일에서 게시글 리스트 추출
@@ -49,21 +50,22 @@ def execute_md(subject_key):
 
 
 # 콘텐츠 업데이트
-subject = {'부동산':'estate', '찌라시':'tabloid'}
+subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock'}
 
 site_link = {'클리앙':'clien', '딴지일보':'ddan', \
-    '루리웹':'ruli', '엠팍':'mlb', '웃대':'HuU', '이토렌트':'Eto', '뽐뿌':'ppom', \
+    '루리웹':'ruli', '엠팍':'mlb', '웃대':'HuU', '이토렌트':'eto', '뽐뿌':'ppom', \
     'SLR':'slr', '82cook':'82cook'}
 
 for j in subject:
-    for s in site_link:
-        directory = '/Users/tansansu/Google Drive/Python/latent_info/links/'
-        with open(directory + subject[j] +'_' + site_link[s] + '.pickle','rb') as f:
-            url = pickle.load(f)
+    # 검색 url 불러오기
+    directory = '/Users/tansansu/Google Drive/Python/latent_info/links/'
+    with open(directory + subject[j] + '.json','r') as f:
+        url = json.load(f)
     
+    for s in site_link:
         try:
-            ## Get articles
-            result = F_common.scrapper(s, url)
+            ## article 가져오기
+            result = F_common.scrapper(s, url[site_link[s]])
             ## DB에 게시글 저장
             F_common.store_db(subject[j], s, result)
         except:
