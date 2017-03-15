@@ -1,6 +1,7 @@
 # 2017.03.12
 
 import pickle
+import json
 import pandas as pd
 import sqlite3
 import sys
@@ -25,6 +26,8 @@ def make_pageview_comment(md, category, foot_padding):
         meta = '---\ntitle: ' + category + '\nweight: 10\n---\n\n'
     elif category == '주식':
         meta = '---\ntitle: ' + category + '\nweight: 20\n---\n\n'
+    elif category == '경제':
+        meta = '---\ntitle: ' + category + '\nweight: 30\n---\n\n'
     elif category == '찌라시':
         meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
     # md 파일에 추가
@@ -41,8 +44,8 @@ def to_md(dataframe, category, directory, page_num):
     html_title = "<tr class='title_link'>"
     html_info = "<tr class='title_info'>"
     # 사이트명에 다른 컬러를 입히기 위한 사이트-컬러명 dictionary
-    with open('/Users/tansansu/Google Drive/Python/latent_info/site_col.pickle', 'rb') as f:
-        site_col = pickle.load(f)
+    with open('db/site_col.json', 'r') as f:
+        site_col = json.load(f)
 
     content = '\n' + html_table
     for i in range(len(dataframe)):
@@ -99,7 +102,7 @@ def compare_article(category, site, dataframe):
     except:
         pass
     # db에서 게시물 추출
-    conn = sqlite3.connect('/Users/tansansu/Google Drive/Python/latent_info/board.db')
+    conn = sqlite3.connect('db/board.db')
     query = 'select article_id from ' + category + ' where site = "' + site + \
     '" order by date_time desc limit 300;'
     temp = pd.read_sql_query(query, conn)
@@ -117,8 +120,7 @@ def store_db(subject, site, dataframe):
     new_d = compare_article(subject, site, dataframe)
     if len(dataframe) != 0:
         ## 신규 자료는 DB에 저장
-        directory = '/Users/tansansu/Google Drive/Python/latent_info/'
-        conn = sqlite3.connect(directory + 'board.db')
+        conn = sqlite3.connect('db/board.db')
         new_d.to_sql(subject, conn, if_exists='append', index=False)
         conn.close()
 
@@ -216,8 +218,7 @@ def add_keyword(subject, word):
 
     import json
     # 저장된 url json 파일 열기
-    directory = '/Users/tansansu/Google Drive/Python/latent_info/links/'
-    with open(directory + subject + '.json','r') as f:
+    with open('links/' + subject + '.json','r') as f:
         url = json.load(f)
     
     # 사이트에 키워드 검색 url 추가하기
@@ -233,5 +234,12 @@ def add_keyword(subject, word):
     print(url)
 
     # url json 파일 저장하기
-    with open(directory + subject + '.json','w') as f:
+    with open('links/' + subject + '.json','w') as f:
         json.dump(url, f)
+
+
+# 함수: 머신러닝 학습용 샘플데이터 저장
+def export_sample(df, object):
+    from xlsxwriter.utility import xl_rowcol_to_cell
+    writer = pd.ExcelWriter('sample_data/sample_' + object + '.xlsx', engine='xlsxwriter')
+    df.to_excel(writer, sheet_name='to')

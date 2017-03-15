@@ -183,8 +183,7 @@ except:
 
 ## md파일 생성
 ### db파일에서 게시글 리스트 추출
-dir_db = '/Users/tansansu/Google Drive/Python/latent_info/board.db'
-with sqlite3.connect(dir_db) as conn:
+with sqlite3.connect('db/board.db') as conn:
     query = 'select site, title, article_link, date_time from ' + subject + \
     ' order by date_time desc limit 300;'
     estate = pd.read_sql_query(query, conn)

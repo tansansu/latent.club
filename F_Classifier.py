@@ -1,4 +1,4 @@
-# 2017.02.26
+# 2017.03.15
 
 from konlpy.tag import Twitter; pos_tagger = Twitter()
 import pandas as pd
@@ -22,18 +22,15 @@ def term_exists(text, doc):
     return {'exists({})'.format(word): (word in set(doc)) for word in text.vocab().keys()}
 
 
-def predict_Y(dataframe):
+def predict_Y(dataframe, subject):
     words = dataframe['title'].apply(tokenizer).tolist()
     
     # loading the model & text sets
-    f = open('/Users/tansansu/Google Drive/Python/latent_info/model_nb.pickle', 'rb')
-    model = pickle.load(f)
-    f.close()
-    f = open('/Users/tansansu/Google Drive/Python/latent_info/nb_text.pickle', 'rb')
-    text = pickle.load(f)
-    f.close()
-    
-    
+    with open('db/nb_model_'+ subject +'.pickle', 'rb') as f:
+        model = pickle.load(f)
+    with open('db/nb_text_' + subject + '.pickle', 'rb') as f:
+        text = pickle.load(f)
+        
     # Prediction
     dataframe['result'] = ''
     for i in range(len(words)):

@@ -134,8 +134,7 @@ except:
 
 ## Making MD files
 ### Getting a data from DB
-dir_db = '/Users/tansansu/Google Drive/Python/latent_info/board.db'
-with sqlite3.connect(dir_db) as conn:
+with sqlite3.connect('db/board.db') as conn:
     query = 'select site, title, article_link, date_time from ' + subject + \
     ' order by date_time desc limit 180;'
     stock = pd.read_sql_query(query, conn)

@@ -1,15 +1,20 @@
+# 2017.03.15
+
 from konlpy.tag import Twitter; pos_tagger = Twitter()
 import pandas as pd
 import random
+import re
 
 # Import Training Dataset
-raw = pd.read_excel('/Users/tansansu/Google Drive/Python/latent_info/sample_data/sample_estate.xlsx')
+filename = 'sample_stock.xlsx'
+directory = '/Users/tansansu/Google Drive/Python/latent_info/sample_data/'
+raw = pd.read_excel(directory + filename)
 raw = raw[raw['result'].notnull()][['title', 'result']]
 raw['result'] = raw['result'].astype(int).astype(str)
 
 # Data cleansing
 raw.loc[raw['result'] == '1', 'result'] = 'Y'
-raw.loc[raw['result'] == '0', 'result'] = 'N'
+raw.loc[(raw['result'] == '0') | (raw['result'].notnull()), 'result'] = 'N'
 
 
 # Tokenize
@@ -38,7 +43,7 @@ test_tokens = [t for l in test_words for t in l if t]
 training = [(t, r) for t, r in zip(train_words, train_result)]
 testing = [(t, r) for t, r in zip(test_words, train_result)]
 
-
+training
 import nltk
 text = nltk.Text(train_tokens, name='NMSC')
 
@@ -60,9 +65,11 @@ classifier.classify(term_exists(test_words[1]))
 # Savting the model
 import pickle
 
-f = open('/Users/tansansu/Google Drive/Python/latent_info/model_nb.pickle', 'wb')
+subject = 'stock'
+f = open('db/nb_model_' + subject + '.pickle', 'wb')
 pickle.dump(classifier, f)
 f.close()
 
-
+with open('db/nb_text_' + subject + '.pickle', 'wb') as f:
+    pickle.dump(text, f)
 

@@ -133,10 +133,9 @@ except:
 
 ## Making MD files
 ### Getting a data from DB
-dir_db = '/Users/tansansu/Google Drive/Python/latent_info/board.db'
-with sqlite3.connect(dir_db) as conn:
+with sqlite3.connect('db/board.db') as conn:
     query = 'select site, title, article_link, date_time from ' + subject + \
-    ' order by date_time desc limit 180;'
+    ' order by date_time desc limit 400;'
     tabloid = pd.read_sql_query(query, conn)
 
 ### ordering by date/time
@@ -153,3 +152,4 @@ F_common.to_md(tabloid_1, '찌라시', directory, 1)
 F_common.to_md(tabloid_2, '찌라시', directory, 2)
 F_common.to_md(tabloid_3, '찌라시', directory, 3)
 
+F_common.export_sample(tabloid, "tabloid")

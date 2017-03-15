@@ -1,4 +1,4 @@
-# 2017.03.12
+# 2017.03.15
 
 import pickle
 import json
@@ -13,18 +13,11 @@ import F_common
 import F_Classifier
 
 
-# 링크 저장
-# f = open('/Users/tansansu/Google Drive/Python/latent_info/links/estate_slr.pickle', 'wb')
-# pickle.dump(slr_url, f)
-# f.close()
-
-
 # 함수: 게시판 md 파일 생성 작업 실행
 def execute_md(subject_key):
     ## md파일 생성
     ### db파일에서 게시글 리스트 추출
-    dir_db = '/Users/tansansu/Google Drive/Python/latent_info/board.db'
-    with sqlite3.connect(dir_db) as conn:
+    with sqlite3.connect('db/board.db') as conn:
         query = 'select site, title, article_link, date_time from ' + subject[subject_key] + \
         ' order by date_time desc limit 400;'
         df = pd.read_sql_query(query, conn)
@@ -32,9 +25,14 @@ def execute_md(subject_key):
     df.sort_values('date_time', ascending=False, inplace=True)
 
     ### 머신러닝 분류
-    if subject_key == '부동산':
-        df = F_Classifier.predict_Y(df)
+    if (subject_key == '부동산') | (subject_key == '주식'):
+        df = F_Classifier.predict_Y(df, subject[subject_key])
         df = df[df['result'] == 'Y']
+    
+    ## 중복글 제거(제목)
+    df.drop_duplicates('title', keep='first', inplace=False)
+    ## 19금 글 제거
+    df = df[~df['title'].str.contains('19')]
 
     ### 데이터 프레임을 3개 페이지로 나누기
     df_1 = df.iloc[:60]
@@ -50,7 +48,7 @@ def execute_md(subject_key):
 
 
 # 콘텐츠 업데이트
-subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock'}
+subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', '경제':'economy'}
 
 site_link = {'클리앙':'clien', '딴지일보':'ddan', \
     '루리웹':'ruli', '엠팍':'mlb', '웃대':'HuU', '이토렌트':'eto', '뽐뿌':'ppom', \
@@ -58,8 +56,7 @@ site_link = {'클리앙':'clien', '딴지일보':'ddan', \
 
 for j in subject:
     # 검색 url 불러오기
-    directory = '/Users/tansansu/Google Drive/Python/latent_info/links/'
-    with open(directory + subject[j] + '.json','r') as f:
+    with open('links/' + subject[j] + '.json','r') as f:
         url = json.load(f)
     
     for s in site_link:
