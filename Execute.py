@@ -1,4 +1,4 @@
-# 2017.03.15
+# 2017.03.18
 
 import pickle
 import json
@@ -30,7 +30,7 @@ def execute_md(subject_key):
         df = df[df['result'] == 'Y']
     
     ## 중복글 제거(제목)
-    df.drop_duplicates('title', keep='first', inplace=False)
+    df.drop_duplicates('title', keep='first', inplace=True)
     ## 19금 글 제거
     df = df[~df['title'].str.contains('19')]
 
@@ -54,7 +54,10 @@ site_link = {'클리앙':'clien', '딴지일보':'ddan', \
     '루리웹':'ruli', '엠팍':'mlb', '웃대':'HuU', '이토렌트':'eto', '뽐뿌':'ppom', \
     'SLR':'slr', '82cook':'82cook'}
 
+log = ''
 for j in subject:
+    # log 메세지 생성
+    log += '[ %s ]\n' % j
     # 검색 url 불러오기
     with open('links/' + subject[j] + '.json','r') as f:
         url = json.load(f)
@@ -64,8 +67,15 @@ for j in subject:
             ## article 가져오기
             result = F_common.scrapper(s, url[site_link[s]])
             ## DB에 게시글 저장
-            F_common.store_db(subject[j], s, result)
+            article_count = F_common.store_db(subject[j], s, result)
+            log += '-%s: %d개 수집\n' % (s, article_count)
         except:
             pass
+        # 프린트 메시지
+        print('%s - %s 완료' % (j, s))
+    log += '\n'
 
     execute_md(j)
+
+# 게시물 수집 log 텔레그램으로 전송
+F_common.noti_to_telegram(log)

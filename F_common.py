@@ -4,6 +4,7 @@ import pickle
 import json
 import pandas as pd
 import sqlite3
+import requests
 import sys
 import time
 sys.path
@@ -123,6 +124,8 @@ def store_db(subject, site, dataframe):
         conn = sqlite3.connect('db/board.db')
         new_d.to_sql(subject, conn, if_exists='append', index=False)
         conn.close()
+    # 수집한 new 게시글 개수 리턴
+    return(len(new_d))
 
 
 # 함수: 사이트 스크래핑
@@ -243,3 +246,13 @@ def export_sample(df, object):
     from xlsxwriter.utility import xl_rowcol_to_cell
     writer = pd.ExcelWriter('sample_data/sample_' + object + '.xlsx', engine='xlsxwriter')
     df.to_excel(writer, sheet_name='to')
+
+
+# 함수: 텔레그램으로 실행Log 보내기
+def noti_to_telegram(message):
+    # API
+    req_url_me = 'https://api.telegram.org/bot308563113:AAH-7sjqxLbLjnKizO1xj_ZMGXJHCWuWu1k/sendmessage'
+    
+    # 크롤링 결과 발송
+    payload_test = { 'chat_id': '63452203', 'text': message }
+    requests.post(url = req_url_me, data = payload_test)

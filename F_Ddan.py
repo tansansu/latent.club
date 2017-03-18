@@ -62,7 +62,6 @@ def get_article(url):
 
     # 결과 데이터 프레임 생성
     result = pd.DataFrame(a_list)
-    print(result.describe())
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content']
     ## Excepting the particular articles by '펌쟁이'
     result = result[result['member_id'] != '펌쟁이']

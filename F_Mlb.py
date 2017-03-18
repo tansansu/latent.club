@@ -58,7 +58,6 @@ def get_article(url):
         time.sleep(.5)
 
     result = pd.DataFrame(a_list)
-    print(result.describe())
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content']
     result['date_time'] = pd.to_datetime(result['date_time'])
