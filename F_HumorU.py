@@ -1,4 +1,4 @@
-# 2017.02.07
+# 2017.03.20
 
 import time
 import requests
@@ -9,9 +9,9 @@ from datetime import datetime
 from lxml import html
 
 # Session
-def sess():
+def sess(url):
     AGENT = 'Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'
-    REFERER = 'http://www.todayhumor.co.kr/'
+    REFERER = url
     
     s = requests.Session()
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
@@ -22,7 +22,7 @@ def sess():
 def get_article(url):
     base_url = 'http://m.humoruniv.com/board/'
     # Get a html
-    s = sess()
+    s = sess(base_url)
     s_result = s.get(url)
     s_result.encoding = 'euc-kr' # Revising the encoding
     # Extracting articles from the html

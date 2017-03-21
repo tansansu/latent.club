@@ -1,11 +1,8 @@
 # 2017.03.18
 
-import pickle
 import json
-import os
 import sqlite3
 import pandas as pd
-import time
 import sys
 sys.path
 sys.path.insert(0, 'latent_info/')
@@ -25,9 +22,8 @@ def execute_md(subject_key):
     df.sort_values('date_time', ascending=False, inplace=True)
 
     ### 머신러닝 분류
-    if (subject_key == '부동산') | (subject_key == '주식'):
-        df = F_Classifier.predict_Y(df, subject[subject_key])
-        df = df[df['result'] == 'Y']
+    df = F_Classifier.predict_Y(df, subject[subject_key])
+    df = df[df['result'] == 'Y']
     
     ## 중복글 제거(제목)
     df.drop_duplicates('title', keep='first', inplace=True)

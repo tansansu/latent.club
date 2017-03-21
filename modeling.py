@@ -1,4 +1,4 @@
-# 2017.03.15
+# 2017.03.20
 
 from konlpy.tag import Twitter; pos_tagger = Twitter()
 import pandas as pd
@@ -6,15 +6,15 @@ import random
 import re
 
 # Import Training Dataset
-filename = 'sample_stock.xlsx'
+filename = 'sample_tabloid.xlsx'
 directory = '/Users/tansansu/Google Drive/Python/latent_info/sample_data/'
 raw = pd.read_excel(directory + filename)
-raw = raw[raw['result'].notnull()][['title', 'result']]
-raw['result'] = raw['result'].astype(int).astype(str)
-
+raw = raw[['title', 'result']]
+# raw['result'] = raw['result'].astype(int).astype(str)
+raw
 # Data cleansing
-raw.loc[raw['result'] == '1', 'result'] = 'Y'
-raw.loc[(raw['result'] == '0') | (raw['result'].notnull()), 'result'] = 'N'
+raw.loc[raw['result'] == 1, 'result'] = 'Y'
+raw.loc[(raw['result'] == 0) | (raw['result'].isnull()), 'result'] = 'N'
 
 
 # Tokenize
@@ -53,19 +53,19 @@ def term_exists(doc):
 train_xy = [(term_exists(t), r) for t, r in training]
 test_xy = [(term_exists(t), r) for t, r in testing]
 
-
+train_xy
 classifier = nltk.NaiveBayesClassifier.train(train_xy)
 classifier
 # 성능 확인
 print(nltk.classify.accuracy(classifier, train_xy))
 print(nltk.classify.accuracy(classifier, test_xy))
 classifier.show_most_informative_features(20)
-classifier.classify(term_exists(test_words[1]))
+classifier.classify(term_exists(test_words[20]))
 
 # Savting the model
 import pickle
 
-subject = 'stock'
+subject = 'tabloid'
 f = open('db/nb_model_' + subject + '.pickle', 'wb')
 pickle.dump(classifier, f)
 f.close()
