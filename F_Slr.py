@@ -40,7 +40,7 @@ def get_article(url):
     payload = {'search_text':url}
     s_result = s.post(search_url, data=payload)
 
-    soup = BeautifulSoup(s_result.text)
+    soup = BeautifulSoup(s_result.text, 'html.parser')
     articles = soup.findAll('div', attrs={'class':'ItemContent Discussion'})
     # print(articles)
     a_list = []
@@ -56,7 +56,7 @@ def get_article(url):
         date = a.find('time')['datetime']
         # Get a content of the article
         s = sess('http://www.slrclub.com/')
-        con = BeautifulSoup(s.get(article_link).text)
+        con = BeautifulSoup(s.get(article_link).text, 'html.parser')
         member_id = con.find('span', attrs={'class':'lop'})
         # 존재하지 않는 게시물 예외 처리
         if member_id is None:

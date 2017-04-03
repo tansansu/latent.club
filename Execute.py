@@ -8,6 +8,7 @@ sys.path
 sys.path.insert(0, 'latent_info/')
 import F_common
 import F_Classifier
+import datetime
 
 
 # 함수: 게시판 md 파일 생성 작업 실행
@@ -36,7 +37,8 @@ def execute_md(subject_key):
     df_3 = df.iloc[120:180]
 
     ### 각각의 데이터프레임을 3개의 md파일(페이지)로 만들기
-    directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
+    # directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
+    directory = '/home/jar/web/hugo_latent-info/content/' + subject[subject_key]
     F_common.to_md(df_1, subject_key, directory, 1)
     F_common.to_md(df_2, subject_key, directory, 2)
     F_common.to_md(df_3, subject_key, directory, 3)
@@ -51,6 +53,9 @@ site_link = {'클리앙':'clien', '딴지일보':'ddan', \
     'SLR':'slr', '82cook':'82cook'}
 
 log = ''
+# 코드 동작 시간 측정용
+start_time = datetime.datetime.now().replace(microsecond=0)
+
 for j in subject:
     # log 메세지 생성
     log += '[ %s ]\n' % j
@@ -72,6 +77,9 @@ for j in subject:
     log += '\n'
 
     execute_md(j)
+end_time = datetime.datetime.now().replace(microsecond=0)
+# log에 동작 시간 추가
+log += '업데이트 동작 시간: ' + str(end_time - start_time)
 
 # 게시물 수집 log 텔레그램으로 전송
 F_common.noti_to_telegram(log)

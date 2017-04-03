@@ -38,7 +38,7 @@ def get_article(url):
     payload = {'search_text':url}
     s_result = s.post(search_url, data=payload)
     
-    soup = BeautifulSoup(s_result.text)
+    soup = BeautifulSoup(s_result.text, 'html.parser')
     articles = soup.findAll('div', attrs={'class':'ItemContent Discussion'})
     
     a_list = []
