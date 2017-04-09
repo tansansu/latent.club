@@ -1,4 +1,4 @@
-# 2017.03.18
+ # 2017.04.09
 
 import json
 import sqlite3
@@ -15,12 +15,15 @@ import datetime
 def execute_md(subject_key):
     ## md파일 생성
     ### db파일에서 게시글 리스트 추출
+    count = '300'
+    if (subject_key == '경제') | (subject_key == '찌라시'):
+        count = '700'
     with sqlite3.connect('db/board.db') as conn:
         query = 'select site, title, article_link, date_time from ' + subject[subject_key] + \
-        ' order by date_time desc limit 400;'
+        ' order by date_time desc limit ' + count + ';'
         df = pd.read_sql_query(query, conn)
     ### 날짜/시간 역순으로 ordering
-    df.sort_values('date_time', ascending=False, inplace=True)
+    # df.sort_values('date_time', ascending=False, inplace=True)
 
     ### 머신러닝 분류
     df = F_Classifier.predict_Y(df, subject[subject_key])

@@ -244,7 +244,7 @@ def add_keyword(subject, word):
 # 함수: 머신러닝 학습용 샘플데이터 저장
 def export_sample(df, object):
     from xlsxwriter.utility import xl_rowcol_to_cell
-    writer = pd.ExcelWriter('sample_data/sample_' + object + '.xlsx', engine='xlsxwriter')
+    writer = pd.ExcelWriter('sample_data/sample_' + object + '_tmp.xlsx', engine='xlsxwriter')
     df.to_excel(writer, sheet_name='to')
 
 

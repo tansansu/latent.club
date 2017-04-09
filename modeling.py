@@ -1,17 +1,21 @@
-# 2017.03.20
+# 2017.04.08
 
 from konlpy.tag import Twitter; pos_tagger = Twitter()
 import pandas as pd
 import random
 import re
 
+# Choose the subject
+subject = 'economy'
+
 # Import Training Dataset
-filename = 'sample_tabloid.xlsx'
+filename = 'sample_' + subject + '.xlsx'
+filename
 directory = '/Users/tansansu/Google Drive/Python/latent_info/sample_data/'
 raw = pd.read_excel(directory + filename)
 raw = raw[['title', 'result']]
 # raw['result'] = raw['result'].astype(int).astype(str)
-raw
+raw.head()
 # Data cleansing
 raw.loc[raw['result'] == 1, 'result'] = 'Y'
 raw.loc[(raw['result'] == 0) | (raw['result'].isnull()), 'result'] = 'N'
@@ -43,33 +47,37 @@ test_tokens = [t for l in test_words for t in l if t]
 training = [(t, r) for t, r in zip(train_words, train_result)]
 testing = [(t, r) for t, r in zip(test_words, train_result)]
 
-training
 import nltk
 text = nltk.Text(train_tokens, name='NMSC')
+len(text.vocab())
+len(set(text))
+selected_word = [w for w in text.vocab()]
 
 def term_exists(doc):
- return {'exists({})'.format(word): (word in set(doc)) for word in text.vocab().keys()}
+    return {'exists({})'.format(word): (word in set(doc)) for word in selected_word}
 
 train_xy = [(term_exists(t), r) for t, r in training]
 test_xy = [(term_exists(t), r) for t, r in testing]
 
-train_xy
 classifier = nltk.NaiveBayesClassifier.train(train_xy)
 classifier
 # 성능 확인
 print(nltk.classify.accuracy(classifier, train_xy))
 print(nltk.classify.accuracy(classifier, test_xy))
 classifier.show_most_informative_features(20)
-classifier.classify(term_exists(test_words[20]))
+# classifier.classify(term_exists(test_words[20]))
 
 # Savting the model
 import pickle
 
-subject = 'tabloid'
-f = open('db/nb_model_' + subject + '.pickle', 'wb')
-pickle.dump(classifier, f)
-f.close()
+def export_model(subject):
+    f = open('db/nb_model_' + subject + '.pickle', 'wb')
+    pickle.dump(classifier, f)
+    f.close()
 
-with open('db/nb_text_' + subject + '.pickle', 'wb') as f:
-    pickle.dump(text, f)
+    with open('db/nb_text_' + subject + '.pickle', 'wb') as f:
+        pickle.dump(text, f)
+
+
+export_model(subject)
 
