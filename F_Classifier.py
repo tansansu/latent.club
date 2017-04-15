@@ -24,7 +24,6 @@ def term_exists(text, doc):
 
 def predict_Y(dataframe, subject):
     words = dataframe['title'].apply(tokenizer).tolist()
-    
     # loading the model & text sets
     with open('db/nb_model_'+ subject +'.pickle', 'rb') as f:
         model = pickle.load(f)
@@ -32,10 +31,8 @@ def predict_Y(dataframe, subject):
         text = pickle.load(f)
         
     # Prediction
-    dataframe['result'] = ''
-    for i in range(len(words)):
-        dataframe.loc[i, 'result'] = model.classify(term_exists(text, words[i]))
-    
+    print(dataframe.info())
+    dataframe['result'] = [model.classify(term_exists(text, word)) for word in words]
     return(dataframe)
-    
+
     

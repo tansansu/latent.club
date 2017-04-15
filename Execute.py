@@ -1,4 +1,4 @@
- # 2017.04.09
+ # 2017.04.14
 
 import json
 import sqlite3
@@ -15,24 +15,12 @@ import datetime
 def execute_md(subject_key):
     ## md파일 생성
     ### db파일에서 게시글 리스트 추출
-    count = '300'
-    if (subject_key == '경제') | (subject_key == '찌라시'):
-        count = '700'
     with sqlite3.connect('db/board.db') as conn:
         query = 'select site, title, article_link, date_time from ' + subject[subject_key] + \
-        ' order by date_time desc limit ' + count + ';'
+        ' where result = "Y" order by date_time desc limit 185;'
         df = pd.read_sql_query(query, conn)
-    ### 날짜/시간 역순으로 ordering
-    # df.sort_values('date_time', ascending=False, inplace=True)
-
-    ### 머신러닝 분류
-    df = F_Classifier.predict_Y(df, subject[subject_key])
-    df = df[df['result'] == 'Y']
-    
     ## 중복글 제거(제목)
     df.drop_duplicates('title', keep='first', inplace=True)
-    ## 19금 글 제거
-    df = df[~df['title'].str.contains('19')]
 
     ### 데이터 프레임을 3개 페이지로 나누기
     df_1 = df.iloc[:60]
@@ -68,13 +56,19 @@ for j in subject:
     
     for s in site_link:
         try:
+            print(j + s)
             ## article 가져오기
             result = F_common.scrapper(s, url[site_link[s]])
+            print(result.shape)
+            ## 19금 글 제거
+            result = result[~result['title'].str.contains('19')]
+            ### 머신러닝 분류
+            result = F_Classifier.predict_Y(result, subject[j])
             ## DB에 게시글 저장
             article_count = F_common.store_db(subject[j], s, result)
             log += '-%s: %d개 수집\n' % (s, article_count)
-        except:
-            pass
+        except Exception as e:
+            print(e)
         # 프린트 메시지
         print('%s - %s 완료' % (j, s))
     log += '\n'
