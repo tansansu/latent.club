@@ -21,7 +21,7 @@ def get_article(url):
     soup = BeautifulSoup(s_result.text, 'html.parser')
 
     title = soup.find_all('span', {'class':'link_hover'})
-    if len(soup) == 0:
+    if len(title) == 0:
         return(pd.DataFrame())
     user_id = soup.find_all('span', {'class':'hu_nick_txt'})
     link_temp = soup.find_all('a', {'class':'list_body_href'})
