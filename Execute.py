@@ -6,9 +6,11 @@ import pandas as pd
 import sys
 sys.path
 sys.path.insert(0, 'latent_info/')
+sys.path.append('/home/jar/Codes/Telegram_Bot/')
 import F_common
 import F_Classifier
 import datetime
+from TelegramBot import TelegramBot
 
 
 # 함수: 게시판 md 파일 생성 작업 실행
@@ -33,7 +35,6 @@ def execute_md(subject_key):
     F_common.to_md(df_1, subject_key, directory, 1)
     F_common.to_md(df_2, subject_key, directory, 2)
     F_common.to_md(df_3, subject_key, directory, 3)
-
 
 
 # 콘텐츠 업데이트
@@ -79,4 +80,4 @@ end_time = datetime.datetime.now().replace(microsecond=0)
 log += '업데이트 동작 시간: ' + str(end_time - start_time)
 
 # 게시물 수집 log 텔레그램으로 전송
-F_common.noti_to_telegram(log)
+TelegramBot().log_to_me(log)

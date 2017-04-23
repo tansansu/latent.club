@@ -1,4 +1,4 @@
-# 2017.03.23
+# 2017.04.23
 
 import pickle
 import json
@@ -246,13 +246,3 @@ def export_sample(df, object):
     from xlsxwriter.utility import xl_rowcol_to_cell
     writer = pd.ExcelWriter('sample_data/sample_' + object + '_tmp.xlsx', engine='xlsxwriter')
     df.to_excel(writer, sheet_name='to')
-
-
-# 함수: 텔레그램으로 실행Log 보내기
-def noti_to_telegram(message):
-    # API
-    req_url_me = 'https://api.telegram.org/bot308563113:AAH-7sjqxLbLjnKizO1xj_ZMGXJHCWuWu1k/sendmessage'
-    
-    # 크롤링 결과 발송
-    payload_test = { 'chat_id': '63452203', 'text': message }
-    requests.post(url = req_url_me, data = payload_test)
