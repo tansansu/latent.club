@@ -1,4 +1,4 @@
- # 2017.04.14
+ # 2017.04.23
 
 import json
 import sqlite3
@@ -7,7 +7,7 @@ import sys
 sys.path
 sys.path.insert(0, 'latent_info/')
 sys.path.append('/home/jar/Codes/Telegram_Bot/')
-import F_common
+import F_common 
 import F_Classifier
 import datetime
 from TelegramBot import TelegramBot
