@@ -1,4 +1,4 @@
-# 2017.04.23
+# 2017.04.30
 
 import pickle
 import json
@@ -211,6 +211,7 @@ def add_keyword(subject, word):
     mlb_pad_2 = '&x=0&y=0'
     ruli_pad = 'http://m.ruliweb.com/community/board/300148?search_type=subject_content&search_key='
     humor_pad = 'http://m.humoruniv.com/board/list.html?table=pdswait&st=subject&searchday=1year&sk='
+    ppom_pad = 'http://m.ppomppu.co.kr/new/bbs_list.php?id=freeboard&category=&search_type=sub_memo&keyword='
 
     b_word = word.encode('utf-8')
     import re
@@ -230,7 +231,7 @@ def add_keyword(subject, word):
     url['ddan'][word] = ddan_pad_1 + b_word + ddan_pad_2
     url['eto'][word] = eto_pad_1 + b_word + eto_pad_2
     url['mlb'][word] = mlb_pad_1 + b_word + mlb_pad_2
-    url['ppom'][word] = b_word
+    url['ppom'][word] = ppom_pad + b_word
     url['ruli'][word] = ruli_pad + b_word
     url['slr'][word] = b_word
     print(url)

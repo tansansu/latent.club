@@ -1,4 +1,4 @@
-# 2017.03.07
+# 2017.04.30
 
 import time
 import requests
@@ -50,7 +50,7 @@ def get_article(url):
         try:
             article_link = a.find('div', attrs={'class':'Title'}).find('a')['href']
         except:
-            return(pd.DataFrame())
+            continue
         # print(article_link)
         article_id = re.search(r'(\d{8})', article_link).group()
         date = a.find('time')['datetime']

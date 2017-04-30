@@ -1,8 +1,7 @@
-# 2017.03.07
+# 2017.04.30
 
 import time
-import requests
-import urllib
+from urllib.request import urlopen
 import re
 import pandas as pd
 from datetime import datetime
@@ -10,52 +9,33 @@ from lxml import html
 from bs4 import BeautifulSoup
 
 
-# cleansing a article title
-def mod_title(char):
-    result = char.replace('\r', '').replace('\n', '').replace('\t', '')
-    # Removing a number of replies
-    result = re.sub(r"\[[0-9]+\]", '', result)
-    return(result)
-
-
-# Session
-def sess(url):
-    AGENT = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
-    REFERER = url
-
-    s = requests.Session()
-    s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
-    return(s)
-
-
 # 게시글 수집
 def get_article(url):
-    base_url = 'http://starboard.kr/ppomppu'
-    search_url = 'http://starboard.kr/conn/board/search'
+    # url
+    base_url = 'http://m.ppomppu.co.kr/new/'
     # Get a html
-    s = sess('http://starboard.kr/')
-    base = s.get(base_url)
-    # s_result.encoding = 'euc-kr' # Revising the encoding
-    # Extracting articles from the html
-    payload = {'search_text':url}
-    s_result = s.post(search_url, data=payload)
-
-    soup = BeautifulSoup(s_result.text, 'html.parser')
-    articles = soup.findAll('div', attrs={'class':'ItemContent Discussion'})
-
+    resp = urlopen(url)
+    soup = BeautifulSoup(resp, 'html.parser')
+    articles = soup.findAll('ul', {'class':'bbsList'})[0].findAll('li')
+    # Return empty dataframe if no articles
+    if len(articles) == 0:
+        return(pd.DataFrame())
+    print(len(articles))
     a_list = []
     for a in articles:
         l = []
-        title = mod_title(a.find('div', attrs={'class':'Title'}).find('a').text)
-        user_id = ''
-        try:
-            article_link = a.find('div', attrs={'class':'Title'}).find('a')['href']
+        try: # 삭제된 게시물은 링크가 안남아서 에러가 생김
+            article_link = a.find('a', attrs={'class':'noeffect'})['href']
+            article_link = base_url + article_link
         except:
-            return(pd.DataFrame())
-        # print(article_link)
+            continue
+        title = a.find('strong').text
+        user_id = a.find('span', {'class':'ct'}).text
         article_id = re.search(r'(\d{7})', article_link).group()
-        date = a.find('time')['datetime']
-        content = ''
+        # scrapping a date, a time and a content
+        cont = BeautifulSoup(urlopen(article_link), 'html.parser')
+        date = cont.find('span', {'class':'hi'}).text.replace('  | ', '')
+        content = cont.find('div', {'class':'cont'}).text
         # Making the list
         l.append(title)
         l.append(date)
