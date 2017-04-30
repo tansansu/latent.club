@@ -52,8 +52,7 @@ def to_md(dataframe, category, directory, page_num):
     for i in range(len(dataframe)):
         # 제목 줄 생성
         con_title = "<td><a href='" + dataframe.iloc[i]['article_link'] + "'>" + \
-        "<font color='dimgray'>" + \
-        dataframe.iloc[i]['title'] + "</font></a></td></tr>\n"
+        dataframe.iloc[i]['title'] + "</a></td></tr>\n"
         # 제목 줄에 html 코드 추가
         content += html_title + con_title
         # 사이트명, 날짜_시간 정보 줄 생성
