@@ -42,6 +42,9 @@ def get_article(url):
 
     soup = BeautifulSoup(s_result.text, 'html.parser')
     articles = soup.findAll('div', attrs={'class':'ItemContent Discussion'})
+    if len(articles) == 0:
+        return(pd.DataFrame())
+        
     # print(articles)
     a_list = []
     for a in articles:
@@ -68,7 +71,6 @@ def get_article(url):
             content = ''
         else:
             content = con.find('div', attrs={'id':'userct'}).text
-
 
         # Making the list
         l.append(title)

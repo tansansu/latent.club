@@ -1,4 +1,4 @@
- # 2017.04.23
+ # 2017.05.07
 
 import json
 import sqlite3
@@ -37,12 +37,9 @@ def execute_md(subject_key):
     F_common.to_md(df_3, subject_key, directory, 3)
 
 
-# 콘텐츠 업데이트
+# 기준 정보
 subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', '경제':'economy'}
-
-site_link = {'클리앙':'clien', '딴지일보':'ddan', \
-    '루리웹':'ruli', '엠팍':'mlb', '웃대':'HuU', '이토렌트':'eto', '뽐뿌':'ppom', \
-    'SLR':'slr', '82cook':'82cook'}
+site = ['클리앙', '딴지일보', '루리웹', '엠팍', '웃대', '이토렌트', '뽐뿌', 'SLR', '82cook']
 
 log = ''
 # 코드 동작 시간 측정용
@@ -55,25 +52,28 @@ for j in subject:
     with open('links/' + subject[j] + '.json','r') as f:
         url = json.load(f)
     
-    for s in site_link:
+    for s in site:
         try:
             print(j + ' | ' + s)
             ## article 가져오기
             result = F_common.scrapper(s, url)
             print(result.shape)
-            ## 19금 글 제거
-            result = result[~result['title'].str.contains('19')]
-            ### 머신러닝 분류
-            result = F_Classifier.predict_Y(result, subject[j])
-            ## DB에 게시글 저장
-            article_count = F_common.store_db(subject[j], s, result)
+            if result.shape[0] >= 1:
+                ## 19금 글 제거
+                result = result[~result['title'].str.contains('19')]
+                ### 머신러닝 분류
+                result = F_Classifier.predict_Y(result, subject[j])
+                ## DB에 게시글 저장
+                article_count = F_common.store_db(subject[j], s, result)
+            else:
+                article_count = 0
             log += '-%s: %d개 수집\n' % (s, article_count)
         except Exception as e:
             print(e)
         # 프린트 메시지
         print('%s - %s 완료' % (j, s))
     log += '\n'
-
+    # md 파일 생성
     execute_md(j)
 end_time = datetime.now().replace(microsecond=0)
 # log에 동작 시간 추가

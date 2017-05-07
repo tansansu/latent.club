@@ -9,6 +9,18 @@ from datetime import datetime
 from lxml import html
 
 
+# Modifing user_ids
+def mod_user_id(char):
+    result = char.replace(" ", '').replace('\r', '').replace('\n', '').replace('\t', '')
+    return(result)
+
+
+def mod_date(char):
+    result = re.search(r'(\d{4}.{15})', char).group()
+    result = result.replace(".", '-').replace('(', ' ')
+    return(result)
+
+
 # 게시글 수집
 def get_article(url):
     # Get a html
@@ -51,14 +63,3 @@ def get_article(url):
 
     return(result)
 
-
-# Modifing user_ids
-def mod_user_id(char):
-    result = char.replace(" ", '').replace('\r', '').replace('\n', '').replace('\t', '')
-    return(result)
-
-
-def mod_date(char):
-    result = re.search(r'(\d{4}.{15})', char).group()
-    result = result.replace(".", '-').replace('(', ' ')
-    return(result)

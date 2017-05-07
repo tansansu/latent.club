@@ -20,7 +20,6 @@ def get_article(url):
     # Return empty dataframe if no articles
     if len(articles) == 0:
         return(pd.DataFrame())
-    print(len(articles))
     a_list = []
     for a in articles:
         l = []

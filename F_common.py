@@ -118,13 +118,15 @@ def compare_article(category, site, dataframe):
 def store_db(subject, site, dataframe):
     # 수집한 게시물이 db에 이미 있는 것인지 비교
     new_d = compare_article(subject, site, dataframe)
-    if len(dataframe) != 0:
+    # 수집한 new 게시글
+    article_count = new_d.shape[0]
+    if article_count >= 1:
         ## 신규 자료는 DB에 저장
         conn = sqlite3.connect('db/board.db')
         new_d.to_sql(subject, conn, if_exists='append', index=False)
         conn.close()
     # 수집한 new 게시글 개수 리턴
-    return(len(new_d))
+    return(article_count)
 
 
 # 함수: 사이트 스크래핑
@@ -142,6 +144,8 @@ def scrapper(site, urls):
     if site == '클리앙':
         for u in keywords:
             temp = F_Clien.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             # 1초 지연
@@ -150,6 +154,8 @@ def scrapper(site, urls):
     elif site == '딴지일보':
         for u in keywords:
             temp = F_Ddan.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
@@ -157,6 +163,8 @@ def scrapper(site, urls):
     elif site == '루리웹':
         for u in keywords:
             temp = F_Ruli.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
@@ -164,6 +172,8 @@ def scrapper(site, urls):
     elif site == '엠팍':
         for u in keywords:
             temp = F_Mlb.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
@@ -171,6 +181,8 @@ def scrapper(site, urls):
     elif site == '웃대':
         for u in keywords:
             temp = F_HumorU.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
@@ -178,6 +190,8 @@ def scrapper(site, urls):
     elif site == '이토렌트':
         for u in keywords:
             temp = F_Etorrent.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
@@ -185,6 +199,8 @@ def scrapper(site, urls):
     elif site == '뽐뿌':
         for u in keywords:
             temp = F_Ppom.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
@@ -192,6 +208,8 @@ def scrapper(site, urls):
     elif site == 'SLR':
         for u in keywords:
             temp = F_Slr.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
@@ -199,6 +217,8 @@ def scrapper(site, urls):
     elif site == '82cook':
         for u in keywords:
             temp = F_82cook.get_article(url[u])
+            if temp.shape[0] == 0:
+                continue
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
@@ -256,7 +276,6 @@ def add_keyword(subject=None, site=None, word=None):
         url['slr'][word] = b_word
     
     print(url)
-
     # url json 파일 저장하기
     with open('links/' + subject + '.json','w') as f:
         json.dump(url, f)
