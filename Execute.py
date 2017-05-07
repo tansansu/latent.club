@@ -59,18 +59,18 @@ for j in subject:
             result = F_common.scrapper(s, url)
             print(result.shape)
             if result.shape[0] >= 1:
-                ## 19금 글 제거
+                ### 19금 글 제거
                 result = result[~result['title'].str.contains('19')]
                 ### 머신러닝 분류
                 result = F_Classifier.predict_Y(result, subject[j])
-                ## DB에 게시글 저장
+                ### DB에 게시글 저장
                 article_count = F_common.store_db(subject[j], s, result)
             else:
                 article_count = 0
             log += '-%s: %d개 수집\n' % (s, article_count)
         except Exception as e:
             print(e)
-        # 프린트 메시지
+        ## 프린트 메시지
         print('%s - %s 완료' % (j, s))
     log += '\n'
     # md 파일 생성
