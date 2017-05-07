@@ -128,11 +128,19 @@ def store_db(subject, site, dataframe):
 
 
 # 함수: 사이트 스크래핑
-def scrapper(site, url):
-    ## 결과로 리턴할 데이터프레임 생성
+def scrapper(site, urls):
+    # 콘텐츠 사이트
+    site_link = {'클리앙':'clien', '딴지일보':'ddan', \
+    '루리웹':'ruli', '엠팍':'mlb', '웃대':'HuU', '이토렌트':'eto', '뽐뿌':'ppom', \
+    'SLR':'slr', '82cook':'82cook'}
+    # URL 리스트
+    url = urls[site_link[site]]
+    # 검색어 리스트
+    keywords = [x for x in url.keys()]
+    # 결과로 리턴할 데이터프레임 생성
     result = pd.DataFrame()
     if site == '클리앙':
-        for u in url:
+        for u in keywords:
             temp = F_Clien.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
@@ -140,56 +148,56 @@ def scrapper(site, url):
             time.sleep(1)
         result['site'] = site
     elif site == '딴지일보':
-        for u in url:
+        for u in keywords:
             temp = F_Ddan.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
         result['site'] = site
     elif site == '루리웹':
-        for u in url:
+        for u in keywords:
             temp = F_Ruli.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
         result['site'] = site
     elif site == '엠팍':
-        for u in url:
+        for u in keywords:
             temp = F_Mlb.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
         result['site'] = site
     elif site == '웃대':
-        for u in url:
+        for u in keywords:
             temp = F_HumorU.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
         result['site'] = site
     elif site == '이토렌트':
-        for u in url:
+        for u in keywords:
             temp = F_Etorrent.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
         result['site'] = site
     elif site == '뽐뿌':
-        for u in url:
+        for u in keywords:
             temp = F_Ppom.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
         result['site'] = site
     elif site == 'SLR':
-        for u in url:
+        for u in keywords:
             temp = F_Slr.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
             time.sleep(1)
         result['site'] = site
     elif site == '82cook':
-        for u in url:
+        for u in keywords:
             temp = F_82cook.get_article(url[u])
             temp['keyword'] = u
             result = result.append(temp)
@@ -200,9 +208,10 @@ def scrapper(site, url):
 
 
 # 함수: 검색 url에 키워드 추가
-def add_keyword(subject, word):
+def add_keyword(subject=None, site=None, word=None):
     # 사이트별 추가할 url 패딩 캐릭터
-    clien_pad = 'http://m.clien.net/cs3/board?bo_table=park&bo_style=lists&sca=&sfl=wr_subject_content&stx='
+    clien_pad_1 = 'https://www.clien.net/service/search?q='
+    clien_pad_2 = '&sort=recency&boardCd=park&boardName=%EB%AA%A8%EB%91%90%EC%9D%98%EA%B3%B5%EC%9B%90'
     ddan_pad_1 = 'http://www.ddanzi.com/index.php?mid=free&act=IS&search_target=all&is_keyword='
     ddan_pad_2 =  '&m=1'
     eto_pad_1 = 'http://etorrent.co.kr/plugin/mobile/board.php?bo_table=eboard&sca=&sfl=wr_subject%7C%7Cwr_content&stx='
@@ -223,17 +232,29 @@ def add_keyword(subject, word):
     # 저장된 url json 파일 열기
     with open('links/' + subject + '.json','r') as f:
         url = json.load(f)
+    # 특정 사이트의 url만 수정 케이스
+    if site is not None:
+        if site in ['ruli', 'humor', 'ppom']:
+            pad = locals()[site + '_pad']
+            url[site][word] = pad + b_word
+        elif site in ['82cook', 'slr']:
+            url[site][word] = b_word
+        else:
+            pad_1 = locals()[site + '_pad_1']
+            pad_2 = locals()[site + '_pad_2']
+            url[site][word] = pad_1 + b_word + pad_2
+    else:
+        # 전체 사이트에 키워드 검색 url 추가하기
+        url['82cook'][word] = b_word
+        url['HuU'][word] = humor_pad + b_word
+        url['clien'][word] = clien_pad_1 + b_word + clien_pad_2
+        url['ddan'][word] = ddan_pad_1 + b_word + ddan_pad_2
+        url['eto'][word] = eto_pad_1 + b_word + eto_pad_2
+        url['mlb'][word] = mlb_pad_1 + b_word + mlb_pad_2
+        url['ppom'][word] = ppom_pad + b_word
+        url['ruli'][word] = ruli_pad + b_word
+        url['slr'][word] = b_word
     
-    # 사이트에 키워드 검색 url 추가하기
-    url['82cook'][word] = b_word
-    url['HuU'][word] = humor_pad + b_word
-    url['clien'][word] = clien_pad + b_word
-    url['ddan'][word] = ddan_pad_1 + b_word + ddan_pad_2
-    url['eto'][word] = eto_pad_1 + b_word + eto_pad_2
-    url['mlb'][word] = mlb_pad_1 + b_word + mlb_pad_2
-    url['ppom'][word] = ppom_pad + b_word
-    url['ruli'][word] = ruli_pad + b_word
-    url['slr'][word] = b_word
     print(url)
 
     # url json 파일 저장하기

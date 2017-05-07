@@ -1,55 +1,38 @@
 # 2017.02.01
 
 import time
-import requests
-import urllib
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
 import re
 import pandas as pd
 from datetime import datetime
 from lxml import html
 
-# Session
-def sess():
-    AGENT = 'Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'
-    REFERER = 'http://m.ruliweb.com'
-
-    s = requests.Session()
-    s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
-    return(s)
-
 
 # 게시글 수집
 def get_article(url):
     # Get a html
-    s = sess()
-    s_result = s.get(url)
-
+    url = 'http://m.ruliweb.com/community/board/300148?search_type=subject_content&search_key=%EC%A6%9D%EA%B6%8C%EA%B0%80'
+    soup = BeautifulSoup(urlopen(url), 'html.parser')
     # Extracting articles from the html
-    elem = html.fromstring(s_result.text)
-    articles = elem.cssselect('tr.table_body')
-    articles = articles[2:]
-    if len(articles) == 0:
+    articles = soup.findAll('tr', {'class':'table_body'})[4:]
+    noti = articles[0].find('strong').text
+    if noti == '결과없음':
         return(pd.DataFrame())
-        
+
+    # Extracting elements from articles
     a_list = []
     for a in articles:
         l = []
-        title = a.cssselect('td.subject')[0].cssselect('div')[0].cssselect('a')[1].text_content()
-        user_id = a.cssselect('td.subject')[0].cssselect('div')[1].cssselect('span')[0].text_content()
-        user_id = mod_user_id(user_id)
-        article_link = a.cssselect('td.subject')[0].cssselect('div')[0].cssselect('a')[1].get('href').strip()
+        title = a.findAll('a', {'class':'subject_link'})[0].text
+        user_id = mod_user_id(a.findAll('span', {'class':'writer'})[0].text)
+        article_link = a.findAll('a', {'class':'subject_link'})[0].get('href')
         # print(article_link)
         article_id = re.search(r'(\d{8})', article_link).group()
         # Gathering the cotent of each article
-        con = s.get(article_link)
-        temp = html.fromstring(con.text)
-        date = temp.cssselect('div.info_wrapper')[0].cssselect('span')[4].\
-        cssselect('span')[0].text_content()
-        date = mod_user_id(date)
-        date = mod_date(date)
-        content = temp.cssselect('div.board_main_view')[0].cssselect('div.view_content')[0].\
-        cssselect('div.row')[0].text_content()
-
+        con = BeautifulSoup(urlopen(article_link), 'html.parser')
+        date = mod_date(mod_user_id(con.find('span', {'class':'regdate'}).text))
+        content = ''
         # Making the list
         l.append(title)
         l.append(date)

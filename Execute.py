@@ -9,7 +9,7 @@ sys.path.insert(0, 'latent_info/')
 sys.path.append('/home/jar/Codes/Telegram_Bot/')
 import F_common 
 import F_Classifier
-import datetime
+from datetime import datetime
 from TelegramBot import TelegramBot
 
 
@@ -46,7 +46,7 @@ site_link = {'클리앙':'clien', '딴지일보':'ddan', \
 
 log = ''
 # 코드 동작 시간 측정용
-start_time = datetime.datetime.now().replace(microsecond=0)
+start_time = datetime.now().replace(microsecond=0)
 
 for j in subject:
     # log 메세지 생성
@@ -57,9 +57,9 @@ for j in subject:
     
     for s in site_link:
         try:
-            print(j + s)
+            print(j + ' | ' + s)
             ## article 가져오기
-            result = F_common.scrapper(s, url[site_link[s]])
+            result = F_common.scrapper(s, url)
             print(result.shape)
             ## 19금 글 제거
             result = result[~result['title'].str.contains('19')]
@@ -75,7 +75,7 @@ for j in subject:
     log += '\n'
 
     execute_md(j)
-end_time = datetime.datetime.now().replace(microsecond=0)
+end_time = datetime.now().replace(microsecond=0)
 # log에 동작 시간 추가
 log += '업데이트 동작 시간: ' + str(end_time - start_time)
 
