@@ -24,7 +24,6 @@ def mod_date(char):
 # 게시글 수집
 def get_article(url):
     # Get a html
-    url = 'http://m.ruliweb.com/community/board/300148?search_type=subject_content&search_key=%EC%A6%9D%EA%B6%8C%EA%B0%80'
     soup = BeautifulSoup(urlopen(url), 'html.parser')
     # Extracting articles from the html
     articles = soup.findAll('tr', {'class':'table_body'})[4:]

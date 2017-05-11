@@ -1,4 +1,4 @@
-# 2017.04.30
+# 2017.05.10
 
 import pickle
 import json
@@ -56,9 +56,10 @@ def to_md(dataframe, category, directory, page_num):
         # 제목 줄에 html 코드 추가
         content += html_title + con_title
         # 사이트명, 날짜_시간 정보 줄 생성
+        ## 날짜 정보 수정
         con_info = "<td><font color='" + site_col[dataframe.iloc[i]['site']] + "'><b>" + \
         dataframe.iloc[i]['site'] + \
-        "</b></font>&nbsp;&nbsp;&nbsp;" + dataframe.iloc[i]['date_time'] + "</td></tr>\n"
+        "</b></font>&nbsp;&nbsp;&nbsp;" + dataframe.iloc[i]['date_time'][:-3] + "</td></tr>\n"
         # 정보 줄에 html 코드 삽입
         content += html_info + con_info
 
