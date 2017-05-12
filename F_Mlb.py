@@ -1,4 +1,4 @@
-# 2017.02.04
+# 2017.05.13
 
 import time
 import requests
@@ -45,7 +45,7 @@ def get_article(url):
         temp = html.fromstring(con.text)
         date = temp.cssselect('ul.view_head')[0].cssselect('span.val')[3].text_content()
         #date = mod_user_id(date)
-        content = temp.cssselect('div.ar_txt')[0].text_content()
+        content = ''
 
         # Making the list
         l.append(title)

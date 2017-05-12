@@ -1,4 +1,4 @@
-# 2017.04.30
+# 2017.05.13
 
 import time
 from urllib.request import urlopen
@@ -34,7 +34,7 @@ def get_article(url):
         # scrapping a date, a time and a content
         cont = BeautifulSoup(urlopen(article_link), 'html.parser')
         date = cont.find('span', {'class':'hi'}).text.replace('  | ', '')
-        content = cont.find('div', {'class':'cont'}).text
+        content = ''
         # Making the list
         l.append(title)
         l.append(date)

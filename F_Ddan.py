@@ -1,4 +1,4 @@
-# 2017.01.30
+# 2017.05.13
 
 import time
 import requests
@@ -42,14 +42,9 @@ def get_article(url):
         article_id = re.search(r'(\d{9})', article_link).group()
         date = a.cssselect('address')[0].cssselect('span')[0].text_content()
         # 게시글 제목 클릭해서 내용 html 수집
-        con = s.get(article_link)
-        temp = html.fromstring(con.text)
-        # 수집 내용 없을 경우 pass
-        try:
-            content = temp.cssselect('div.content')[0].cssselect('div.bd')[0].\
-            cssselect('div.co')[0].text_content()
-        except:
-            content = a.cssselect('dl')[0].cssselect('dd')[0].text_content()
+        #con = s.get(article_link)
+        #temp = html.fromstring(con.text)
+        content = ''
         # 추출항목 리스트로 생성
         l.append(title)
         l.append(date)

@@ -1,4 +1,4 @@
-# 2017.02.11
+# 2017.05.13
 
 import time
 import requests
@@ -59,8 +59,11 @@ def get_article(url):
         # con.encoding = 'euc-kr'
         temp = html.fromstring(con.text)
         try:
+            '''
             content = temp.cssselect('td.mw_basic_view_content')[0].\
             cssselect('div[id="view_content"]')[0].text_content()
+            '''
+            content = ''
             date = mod_date(temp.cssselect('span.mw_basic_view_datetime')[0].text_content())
         except:
             continue
