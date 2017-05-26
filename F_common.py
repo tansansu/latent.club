@@ -260,7 +260,7 @@ def add_keyword(subject=None, site=None, word=None):
             url[site][word] = pad + b_word
         elif site in ['82cook', 'slr']:
             url[site][word] = b_word
-        else:
+        elif site != 'eto':
             pad_1 = locals()[site + '_pad_1']
             pad_2 = locals()[site + '_pad_2']
             url[site][word] = pad_1 + b_word + pad_2
@@ -270,7 +270,7 @@ def add_keyword(subject=None, site=None, word=None):
         url['HuU'][word] = humor_pad + b_word
         url['clien'][word] = clien_pad_1 + b_word + clien_pad_2
         url['ddan'][word] = ddan_pad_1 + b_word + ddan_pad_2
-        url['eto'][word] = eto_pad_1 + b_word + eto_pad_2
+        # url['eto'][word] = eto_pad_1 + b_word + eto_pad_2
         url['mlb'][word] = mlb_pad_1 + b_word + mlb_pad_2
         url['ppom'][word] = ppom_pad + b_word
         url['ruli'][word] = ruli_pad + b_word

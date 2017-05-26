@@ -20,13 +20,17 @@ def mod_date(char):
     result = result.replace(".", '-').replace('(', ' ')
     return(result)
 
-
+re.compile('subject_link.*')
 # 게시글 수집
 def get_article(url):
     # Get a html
     soup = BeautifulSoup(urlopen(url), 'html.parser')
     # Extracting articles from the html
-    articles = soup.findAll('tr', {'class':'table_body'})[4:]
+    articles = soup.findAll('tr', {'class':'table_body'})[1:] # 맨 첫글 공지 제외
+    # 유동적인 상단 공지글 제외(strong 태그) 
+    articles = [a for a in articles \
+    if str(a.find('a', {'class':re.compile(r'subject_link')})).__contains__('strong') == False]
+
     noti = articles[0].find('strong').text
     if noti == '결과없음':
         return(pd.DataFrame())
@@ -36,6 +40,7 @@ def get_article(url):
     for a in articles:
         l = []
         title = a.findAll('a', {'class':'subject_link'})[0].text
+        title
         user_id = mod_user_id(a.findAll('span', {'class':'writer'})[0].text)
         article_link = a.findAll('a', {'class':'subject_link'})[0].get('href')
         # print(article_link)
