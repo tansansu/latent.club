@@ -6,7 +6,7 @@ import pandas as pd
 import sys
 sys.path
 sys.path.insert(0, 'latent_info/')
-sys.path.append('/home/jar/Codes/Telegram_Bot/')
+sys.path.append('/home/ubuntu/Codes/Crawler/Telegram_Bot/')
 import F_common 
 import F_Classifier
 from datetime import datetime
@@ -31,7 +31,7 @@ def execute_md(subject_key):
 
     ### 각각의 데이터프레임을 3개의 md파일(페이지)로 만들기
     # directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
-    directory = '/home/jar/web/hugo_latent-info/content/' + subject[subject_key]
+    directory = '/home/ubuntu/Web/hugo_latent-info/content/' + subject[subject_key]
     F_common.to_md(df_1, subject_key, directory, 1)
     F_common.to_md(df_2, subject_key, directory, 2)
     F_common.to_md(df_3, subject_key, directory, 3)

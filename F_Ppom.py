@@ -17,10 +17,12 @@ def get_article(url):
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
     articles = soup.findAll('ul', {'class':'bbsList'})[0].findAll('li')
+    articles = [x for x in articles if not x.find('strike')]
     # Return empty dataframe if no articles
     if len(articles) == 0:
         return(pd.DataFrame())
     a_list = []
+    a = articles[13]
     for a in articles:
         l = []
         try: # 삭제된 게시물은 링크가 안남아서 에러가 생김
@@ -29,6 +31,7 @@ def get_article(url):
         except:
             continue
         title = a.find('strong').text
+        title
         user_id = a.find('span', {'class':'ct'}).text
         article_id = re.search(r'(\d{7})', article_link).group()
         # scrapping a date, a time and a content
