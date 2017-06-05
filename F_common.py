@@ -13,7 +13,7 @@ import F_Clien
 import F_Ddan
 import F_Ruli
 import F_Mlb
-import F_HumorU
+import F_Ou
 import F_Etorrent
 import F_Ppom
 import F_Slr
@@ -47,7 +47,7 @@ def to_md(dataframe, category, directory, page_num):
     # 사이트명에 다른 컬러를 입히기 위한 사이트-컬러명 dictionary
     with open('db/site_col.json', 'r') as f:
         site_col = json.load(f)
-
+        
     content = '\n' + html_table
     for i in range(len(dataframe)):
         # 제목 줄 생성
@@ -134,7 +134,7 @@ def store_db(subject, site, dataframe):
 def scrapper(site, urls):
     # 콘텐츠 사이트
     site_link = {'클리앙':'clien', '딴지일보':'ddan', \
-    '루리웹':'ruli', '엠팍':'mlb', '웃대':'HuU', '이토렌트':'eto', '뽐뿌':'ppom', \
+    '루리웹':'ruli', '엠팍':'mlb', '오유':'Ou', '이토렌트':'eto', '뽐뿌':'ppom', \
     'SLR':'slr', '82cook':'82cook'}
     # URL 리스트
     url = urls[site_link[site]]
@@ -179,9 +179,9 @@ def scrapper(site, urls):
             result = result.append(temp)
             time.sleep(1)
         result['site'] = site
-    elif site == '웃대':
+    elif site == '오유':
         for u in keywords:
-            temp = F_HumorU.get_article(url[u])
+            temp = F_Ou.get_article(url[u])
             if temp.shape[0] == 0:
                 continue
             temp['keyword'] = u
@@ -242,6 +242,7 @@ def add_keyword(subject=None, site=None, word=None):
     ruli_pad = 'http://m.ruliweb.com/community/board/300148?search_type=subject_content&search_key='
     humor_pad = 'http://m.humoruniv.com/board/list.html?table=pdswait&st=subject&searchday=1year&sk='
     ppom_pad = 'http://m.ppomppu.co.kr/new/bbs_list.php?id=freeboard&category=&search_type=sub_memo&keyword='
+    Ou_pad = 'http://m.todayhumor.co.kr/list.php?kind=search&table=total&search_table_name=total&keyfield=subject&keyword='
 
     b_word = word.encode('utf-8')
     import re
@@ -255,7 +256,7 @@ def add_keyword(subject=None, site=None, word=None):
         url = json.load(f)
     # 특정 사이트의 url만 수정 케이스
     if site is not None:
-        if site in ['ruli', 'humor', 'ppom']:
+        if site in ['ruli', 'humor', 'ppom', 'Ou']:
             pad = locals()[site + '_pad']
             url[site][word] = pad + b_word
         elif site in ['82cook', 'slr']:
@@ -275,12 +276,12 @@ def add_keyword(subject=None, site=None, word=None):
         url['ppom'][word] = ppom_pad + b_word
         url['ruli'][word] = ruli_pad + b_word
         url['slr'][word] = b_word
+        url['Ou'][word] = Ou_pad + b_word
     
-    print(url)
     # url json 파일 저장하기
-    with open('links/' + subject + '.json','w') as f:
+    with open('links/' + subject + '.json', 'w') as f:
         json.dump(url, f)
-
+    
 
 # 함수: 머신러닝 학습용 샘플데이터 저장
 def export_sample(df, object):

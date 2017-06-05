@@ -1,26 +1,23 @@
-# 2017.02.05
+# 2017.06.06
 
 import time
+from urllib.request import urlopen
 import requests
-import urllib
 import re
 import pandas as pd
 from datetime import datetime
-from lxml import html
 from bs4 import BeautifulSoup
 
 
 # cleansing a article title
 def mod_title(char):
-    result = char.replace('\r', '').replace('\n', '').replace('\t', '')
+    result = re.sub(r' [[0-9]*]', '', char)
     return(result)
 
-
-# Session
-def sess(url):
-    AGENT = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
-    REFERER = url
-
+# 함수: 세션생성
+def sess():
+    AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
+    REFERER = 'http://m.todayhumor.co.kr/'
     s = requests.Session()
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
     return(s)
@@ -28,31 +25,28 @@ def sess(url):
 
 # 게시글 수집
 def get_article(url):
-    base_url = 'http://starboard.kr/ppomppu'
-    search_url = 'http://starboard.kr/conn/board/search'
+    base_url = 'http://m.todayhumor.co.kr/'
     # Get a html
-    s = sess('http://starboard.kr/')
-    base = s.get(base_url)
-    # s_result.encoding = 'euc-kr' # Revising the encoding
-    # Extracting articles from the html
-    payload = {'search_text':url}
-    s_result = s.post(search_url, data=payload)
-    
-    soup = BeautifulSoup(s_result.text, 'html.parser')
-    articles = soup.findAll('div', attrs={'class':'ItemContent Discussion'})
-    
+    s = sess()
+    resp = s.get(url)
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    articles = soup.findAll('a', {'href':re.compile('view.php?.*')})
+    # 게시글이 없는 경우 리턴
+    if len(articles) == 0:
+        return(pd.DataFrame())
+
     a_list = []
     for a in articles:
         l = []
-        title = mod_title(a.find('div', attrs={'class':'Title'}).find('a').text)
+        title = mod_title(a.find('h2', {'class':'listSubject'}).text)
         user_id = ''
         try:
-            article_link = a.find('div', attrs={'class':'Title'}).find('a')['href']
+            article_link = base_url + a.get('href')
         except:
             return(pd.DataFrame())
         # print(article_link)
-        article_id = re.search(r'(\d{7})', article_link).group()
-        date = a.find('time')['datetime']
+        article_id = a.find('span', {'class':'list_no'}).text
+        date = a.find('span', {'class':'listDate'}).text.replace('/', '-')
         content = ''
         # Making the list
         l.append(title)

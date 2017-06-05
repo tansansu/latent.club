@@ -39,7 +39,7 @@ def execute_md(subject_key):
 
 # 기준 정보
 subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', '경제':'economy'}
-site = ['클리앙', '딴지일보', '루리웹', '엠팍', '웃대', '이토렌트', '뽐뿌', 'SLR', '82cook']
+site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', '뽐뿌', 'SLR', '82cook']
 
 log = ''
 # 코드 동작 시간 측정용
