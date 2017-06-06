@@ -133,9 +133,9 @@ def store_db(subject, site, dataframe):
 # 함수: 사이트 스크래핑
 def scrapper(site, urls):
     # 콘텐츠 사이트
-    site_link = {'클리앙':'clien', '딴지일보':'ddan', \
-    '루리웹':'ruli', '엠팍':'mlb', '오유':'Ou', '이토렌트':'eto', '뽐뿌':'ppom', \
-    'SLR':'slr', '82cook':'82cook'}
+    site_link = {'클리앙':'clien', '딴지일보':'ddan', '루리웹':'ruli', \
+    '엠팍':'mlb', '오유':'Ou', '이토렌트':'eto', '뽐뿌':'ppom', \
+    'SLR':'slr', '82cook':'82cook', '인벤':'inven'}
     # URL 리스트
     url = urls[site_link[site]]
     # 검색어 리스트
@@ -171,6 +171,7 @@ def add_keyword(subject=None, site=None, word=None):
     humor_pad = 'http://m.humoruniv.com/board/list.html?table=pdswait&st=subject&searchday=1year&sk='
     ppom_pad = 'http://m.ppomppu.co.kr/new/bbs_list.php?id=freeboard&category=&search_type=sub_memo&keyword='
     Ou_pad = 'http://m.todayhumor.co.kr/list.php?kind=search&table=total&search_table_name=total&keyfield=subject&keyword='
+    inven_pad = 'http://m.inven.co.kr/board/powerbbs.php?come_idx=2097&stype=content&svalue='
 
     b_word = word.encode('utf-8')
     import re
@@ -184,9 +185,12 @@ def add_keyword(subject=None, site=None, word=None):
         url = json.load(f)
     # 특정 사이트의 url만 수정 케이스
     if site is not None:
-        if site in ['ruli', 'humor', 'ppom', 'Ou']:
+        if site in ['ruli', 'humor', 'ppom', 'Ou', 'inven']:
             pad = locals()[site + '_pad']
-            url[site][word] = pad + b_word
+            try:
+                url[site][word] = pad + b_word
+            except KeyError:
+                url[site] = {word: pad + b_word}
         elif site in ['82cook', 'slr']:
             url[site][word] = b_word
         elif site != 'eto':
@@ -205,11 +209,13 @@ def add_keyword(subject=None, site=None, word=None):
         url['ruli'][word] = ruli_pad + b_word
         url['slr'][word] = b_word
         url['Ou'][word] = Ou_pad + b_word
+        url['inven'][word] = Ou_pad + b_word
     
     # url json 파일 저장하기
     with open('links/' + subject + '.json', 'w') as f:
         json.dump(url, f)
     
+    print(url)
 
 # 함수: 머신러닝 학습용 샘플데이터 저장
 def export_sample(df, object):

@@ -39,7 +39,8 @@ def execute_md(subject_key):
 
 # 기준 정보
 subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', '경제':'economy'}
-site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', '뽐뿌', 'SLR', '82cook']
+site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
+'뽐뿌', 'SLR', '82cook', '인벤']
 
 log = ''
 # 코드 동작 시간 측정용
@@ -52,7 +53,7 @@ for j in subject:
     with open('links/' + subject[j] + '.json','r') as f:
         url = json.load(f)
     
-    for s in site:
+    for i, s in enumerate(site):
         try:
             print(j + ' | ' + s)
             ## article 가져오기
@@ -67,7 +68,7 @@ for j in subject:
                 article_count = F_common.store_db(subject[j], s, result)
             else:
                 article_count = 0
-            log += '-%s: %d개 수집\n' % (s, article_count)
+            log += '-%d %s: %d개 수집\n' % (i+1, s, article_count)
         except Exception as e:
             print(e)
         ## 프린트 메시지

@@ -1,4 +1,4 @@
-# 2017.06.04
+# 2017.06.06
 
 import time
 from urllib.request import urlopen
@@ -7,32 +7,31 @@ import pandas as pd
 from datetime import datetime
 from bs4 import BeautifulSoup
 
+# 아이디 글자의 Level 표시 삭제
+def mod_id(char):
+    result = re.sub(r'L.*', '', char)
+    return(result.replace(' ', ''))
 
 # 게시글 수집
 def get_article(url):
-    # url
-    base_url = 'http://m.ppomppu.co.kr/new/'
+    base_url = 'http://m.inven.co.kr'
     # Get a html
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
-    articles = soup.findAll('ul', {'class':'bbsList'})[0].findAll('li')
-    articles = [x for x in articles if not x.find('strike')]
+    articles = soup.findAll('li', {'class':'articleSubject'})
     # Return empty dataframe if no articles
     if len(articles) == 0:
         return(pd.DataFrame())
     a_list = []
     for a in articles:
         l = []
-        try: # 삭제된 게시물은 링크가 안남아서 에러가 생김
-            article_link = base_url + a.find('a', {'class':'noeffect'})['href']
-        except:
-            continue
-        title = a.find('strong').text
-        user_id = a.find('span', {'class':'ct'}).text
-        article_id = re.search(r'(\d{7})', article_link).group()
+        article_link = base_url + a.find('a', {'class':'subject'})['href']
+        title = a.find('span', {'class':'title'}).text
+        user_id = a.find('em', {'class':'writer'}).text
+        user_id = mod_id(user_id)
+        article_id = re.search(r'(\d{6})', article_link).group()
         # scrapping a date, a time and a content
-        cont = BeautifulSoup(urlopen(article_link), 'html.parser')
-        date = cont.find('span', {'class':'hi'}).text.replace('  | ', '')
+        date = a.find('span', {'class':'postdate'}).find('span')['title']
         content = ''
         # Making the list
         l.append(title)
