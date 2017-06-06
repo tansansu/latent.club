@@ -145,6 +145,7 @@ def scrapper(site, urls):
     result = pd.DataFrame()
     # 사이트마다 키워드 url 반복
     for u in keywords:
+        # 개별 사이트 소스파일의 get_article 함수 실행
         temp = globals()['F_' + site_link[site]].get_article(url[u])
         if temp.shape[0] == 0:
             continue

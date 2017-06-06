@@ -19,9 +19,15 @@ def get_article(url):
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
     articles = soup.findAll('li', {'class':'articleSubject'})
+    # 배너 광고 삭제
+    articles = [x for x in articles if x.find('em') is not None]
     # Return empty dataframe if no articles
     if len(articles) == 0:
         return(pd.DataFrame())
+    # 검색 글 없을 때 출력되는 메세지가 나타나면 리턴
+    elif articles[0].find('span', {'class':'title'}).text.__contains__('검색된'):
+        return(pd.DataFrame())
+
     a_list = []
     for a in articles:
         l = []
