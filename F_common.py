@@ -18,6 +18,7 @@ import F_eto
 import F_ppom
 import F_slr
 import F_82cook
+import F_inven
 
 
 # 함수: md 파일에 header와 footer 추가하는 함수
