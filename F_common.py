@@ -1,4 +1,4 @@
-# 2017.05.10
+# 2017.06.06
 
 import pickle
 import json
@@ -9,14 +9,14 @@ import sys
 import time
 sys.path
 sys.path.insert(0, 'latent_info/')
-import F_Clien
-import F_Ddan
-import F_Ruli
-import F_Mlb
+import F_clien
+import F_ddan
+import F_ruli
+import F_mlb
 import F_Ou
-import F_Etorrent
-import F_Ppom
-import F_Slr
+import F_eto
+import F_ppom
+import F_slr
 import F_82cook
 
 
@@ -142,88 +142,16 @@ def scrapper(site, urls):
     keywords = [x for x in url.keys()]
     # 결과로 리턴할 데이터프레임 생성
     result = pd.DataFrame()
-    if site == '클리앙':
-        for u in keywords:
-            temp = F_Clien.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            # 1초 지연
-            time.sleep(1)
-        result['site'] = site
-    elif site == '딴지일보':
-        for u in keywords:
-            temp = F_Ddan.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            time.sleep(1)
-        result['site'] = site
-    elif site == '루리웹':
-        for u in keywords:
-            temp = F_Ruli.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            time.sleep(1)
-        result['site'] = site
-    elif site == '엠팍':
-        for u in keywords:
-            temp = F_Mlb.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            time.sleep(1)
-        result['site'] = site
-    elif site == '오유':
-        for u in keywords:
-            temp = F_Ou.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            time.sleep(1)
-        result['site'] = site
-    elif site == '이토렌트':
-        for u in keywords:
-            temp = F_Etorrent.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            time.sleep(1)
-        result['site'] = site
-    elif site == '뽐뿌':
-        for u in keywords:
-            temp = F_Ppom.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            time.sleep(1)
-        result['site'] = site
-    elif site == 'SLR':
-        for u in keywords:
-            temp = F_Slr.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            time.sleep(1)
-        result['site'] = site
-    elif site == '82cook':
-        for u in keywords:
-            temp = F_82cook.get_article(url[u])
-            if temp.shape[0] == 0:
-                continue
-            temp['keyword'] = u
-            result = result.append(temp)
-            time.sleep(1)
-        result['site'] = site
+    # 사이트마다 키워드 url 반복
+    for u in keywords:
+        temp = globals()['F_' + site_link[site]].get_article(url[u])
+        if temp.shape[0] == 0:
+            continue
+        temp['keyword'] = u
+        result = result.append(temp)
+        # 1초 지연
+        time.sleep(1)
+    result['site'] = site
 
     return(result)
 
