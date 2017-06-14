@@ -1,4 +1,4 @@
-# 2017.05.13
+# 2017.06.13
 
 import time
 import requests
@@ -10,7 +10,7 @@ from lxml import html
 
 # Modifing user_ids
 def mod_title(char):
-    result = re.sub(r'(\t \([^.]\) +$)', '', char).replace('\xa0', '')
+    result = re.sub(r'(\([^()]*\))', '', char).replace('\xa0', '')
     return(result)
 
 
