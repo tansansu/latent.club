@@ -1,4 +1,4 @@
- # 2017.05.07
+ # 2017.06.15
 
 import json
 import sqlite3
@@ -38,7 +38,8 @@ def execute_md(subject_key):
 
 
 # 기준 정보
-subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', '경제':'economy'}
+subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', \
+'경제':'economy', '트윗':'tweet'}
 site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
 '뽐뿌', 'SLR', '82cook', '인벤']
 
@@ -62,8 +63,11 @@ for j in subject:
             if result.shape[0] >= 1:
                 ### 19금 글 제거
                 result = result[~result['title'].str.contains('19')]
-                ### 머신러닝 분류
-                result = F_Classifier.predict_Y(result, subject[j])
+                ### 머신러닝 분류(트윗 주제는 제목의 글자포함 여부만 필터링함)
+                if j != '트윗':
+                    result = F_Classifier.predict_Y(result, subject[j])
+                else:
+                    result = F_common.tweet_name_filter(result)
                 ### DB에 게시글 저장
                 article_count = F_common.store_db(subject[j], s, result)
             else:

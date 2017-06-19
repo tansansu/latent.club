@@ -63,8 +63,8 @@ def get_article(url):
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content']
     result['date_time'] = pd.to_datetime(result['date_time'])
     # 루리웹 도배글 삭제
-   result = result[~(result['title'].str.contains('주식아') | \
-   result['title'].str.contains('주식이'))]
+    result = result[~result['title'].str.contains('주식아') & ~result['title'].str.contains('주식이')]
     result.set_index('article_id')
 
     return(result)
+

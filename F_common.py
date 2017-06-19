@@ -1,4 +1,4 @@
-# 2017.06.12
+# 2017.06.15
 
 import pickle
 import json
@@ -32,6 +32,8 @@ def make_pageview_comment(md, category, foot_padding):
         meta = '---\ntitle: ' + category + '\nweight: 30\n---\n\n'
     elif category == '찌라시':
         meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
+    elif category == '트윗':
+        meta = '---\ntitle: ' + category + '\nweight: 60\n---\n\n'
     # md 파일에 추가
     with open(md, 'r+') as f:
         content = f.read()
@@ -59,14 +61,14 @@ def to_md(dataframe, category, directory, page_num):
         # 사이트명, 날짜_시간 정보 줄 생성
         ## 사이트명의 너비를 10칸으로 고정하고 양쪽에 빈공간 생성
         site_width = len(dataframe.iloc[i]['site'])
-        elif (site_width == 6):
+        if (site_width == 6):
             site_name = ('&nbsp;' * 4) + dataframe.iloc[i]['site'] + ('&nbsp;' * 4)
         elif site_width == 4:
             site_name = ('&nbsp;' * 3) + dataframe.iloc[i]['site'] + ('&nbsp;' * 3)
         elif (site_width == 3) & (dataframe.iloc[i]['site'] != 'SLR'):
-            site_name = ('&nbsp;' * 5) + dataframe.iloc[i]['site'] + ('&nbsp;' * 5)
+            site_name = ('&nbsp;' * 4) + dataframe.iloc[i]['site'] + ('&nbsp;' * 4)
         else:
-            site_name = ('&nbsp;' * 7) + dataframe.iloc[i]['site'] + ('&nbsp;' * 7)
+            site_name = ('&nbsp;' * 8) + dataframe.iloc[i]['site'] + ('&nbsp;' * 7)
         # 정보 표시줄(사이트명, 날짜_시간) 생성, 날짜_시간은 분까지만 표시되게 함
         con_info = "<td><span style='background-color:" + site_col[dataframe.iloc[i]['site']] + "'><font color='white'>" + \
         site_name + "</font></span>&nbsp;&nbsp;&nbsp;" + dataframe.iloc[i]['date_time'][:-3] + "</td></tr>\n"        
@@ -133,9 +135,8 @@ def store_db(subject, site, dataframe):
     article_count = new_d.shape[0]
     if article_count >= 1:
         ## 신규 자료는 DB에 저장
-        conn = sqlite3.connect('db/board.db')
-        new_d.to_sql(subject, conn, if_exists='append', index=False)
-        conn.close()
+        with sqlite3.connect('db/board.db') as conn:
+            new_d.to_sql(subject, conn, if_exists='append', index=False)
     # 수집한 new 게시글 개수 리턴
     return(article_count)
 
@@ -211,7 +212,7 @@ def add_keyword(subject=None, site=None, word=None):
     else:
         # 전체 사이트에 키워드 검색 url 추가하기
         url['82cook'][word] = b_word
-        url['HuU'][word] = humor_pad + b_word
+        # url['HuU'][word] = humor_pad + b_word
         url['clien'][word] = clien_pad_1 + b_word + clien_pad_2
         url['ddan'][word] = ddan_pad_1 + b_word + ddan_pad_2
         # url['eto'][word] = eto_pad_1 + b_word + eto_pad_2
@@ -228,8 +229,18 @@ def add_keyword(subject=None, site=None, word=None):
     
     print(url)
 
+
 # 함수: 머신러닝 학습용 샘플데이터 저장
 def export_sample(df, object):
     from xlsxwriter.utility import xl_rowcol_to_cell
     writer = pd.ExcelWriter('sample_data/sample_' + object + '_tmp.xlsx', engine='xlsxwriter')
     df.to_excel(writer, sheet_name='to')
+
+
+# 제목에 트윗이 표시된 것만 추출하는 함수
+def tweet_name_filter(dataframe):
+    cond_1 = dataframe['title'].str.contains('트윗$')
+    cond_2 = dataframe['title'].str.contains('트윗\.')
+    cond_3 = dataframe['title'].str.contains('트위터$')
+    cond_4 = dataframe['title'].str.contains('트위터\.')
+    return(dataframe[cond_1 | cond_2 | cond_3 | cond_4])
