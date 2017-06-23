@@ -184,7 +184,8 @@ def add_keyword(subject=None, site=None, word=None):
     ppom_pad = 'http://m.ppomppu.co.kr/new/bbs_list.php?id=freeboard&category=&search_type=sub_memo&keyword='
     Ou_pad = 'http://m.todayhumor.co.kr/list.php?kind=search&table=total&search_table_name=total&keyfield=subject&keyword='
     inven_pad = 'http://m.inven.co.kr/board/powerbbs.php?come_idx=2097&stype=content&svalue='
-
+    cook_pad = 'http://www.82cook.com/entiz/enti.php?bn=15&searchType=search&search1=1&search1=2&keys='
+    
     b_word = word.encode('utf-8')
     import re
     b_word = str(b_word).replace('\\x', '%').replace("\'", '').upper()
@@ -195,23 +196,31 @@ def add_keyword(subject=None, site=None, word=None):
     # 저장된 url json 파일 열기
     with open('links/' + subject + '.json','r') as f:
         url = json.load(f)
+    
     # 특정 사이트의 url만 수정 케이스
     if site is not None:
-        if site in ['ruli', 'humor', 'ppom', 'Ou', 'inven']:
-            pad = locals()[site + '_pad']
+        if site in ['ruli', 'humor', 'ppom', 'Ou', 'inven', '82cook']:
+            # 사이트명에서 숫자 제거한 pad를 붙임(82cook 때문)
+            pad = locals()[re.search(r'[^0-9]+', site).group() + '_pad']
             try:
                 url[site][word] = pad + b_word
             except KeyError:
                 url[site] = {word: pad + b_word}
-        elif site in ['82cook', 'slr']:
-            url[site][word] = b_word
+        elif site == 'slr':
+            try:
+                url[site][word] = b_word
+            except KeyError:
+                url[site] = {word: b_word}
         elif site != 'eto':
             pad_1 = locals()[site + '_pad_1']
             pad_2 = locals()[site + '_pad_2']
-            url[site][word] = pad_1 + b_word + pad_2
+            try:
+                url[site][word] = pad_1 + b_word + pad_2
+            except KeyError:
+                url[site] = {word: pad_1 + b_word + pad_2}
+    # 전체 사이트에 키워드 검색 url 추가하기
     else:
-        # 전체 사이트에 키워드 검색 url 추가하기
-        url['82cook'][word] = b_word
+        url['82cook'][word] = cook_pad + b_word
         # url['HuU'][word] = humor_pad + b_word
         url['clien'][word] = clien_pad_1 + b_word + clien_pad_2
         url['ddan'][word] = ddan_pad_1 + b_word + ddan_pad_2

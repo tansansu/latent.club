@@ -7,6 +7,11 @@ import pandas as pd
 from datetime import datetime
 from bs4 import BeautifulSoup
 
+def mod_reply(char):
+    try:
+        return(re.search(r'\[ [0-9]+', char).group()
+    except:
+        return('0')
 
 # 게시글 수집
 def get_article(url):
@@ -30,10 +35,13 @@ def get_article(url):
         title = a.find('strong').text
         user_id = a.find('span', {'class':'ct'}).text
         article_id = re.search(r'(\d{7})', article_link).group()
+        reply_num = mod_reply(a.find('span', {'class':'rp'}).text)
+        view_num = mod_reply(a.find('span', {'class':'hi'}).text).replace('[ ', ''))
         # scrapping a date, a time and a content
         cont = BeautifulSoup(urlopen(article_link), 'html.parser')
         date = cont.find('span', {'class':'hi'}).text.replace('  | ', '')
         content = ''
+        
         # Making the list
         l.append(title)
         l.append(date)
@@ -41,12 +49,14 @@ def get_article(url):
         l.append(user_id)
         l.append(article_link)
         l.append(content)
+        l.append(reply_num)
+        l.append(view_num)
         a_list.append(l)
         time.sleep(.5)
 
     result = pd.DataFrame(a_list)
     # munging of the dataframe
-    result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content']
+    result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
     result['date_time'] = pd.to_datetime(result['date_time'])
     result.set_index('article_id')
 

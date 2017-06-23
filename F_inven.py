@@ -12,6 +12,12 @@ def mod_id(char):
     result = re.sub(r'L.*', '', char)
     return(result.replace(' ', ''))
 
+def mod_reply(char):
+    try:
+        return(char.find('a', {'class':re.compile(r'^cmt')}).text)
+    except:
+        return('0')
+
 # 게시글 수집
 def get_article(url):
     base_url = 'http://m.inven.co.kr'
@@ -27,7 +33,7 @@ def get_article(url):
     # 검색 글 없을 때 출력되는 메세지가 나타나면 리턴
     elif articles[0].find('span', {'class':'title'}).text.__contains__('검색된'):
         return(pd.DataFrame())
-
+    re.search(r'[0-9]+', articles[3].find('span', {'class':'hit'}).text).group()
     a_list = []
     for a in articles:
         l = []
@@ -39,6 +45,8 @@ def get_article(url):
         # scrapping a date, a time and a content
         date = a.find('span', {'class':'postdate'}).find('span')['title']
         content = ''
+        reply_num = mod_reply(a)
+        view_num = re.search(r'[0-9]+', a.find('span', {'class':'hit'}).text).group()
         # Making the list
         l.append(title)
         l.append(date)
@@ -46,12 +54,14 @@ def get_article(url):
         l.append(user_id)
         l.append(article_link)
         l.append(content)
+        l.append(reply_num)
+        l.append(view_num)
         a_list.append(l)
         time.sleep(.5)
 
     result = pd.DataFrame(a_list)
     # munging of the dataframe
-    result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content']
+    result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
     result['date_time'] = pd.to_datetime(result['date_time'])
     result.set_index('article_id')
 

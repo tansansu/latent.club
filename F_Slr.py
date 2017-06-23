@@ -1,4 +1,4 @@
-# 2017.04.30
+# 2017.06.22
 
 import time
 import requests
@@ -17,6 +17,13 @@ def mod_title(char):
     result = re.sub(r"\[[0-9]+\]", '', result)
     return(result)
 
+# 리플 수 추출하는 함수
+def mod_reply(char):
+    try:
+        result = re.search(r'\[[0-9]+\]', char).group(0)
+        return(re.search(r'[0-9]+', result).group(0))
+    except:
+        return('0')
 
 # Session
 def sess(url):
@@ -71,6 +78,8 @@ def get_article(url):
             content = ''
         else:
             content = con.find('div', attrs={'id':'userct'}).text
+        reply_num = mod_reply(a.find('div', attrs={'class':'Title'}).find('a').text)
+        view_num = ''
 
         # Making the list
         l.append(title)
@@ -79,12 +88,14 @@ def get_article(url):
         l.append(member_id)
         l.append(article_link)
         l.append(content)
+        l.append(reply_num)
+        l.append(view_num)
         a_list.append(l)
         time.sleep(.5)
 
     result = pd.DataFrame(a_list)
     # munging of the dataframe
-    result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content']
+    result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
     result['date_time'] = pd.to_datetime(result['date_time'])
     result = result[result['member_id'] != '']
     result.set_index('article_id')
