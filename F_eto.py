@@ -66,7 +66,7 @@ def get_article(url):
             '''
             content = ''
             date = mod_date(temp.find('span', {'class':'write_date'}).text)
-            if temp.find('span', {'class':'write_date'}.text == date:
+            if temp.find('span', {'class':'write_date'}).text == date:
                 continue
         except:
             continue
