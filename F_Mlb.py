@@ -10,7 +10,8 @@ from datetime import datetime
 
 def mod_reply(char):
     try:
-        return(char.find('span', {'class':'replycnt'}).text.replace('[', '').replace(']', ''))
+        return(char.find('span', {'class':'replycnt'}).text.\
+        replace('[', '').replace(']', '').replace(',', ''))
     except:
         return('0')
 
@@ -35,7 +36,7 @@ def get_article(url):
         article_link = a.find('a')['href']
         article_id = re.search(r'(\d{18})', article_link).group()
         reply_num = mod_reply(a)
-        view_num = a.find('span', {'class':'viewV'}).text
+        view_num = a.find('span', {'class':'viewV'}).text.replace(',', '')
         # Gathering the cotent of each article
         con = BeautifulSoup(urlopen(article_link), 'html.parser')
         date = con.findAll('span', {'class':'val'})[3].text

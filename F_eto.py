@@ -12,14 +12,12 @@ def mod_title(char):
     result = re.sub(r'(\([^()]*\))', '', char).replace('\xa0', '').replace('\t', '')
     return(result)
 
-
 def mod_user_id(char):
     result = re.sub(r' +', '', char)
     return(result)
 
-
 def mod_date(char):
-    result = re.sub(r' \([^.]\)', '', char)
+    result = re.sub(r' \([^()]\)', '', char)
     return(result)
 
 def mod_reply(char):
@@ -37,7 +35,7 @@ def sess():
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
     return(s)
 
-url
+
 # 게시글 수집
 def get_article(url):
     base_url = 'http://etorrent.co.kr/plugin/mobile/'
@@ -55,7 +53,7 @@ def get_article(url):
         title = mod_title(a.find('div').text)
         user_id = mod_user_id(a.find('span', {'class':'name'}).text)
         article_link = base_url + a.find('a')['href']
-        article_id = re.search(r'(\d{5})', article_link).group()
+        article_id = re.search(r'\d{3,}', article_link).group()
         reply_num = mod_reply(a.find('div').text)
         view_num = re.search(r'[0-9]+', a.findAll('span', {'class':'datetime'})[1].text).group()
         # Gathering the cotent of each article
@@ -68,6 +66,8 @@ def get_article(url):
             '''
             content = ''
             date = mod_date(temp.find('span', {'class':'write_date'}).text)
+            if temp.find('span', {'class':'write_date'}.text == date:
+                continue
         except:
             continue
 
@@ -84,6 +84,7 @@ def get_article(url):
         time.sleep(.5)
         
     result = pd.DataFrame(a_list)
+
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
     result['date_time'] = pd.to_datetime(result['date_time'])

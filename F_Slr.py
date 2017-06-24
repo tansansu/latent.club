@@ -72,18 +72,16 @@ def get_article(url):
         # Get a content of the article
         s = sess('http://www.slrclub.com/')
         con = BeautifulSoup(s.get(article_link).text, 'html.parser')
-        member_id = con.find('span', attrs={'class':'lop'})
         # 존재하지 않는 게시물 예외 처리
+        if con.find('p', {'class':'err_msg'}) is not None:
+            continue
+        member_id = con.find('span', attrs={'class':'lop'})
         if member_id is None:
             member_id = ''
         else:
             member_id = con.find('span', attrs={'class':'lop'}).text
-        content = con.find('div', attrs={'id':'userct'})
-        if content is None:
-            content = ''
-        else:
-            content = con.find('div', attrs={'id':'userct'}).text
         view_num = mod_view(con.find('div', {'class':'info-wrap'}).text)
+        content = ''
 
         # Making the list
         l.append(title)
