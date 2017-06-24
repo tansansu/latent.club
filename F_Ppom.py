@@ -9,9 +9,18 @@ from bs4 import BeautifulSoup
 
 def mod_reply(char):
     try:
-        return(re.search(r'\[ [0-9]+', char).group()
+        result = char.find('span', {'class':'rp'}).text
+        return(re.search(r'[0-9]+', result).group())
     except:
         return('0')
+
+def mod_view(char):
+    try:
+        result = re.search(r'\[ [0-9]+', char.find('span', {'class':'hi'}).text).group()
+        return(result.replace('[ ', ''))
+    except:
+        return('0')
+
 
 # 게시글 수집
 def get_article(url):
@@ -25,6 +34,7 @@ def get_article(url):
     # Return empty dataframe if no articles
     if len(articles) == 0:
         return(pd.DataFrame())
+
     a_list = []
     for a in articles:
         l = []
@@ -35,8 +45,8 @@ def get_article(url):
         title = a.find('strong').text
         user_id = a.find('span', {'class':'ct'}).text
         article_id = re.search(r'(\d{7})', article_link).group()
-        reply_num = mod_reply(a.find('span', {'class':'rp'}).text)
-        view_num = mod_reply(a.find('span', {'class':'hi'}).text).replace('[ ', ''))
+        reply_num = mod_reply(a)
+        view_num = mod_view(a)
         # scrapping a date, a time and a content
         cont = BeautifulSoup(urlopen(article_link), 'html.parser')
         date = cont.find('span', {'class':'hi'}).text.replace('  | ', '')

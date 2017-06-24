@@ -33,7 +33,7 @@ def get_article(url):
     # 검색 글 없을 때 출력되는 메세지가 나타나면 리턴
     elif articles[0].find('span', {'class':'title'}).text.__contains__('검색된'):
         return(pd.DataFrame())
-    re.search(r'[0-9]+', articles[3].find('span', {'class':'hit'}).text).group()
+    
     a_list = []
     for a in articles:
         l = []

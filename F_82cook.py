@@ -21,7 +21,7 @@ def get_article(url):
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
     articles = soup.findAll('tr')[1:]
-
+    a = articles[1]
     a_list = []
     for a in articles:
         l = []
@@ -29,11 +29,11 @@ def get_article(url):
         title = a.find('td', {'class':'title'}).find('a').text
         user_id = a.find('td', {'class':'user_function'}).text
         article_link = base_url + a.find('a')['href']
-        article_id = re.search(r'(\d{7})', article_link).group()
+        article_id = re.search(r'(\d{7}|\d{6})', article_link).group()
         date = a.find('td', {'class':'regdate'})['title']
         content = ''
         reply_num = mod_reply(a)
-        view_num = a.find('td', {'class':'numbers'}).text
+        view_num = a.findAll('td', {'class':'numbers'})[2].text.replace(',', '')
         # Making the list
         l.append(title)
         l.append(date)

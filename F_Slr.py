@@ -20,10 +20,14 @@ def mod_title(char):
 # 리플 수 추출하는 함수
 def mod_reply(char):
     try:
-        result = re.search(r'\[[0-9]+\]', char).group(0)
-        return(re.search(r'[0-9]+', result).group(0))
+        result = re.search(r'\[[0-9]+\]', char).group()
+        return(re.search(r'[0-9]+', result).group())
     except:
         return('0')
+
+def mod_view(char):
+    result = re.search(r'조회 [0-9]+', char).group()
+    return(result.replace('조회 ', ''))
 
 # Session
 def sess(url):
@@ -64,6 +68,7 @@ def get_article(url):
         # print(article_link)
         article_id = re.search(r'(\d{8})', article_link).group()
         date = a.find('time')['datetime']
+        reply_num = mod_reply(a.find('div', attrs={'class':'Title'}).find('a').text)
         # Get a content of the article
         s = sess('http://www.slrclub.com/')
         con = BeautifulSoup(s.get(article_link).text, 'html.parser')
@@ -78,8 +83,7 @@ def get_article(url):
             content = ''
         else:
             content = con.find('div', attrs={'id':'userct'}).text
-        reply_num = mod_reply(a.find('div', attrs={'class':'Title'}).find('a').text)
-        view_num = ''
+        view_num = mod_view(con.find('div', {'class':'info-wrap'}).text)
 
         # Making the list
         l.append(title)

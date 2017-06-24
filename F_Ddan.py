@@ -32,7 +32,6 @@ def get_article(url):
     articles = soup.findAll('li')
     # 게시글만 추출
     articles = [a for a in articles if a.find('dd') is not None]
-    a = articles[1]
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
         return(pd.DataFrame())
@@ -41,7 +40,7 @@ def get_article(url):
     a_list = []
     for a in articles:
         l = []
-        a.find('')
+
         title = a.find('dt').find('a').text
         user_id = a.find('strong').text
         article_link = a.find('a')['href']
