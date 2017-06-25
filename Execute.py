@@ -1,4 +1,4 @@
- # 2017.06.15
+# 2017.06.25
 
 import json
 import sqlite3
@@ -30,7 +30,7 @@ def execute_md(subject_key):
     df_3 = df.iloc[120:180]
 
     ### 각각의 데이터프레임을 3개의 md파일(페이지)로 만들기
-    # directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
+    #directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
     directory = '/home/ubuntu/Codes/Web/hugo_latent-info/content/' + subject[subject_key]
     F_common.to_md(df_1, subject_key, directory, 1)
     F_common.to_md(df_2, subject_key, directory, 2)
@@ -39,13 +39,14 @@ def execute_md(subject_key):
 
 # 기준 정보
 subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', \
-'경제':'economy', '트윗':'tweet'}
+'경제':'economy', '트윗':'tweet', '가상화폐':'coin'}
 site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
 '뽐뿌', 'SLR', '82cook', '인벤']
 
-log = ''
 # 코드 동작 시간 측정용
 start_time = datetime.now().replace(microsecond=0)
+# 로깅
+log = 'Start_time: ' + str(datetime.now().replace(microsecond=0)) + '\n'
 
 for j in subject:
     # log 메세지 생성
@@ -64,8 +65,11 @@ for j in subject:
                 ### 19금 글 제거
                 result = result[~result['title'].str.contains('19')]
                 ### 머신러닝 분류(트윗 주제는 제목의 글자포함 여부만 필터링함)
-                if j != '트윗':
+                if j not in ['트윗', '가상화폐']:
                     result = F_Classifier.predict_Y(result, subject[j])
+                # 가상화폐 게시글 확보때까지 임시
+                elif j == '가상화폐':
+                    result['result'] = 'Y'
                 else:
                     result = F_common.tweet_name_filter(result)
                 ### DB에 게시글 저장

@@ -1,4 +1,4 @@
-# 2017.03.15
+# 2017.06.25
 
 from konlpy.tag import Twitter; pos_tagger = Twitter()
 import pandas as pd
@@ -29,10 +29,9 @@ def predict_Y(dataframe, subject):
         model = pickle.load(f)
     with open('db/nb_text_' + subject + '.pickle', 'rb') as f:
         text = pickle.load(f)
-        
     # Prediction
-    print(dataframe.info())
     dataframe['result'] = [model.classify(term_exists(text, word)) for word in words]
+    
     return(dataframe)
 
     

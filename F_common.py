@@ -1,4 +1,4 @@
-# 2017.06.15
+# 2017.06.25
 
 import pickle
 import json
@@ -34,6 +34,8 @@ def make_pageview_comment(md, category, foot_padding):
         meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
     elif category == '트윗':
         meta = '---\ntitle: ' + category + '\nweight: 60\n---\n\n'
+    elif category == '가상화폐':
+        meta = '---\ntitle: ' + category + '\nweight: 70\n---\n\n'
     # md 파일에 추가
     with open(md, 'r+') as f:
         content = f.read()
@@ -169,12 +171,12 @@ def scrapper(site, urls):
 
 
 # 함수: 검색 url에 키워드 추가
-def add_keyword(subject=None, site=None, word=None):
+def add_keyword(subject=None, site=None, word=None, eto_link=None):
     # 사이트별 추가할 url 패딩 캐릭터
     clien_pad_1 = 'https://www.clien.net/service/search?q='
     clien_pad_2 = '&sort=recency&boardCd=park&boardName=%EB%AA%A8%EB%91%90%EC%9D%98%EA%B3%B5%EC%9B%90'
     ddan_pad_1 = 'http://www.ddanzi.com/index.php?mid=free&act=IS&search_target=all&is_keyword='
-    ddan_pad_2 =  '&m=1'
+    ddan_pad_2 =  '&m=0'
     eto_pad_1 = 'http://etorrent.co.kr/plugin/mobile/board.php?bo_table=eboard&sca=&sfl=wr_subject%7C%7Cwr_content&stx='
     eto_pad_2 = '&x=0&y=0'
     mlb_pad_1 = 'http://mlbpark.donga.com/mp/b.php?select=sct&m=search&b=bullpen&select=sct&query='
@@ -199,7 +201,7 @@ def add_keyword(subject=None, site=None, word=None):
     
     # 특정 사이트의 url만 수정 케이스
     if site is not None:
-        if site in ['ruli', 'humor', 'ppom', 'Ou', 'inven', '82cook']:
+        if site in ['ruli', 'ppom', 'Ou', 'inven', '82cook']:
             # 사이트명에서 숫자 제거한 pad를 붙임(82cook 때문)
             pad = locals()[re.search(r'[^0-9]+', site).group() + '_pad']
             try:
@@ -211,27 +213,46 @@ def add_keyword(subject=None, site=None, word=None):
                 url[site][word] = b_word
             except KeyError:
                 url[site] = {word: b_word}
-        elif site != 'eto':
+        elif site in ['clien', 'mlb', 'ddan']:
             pad_1 = locals()[site + '_pad_1']
             pad_2 = locals()[site + '_pad_2']
             try:
                 url[site][word] = pad_1 + b_word + pad_2
             except KeyError:
                 url[site] = {word: pad_1 + b_word + pad_2}
+        elif site == 'eto':
+            try:
+                url[site][word] = eto_link
+            except KeyError:
+                url[site] = {word:eto_link}
     # 전체 사이트에 키워드 검색 url 추가하기
     else:
-        url['82cook'][word] = cook_pad + b_word
+        for site in ['clien', 'ddan', 'ruli', 'mlb', 'Ou', 'ppom', 'slr', '82cook', 'inven']:
+            if site in ['ruli', 'ppom', 'Ou', 'inven', '82cook']:
+                pad = locals()[re.search(r'[^0-9]+', site).group() + '_pad']
+                try:
+                    url[site][word] = pad + b_word
+                except KeyError:
+                    url[site] = {word: pad + b_word}
+            elif site == 'slr':
+                try:
+                    url[site][word] = b_word
+                except KeyError:
+                    url[site] = {word: b_word}
+            elif site in ['clien', 'mlb', 'ddan']:
+                pad_1 = locals()[site + '_pad_1']
+                pad_2 = locals()[site + '_pad_2']
+                try:
+                    url[site][word] = pad_1 + b_word + pad_2
+                except KeyError:
+                    url[site] = {word: pad_1 + b_word + pad_2}
+        # 이토렌트는 별도로 추가
+        try:
+            url['eto'][word] = ''
+        except KeyError:
+            url['eto'] = {word:''}
         # url['HuU'][word] = humor_pad + b_word
-        url['clien'][word] = clien_pad_1 + b_word + clien_pad_2
-        url['ddan'][word] = ddan_pad_1 + b_word + ddan_pad_2
-        # url['eto'][word] = eto_pad_1 + b_word + eto_pad_2
-        url['mlb'][word] = mlb_pad_1 + b_word + mlb_pad_2
-        url['ppom'][word] = ppom_pad + b_word
-        url['ruli'][word] = ruli_pad + b_word
-        url['slr'][word] = b_word
-        url['Ou'][word] = Ou_pad + b_word
-        url['inven'][word] = Ou_pad + b_word
-    
+        
     # url json 파일 저장하기
     with open('links/' + subject + '.json', 'w') as f:
         json.dump(url, f)
@@ -252,4 +273,6 @@ def tweet_name_filter(dataframe):
     cond_2 = dataframe['title'].str.contains('트윗\.')
     cond_3 = dataframe['title'].str.contains('트위터$')
     cond_4 = dataframe['title'].str.contains('트위터\.')
-    return(dataframe[cond_1 | cond_2 | cond_3 | cond_4])
+    dataframe = dataframe[cond_1 | cond_2 | cond_3 | cond_4]
+    dataframe['result'] = 'Y'
+    return(dataframe)
