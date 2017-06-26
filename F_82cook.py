@@ -21,7 +21,11 @@ def get_article(url):
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
     articles = soup.findAll('tr')[1:]
-    a = articles[1]
+    # 게시글이 없으면 리턴
+    if len(articles) == 0:
+        return(pd.DataFrame())
+    
+    # 게시글 정보 추출
     a_list = []
     for a in articles:
         l = []

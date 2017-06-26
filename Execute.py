@@ -18,8 +18,8 @@ def execute_md(subject_key):
     ## md파일 생성
     ### db파일에서 게시글 리스트 추출
     with sqlite3.connect('db/board.db') as conn:
-        query = 'select site, title, article_link, date_time from ' + subject[subject_key] + \
-        ' where result = "Y" order by date_time desc limit 185;'
+        query = 'select site, title, article_link, date_time, view_num, reply_num from ' + \
+        subject[subject_key] + ' where result = "Y" order by date_time desc limit 185;'
         df = pd.read_sql_query(query, conn)
     ## 중복글 제거(제목)
     df.drop_duplicates('title', keep='first', inplace=True)

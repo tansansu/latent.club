@@ -41,7 +41,7 @@ def get_article(url):
         title = a.find('span', {'class':'title'}).text
         user_id = a.find('em', {'class':'writer'}).text
         user_id = mod_id(user_id)
-        article_id = re.search(r'(\d{6})', article_link).group()
+        article_id = re.search(r'(\d{6,})', article_link).group()
         # scrapping a date, a time and a content
         date = a.find('span', {'class':'postdate'}).find('span')['title']
         content = ''
