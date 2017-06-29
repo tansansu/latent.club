@@ -74,6 +74,11 @@ def to_md(dataframe, category, directory, page_num):
         else:
             site_name = ('&nbsp;' * 7) + dataframe.iloc[i]['site'] + ('&nbsp;' * 7)
         # 정보 표시줄(사이트명, 날짜_시간) 생성, 날짜_시간은 분까지만 표시되게 함
+        if dataframe.iloc[i]['view_num'] is None:
+            dataframe.iloc[i]['view_num'] = '  -  '
+        if dataframe.iloc[i]['reply_num'] is None:
+            dataframe.iloc[i]['reply_num'] = ' - '
+            
         con_info = "<td><span style='background-color:" + site_col[dataframe.iloc[i]['site']] + "'><font color='white'>" + \
         site_name + "</font></span>&nbsp;&nbsp;&nbsp;" + dataframe.iloc[i]['date_time'][:-3] + '&nbsp;&nbsp;' + \
         '<b><font color="CornflowerBlue">' + dataframe.iloc[i]['view_num'] + '</font>&nbsp;&nbsp;<font color="orange">[' + \

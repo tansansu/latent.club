@@ -48,7 +48,6 @@ def get_article(url):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
-        time.sleep(.5)
 
     result = pd.DataFrame(a_list)
     # munging of the dataframe

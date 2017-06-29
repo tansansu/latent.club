@@ -60,7 +60,6 @@ def get_article(url):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
-        time.sleep(.5)
 
     # 결과 데이터 프레임 생성
     result = pd.DataFrame(a_list)
