@@ -6,10 +6,10 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
-            "pythonPath": "${config.python.pythonPath}",
+            "pythonPath": "/Users/tansansu/anaconda/bin/python",
             "program": "${file}",
             "cwd": "${workspaceRoot}",
-            "env": "root",
+            "env": "${workspaceRoot}/.env",
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",

@@ -1,4 +1,4 @@
-# 2017.06.25
+# 2017.07.01
 
 import json
 import sqlite3
@@ -16,12 +16,21 @@ from TelegramBot import TelegramBot
 
 # 함수: 게시판 md 파일 생성 작업 실행
 def execute_md(subject_key):
-    ## md파일 생성
-    ### db파일에서 게시글 리스트 추출
-    with sqlite3.connect('db/board.db') as conn:
-        query = 'select site, title, article_link, date_time, view_num, reply_num from ' + \
-        subject[subject_key] + ' where result = "Y" order by date_time desc limit 185;'
-        df = pd.read_sql_query(query, conn)
+    ## 주식 게시판에서 코인 글은 제외
+    if subject_key == 'stock':
+        ### db파일에서 게시글 리스트 추출
+        with sqlite3.connect('db/board.db') as conn:
+            query = 'select site, title, article_link, date_time, view_num, reply_num from \
+            (select site, title, article_link, date_time, view_num, reply_num, article_id from ' +  \
+            subject[subject_key] + 'where result = "Y" order by date_time desc limit 500) \
+            where article_id in (select article_id from coin order by date_time desc limit 2000) limit 185;'
+            df = pd.read_sql_query(query, conn)
+    else:
+        ### db파일에서 게시글 리스트 추출
+        with sqlite3.connect('db/board.db') as conn:
+            query = 'select site, title, article_link, date_time, view_num, reply_num from ' + \
+            subject[subject_key] + ' where result = "Y" order by date_time desc limit 185;'
+            df = pd.read_sql_query(query, conn)
     ## 중복글 제거(제목)
     df.drop_duplicates('title', keep='first', inplace=True)
 
@@ -50,6 +59,13 @@ start_time = datetime.now().replace(microsecond=0)
 # 로깅
 log = 'Start_time: ' + str(datetime.now().replace(microsecond=0)) + '\n'
 
+# 특정 사이트만 돌리고 싶은 경우
+try:
+    if sys.argv[1] is not None:
+        site = [sys.argv[1]]
+except:
+    pass
+
 for j in subject:
     # log 메세지 생성
     log += '[ %s ]\n' % j
@@ -67,13 +83,10 @@ for j in subject:
                 ### 19금 글 제거
                 result = result[~result['title'].str.contains('19')]
                 ### 머신러닝 분류(트윗 주제는 제목의 글자포함 여부만 필터링함)
-                if j not in ['트윗', '가상화폐']:
-                    result = F_Classifier.predict_Y(result, subject[j])
-                # 가상화폐 게시글 확보때까지 임시
-                elif j == '가상화폐':
-                    result['result'] = 'Y'
-                else:
+                if j in ['트윗']:
                     result = F_common.tweet_name_filter(result)
+                else:
+                    result = F_Classifier.predict_Y(result, subject[j])
                 ### DB에 게시글 저장
                 article_count = F_common.store_db(subject[j], s, result)
             else:

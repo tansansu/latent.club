@@ -6,7 +6,7 @@ import random
 import re
 
 # Choose the subject
-subject = 'economy'
+subject = 'coin'
 
 # Import Training Dataset
 filename = 'sample_' + subject + '.xlsx'
