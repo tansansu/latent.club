@@ -83,8 +83,10 @@ for j in subject:
                 ### 19금 글 제거
                 result = result[~result['title'].str.contains('19')]
                 ### 머신러닝 분류(트윗 주제는 제목의 글자포함 여부만 필터링함)
-                if j in ['트윗']:
+                if j == '트윗':
                     result = F_common.tweet_name_filter(result)
+                elif j == '가상화폐':
+                    result = F_common.coin_name_filter(result)
                 else:
                     result = F_Classifier.predict_Y(result, subject[j])
                 ### DB에 게시글 저장

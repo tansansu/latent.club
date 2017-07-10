@@ -21,28 +21,6 @@ import F_82cook
 import F_inven
 
 
-# 함수: md 파일에 header와 footer 추가하는 함수
-def make_pageview_comment(md, category, foot_padding):
-    # 헤더 생성
-    if category == '부동산':
-        meta = '---\ntitle: ' + category + '\nweight: 10\n---\n\n'
-    elif category == '주식':
-        meta = '---\ntitle: ' + category + '\nweight: 20\n---\n\n'
-    elif category == '경제':
-        meta = '---\ntitle: ' + category + '\nweight: 30\n---\n\n'
-    elif category == '찌라시':
-        meta = '---\ntitle: ' + category + '\nweight: 40\n---\n\n'
-    elif category == '가상화폐':
-        meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
-    elif category == '트윗':
-        meta = '---\ntitle: ' + category + '\nweight: 60\n---\n\n'
-    # md 파일에 추가
-    with open(md, 'r+') as f:
-        content = f.read()
-        f.seek(0, 0)
-        f.write(meta.rstrip('\r\n') + '\n' + content + '\n' + foot_padding)
-
-
 # 함수: 데이터 프레임을 markdown파일로 변환
 def to_md(dataframe, category, directory, page_num):
     # html table code
@@ -92,6 +70,27 @@ def to_md(dataframe, category, directory, page_num):
 
     # footer(더보기) 추가하기 위한 html코드
     html_code_page = '/"><center><b><font color="darkblue" size=4><i class="icon icon-download"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;더 보기&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon icon-download"></i></font></b></center></a>'
+    # 함수: md 파일에 header와 footer 추가하는 함수
+    def make_pageview_comment(md, category, foot_padding):
+        # 헤더 생성
+        if category == '부동산':
+            meta = '---\ntitle: ' + category + '\nweight: 10\n---\n\n'
+        elif category == '주식':
+            meta = '---\ntitle: ' + category + '\nweight: 20\n---\n\n'
+        elif category == '경제':
+            meta = '---\ntitle: ' + category + '\nweight: 30\n---\n\n'
+        elif category == '찌라시':
+            meta = '---\ntitle: ' + category + '\nweight: 40\n---\n\n'
+        elif category == '가상화폐':
+            meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
+        elif category == '트윗':
+            meta = '---\ntitle: ' + category + '\nweight: 60\n---\n\n'
+        # md 파일에 추가
+        with open(md, 'r+') as f:
+            content = f.read()
+            f.seek(0, 0)
+            f.write(meta.rstrip('\r\n') + '\n' + content + '\n' + foot_padding)
+
     # md 파일로 데이터 프레임 저장
     if page_num == 3:
         md = directory + '/page' + str(page_num) + '.md'
@@ -285,5 +284,12 @@ def tweet_name_filter(dataframe):
     cond_3 = dataframe['title'].str.contains('트위터$')
     cond_4 = dataframe['title'].str.contains('트위터\.')
     dataframe = dataframe[cond_1 | cond_2 | cond_3 | cond_4]
+    dataframe['result'] = 'Y'
+    return(dataframe)
+
+# 가상화폐에서 코인노래방 게시글은 제외
+def coin_name_filter(dataframe):
+    condition = dataframe['title'].str.contains('노래방')
+    dataframe = dataframe[~condition]
     dataframe['result'] = 'Y'
     return(dataframe)
