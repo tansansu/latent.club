@@ -30,18 +30,23 @@ def get_article(url):
     s_result = s.get(url)
     soup = BeautifulSoup(s_result.text, 'html.parser')
     articles = soup.findAll('li')
+    articles
     # 게시글만 추출
     articles = [a for a in articles if a.find('dd') is not None]
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
         return(pd.DataFrame())
-
+    a = articles[3]
     # 추출 요소
     a_list = []
     for a in articles:
         l = []
 
         title = a.find('dt').find('a').text
+        # 글이 표시안되는 blank 예외처리
+        if title == '':
+            continue
+        
         user_id = a.find('strong').text
         article_link = a.find('a')['href']
         # print(article_link)

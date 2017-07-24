@@ -22,13 +22,16 @@ def get_article(url):
     soup = BeautifulSoup(resp, 'html.parser')
     articles = soup.findAll('tr')[1:]
     # 게시글이 없으면 리턴
-    if len(articles) == 0:
+    if (len(articles) == 0) | (articles[0].find('td', {'class':'title'}) is None):
         return(pd.DataFrame())
-    
+
     # 게시글 정보 추출
     a_list = []
     for a in articles:
         l = []
+        # 검색결과가 없는 경우 예외 처리
+        if a.find('td', {'class':'title'}) is None:
+            continue
 
         title = a.find('td', {'class':'title'}).find('a').text
         user_id = a.find('td', {'class':'user_function'}).text

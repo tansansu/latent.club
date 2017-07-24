@@ -1,4 +1,4 @@
-# 2017.07.01
+# 2017.07.18
 
 import json
 import sqlite3
@@ -23,7 +23,7 @@ def execute_md(subject_key):
             query = 'select site, title, article_link, date_time, view_num, reply_num from \
             (select site, title, article_link, date_time, view_num, reply_num, article_id from ' +  \
             subject[subject_key] + 'where result = "Y" order by date_time desc limit 500) \
-            where article_id in (select article_id from coin order by date_time desc limit 2000) limit 185;'
+            where article_id not in (select article_id from coin order by date_time desc limit 2000) limit 185;'
             df = pd.read_sql_query(query, conn)
     else:
         ### db파일에서 게시글 리스트 추출
