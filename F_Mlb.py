@@ -37,6 +37,8 @@ def get_article(url):
         article_id = re.search(r'(\d{18})', article_link).group()
         reply_num = mod_reply(a)
         view_num = a.find('span', {'class':'viewV'}).text.replace(',', '')
+        if view_num == '':
+            continue
         # Gathering the cotent of each article
         con = BeautifulSoup(urlopen(article_link), 'html.parser')
         date = con.findAll('span', {'class':'val'})[3].text
