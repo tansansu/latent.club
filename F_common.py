@@ -284,7 +284,7 @@ def tweet_name_filter(dataframe):
     cond_3 = dataframe['title'].str.contains('트위터$')
     cond_4 = dataframe['title'].str.contains('트위터\.')
     dataframe = dataframe[cond_1 | cond_2 | cond_3 | cond_4]
-    dataframe['result'] = 'Y'
+    dataframe.loc[:, 'result'] = 'Y'
     return(dataframe)
 
 # 가상화폐에서 코인노래방 게시글은 제외
