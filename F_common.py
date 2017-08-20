@@ -291,5 +291,5 @@ def tweet_name_filter(dataframe):
 def coin_name_filter(dataframe):
     condition = dataframe['title'].str.contains('노래방')
     dataframe = dataframe[~condition]
-    dataframe['result'] = 'Y'
+    dataframe.loc[:, 'result'] = 'Y'
     return(dataframe)
