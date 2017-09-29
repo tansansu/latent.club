@@ -1,4 +1,4 @@
-# 2017.06.25
+# 2017.09.29
 
 import pickle
 import json
@@ -141,6 +141,8 @@ def compare_article(category, site, dataframe):
 
 # 함수: 스크랩한 게시물 db에 저장
 def store_db(subject, site, dataframe):
+    if dataframe is None:
+        return(0)
     # 수집한 게시물이 db에 이미 있는 것인지 비교
     new_d = compare_article(subject, site, dataframe)
     # 수집한 new 게시글
@@ -284,12 +286,18 @@ def tweet_name_filter(dataframe):
     cond_3 = dataframe['title'].str.contains('트위터$')
     cond_4 = dataframe['title'].str.contains('트위터\.')
     dataframe = dataframe[cond_1 | cond_2 | cond_3 | cond_4]
-    dataframe.loc[:, 'result'] = 'Y'
-    return(dataframe)
+    if dataframe.shape[0] == 0:
+        return(None)
+    else:
+        dataframe.loc[:, 'result'] = 'Y'
+        return(dataframe)
 
 # 가상화폐에서 코인노래방 게시글은 제외
 def coin_name_filter(dataframe):
     condition = dataframe['title'].str.contains('노래방')
     dataframe = dataframe[~condition]
-    dataframe.loc[:, 'result'] = 'Y'
-    return(dataframe)
+    if dataframe.shape[0] == 0:
+        return(None)
+    else:
+        dataframe.loc[:, 'result'] = 'Y'
+        return(dataframe)
