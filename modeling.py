@@ -60,7 +60,6 @@ train_xy = [(term_exists(t), r) for t, r in training]
 test_xy = [(term_exists(t), r) for t, r in testing]
 
 classifier = nltk.NaiveBayesClassifier.train(train_xy)
-classifier
 # 성능 확인
 print(nltk.classify.accuracy(classifier, train_xy))
 print(nltk.classify.accuracy(classifier, test_xy))

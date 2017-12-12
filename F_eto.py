@@ -35,7 +35,6 @@ def sess():
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
     return(s)
 
-
 # 게시글 수집
 def get_article(url):
     base_url = 'http://etorrent.co.kr/plugin/mobile/'
@@ -44,9 +43,9 @@ def get_article(url):
     soup = BeautifulSoup(resp, 'html.parser')
     articles = soup.findAll('li', {'class':'subject'})
     # 게시글이 없으면 리턴
-    if len(articles) == 0:
+    if len(articles) <= 1:
         return(pd.DataFrame())
-    
+
     a_list = []
     for a in articles:
         l = []
@@ -82,7 +81,7 @@ def get_article(url):
         l.append(view_num)
         a_list.append(l)
         time.sleep(.5)
-        
+
     result = pd.DataFrame(a_list)
 
     # munging of the dataframe
@@ -91,4 +90,3 @@ def get_article(url):
     result.set_index('article_id')
     
     return(result)
-
