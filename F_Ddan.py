@@ -1,4 +1,4 @@
-# 2017.06.20
+# 2017.12.31
 
 import time
 import requests
@@ -10,18 +10,22 @@ from datetime import datetime
 
 # 함수: 세션생성
 def sess():
-    AGENT = 'Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'
+    AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25'
     REFERER = 'http://www.ddanzi.com/'
 
     s = requests.Session()
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
     return(s)
 
+def mod_char(char):
+    return(char.replace('\n', '').replace('\t', ''))
+
 def mod_reply(char):
     try:
-        return(re.search(r'[0-9]+', char.find('span', {'class':'reply'}).text).group())
+        return(char.replace('[', '').replace(']', ''))
     except:
         return('0')
+
 
 # 함수: 게시글 수집
 def get_article(url):
@@ -29,31 +33,33 @@ def get_article(url):
     s = sess()
     s_result = s.get(url)
     soup = BeautifulSoup(s_result.text, 'html.parser')
-    articles = soup.findAll('li')
-    articles
+    articles = soup.findAll('li', {'class':'notice'})
     # 게시글만 추출
-    articles = [a for a in articles if a.find('dd') is not None]
+    articles = [x for x in articles if x.find('span', {'class':'author'}).text != '죽지않는돌고래']
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
         return(pd.DataFrame())
-    a = articles[3]
+
     # 추출 요소
     a_list = []
     for a in articles:
         l = []
 
-        title = a.find('dt').find('a').text
-        # 글이 표시안되는 blank 예외처리
-        if title == '':
-            continue
-        
-        user_id = a.find('strong').text
-        article_link = a.find('a')['href']
+        title = mod_char(a.find('span', {'class':'title'}).text)
+        user_id = a.find('span', {'class':'author'}).text
+        article_link = a.find('a', {'class':'link'})['href']
         # print(article_link)
         article_id = re.search(r'(\d{9})', article_link).group()
-        date = a.find('span', {'class':'time'}).text
-        reply_num = mod_reply(a)
-        view_num = a.find('span', {'class':'readNum'}).text
+        reply_num = mod_reply( a.find('span', {'class':'talk'}).text)
+        view_num = a.find('span', {'class':'hits'}).text.replace('|', '')
+        # 날짜를 구하기 위해 게시글 클릭
+        cont = BeautifulSoup(s.get(article_link).text, 'html.parser')
+        date = cont.find('p', {'class':'time'}).text.replace('|', '')
+        if len(date) < 9:
+            date = str(datetime.now()).split(' ')[0] + ' ' + date
+        else:
+            date = date.replace('.', '-')
+
         content = ''
         # 추출항목 리스트로 생성
         l.append(title)
@@ -65,6 +71,7 @@ def get_article(url):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
+        time.sleep(1.3)
 
     # 결과 데이터 프레임 생성
     result = pd.DataFrame(a_list)
