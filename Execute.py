@@ -1,8 +1,9 @@
-# 2017.07.18
+# 2018.01.01
 
 import json
 import sqlite3
 import pandas as pd
+import logging
 import sys
 sys.path.insert(0, 'latent_info/')
 #sys.path.append('/home/ubuntu/Codes/Telegram_Bot/')
@@ -47,6 +48,9 @@ def execute_md(subject_key):
     F_common.to_md(df_2, subject_key, directory, 2)
     F_common.to_md(df_3, subject_key, directory, 3)
 
+# 로깅
+logging.basicConfig(filename='log/test.log',level=logging.DEBUG)
+logging.info('=========================================')
 
 # 기준 정보
 subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', \
@@ -58,10 +62,11 @@ site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌
 start_time = datetime.now().replace(microsecond=0)
 # 로깅
 log = 'Start_time: ' + str(datetime.now().replace(microsecond=0)) + '\n'
+logging.info(log)
 
 # 특정 사이트만 돌리고 싶은 경우
 try:
-    if sys.argv[1] is not None:
+    if sys.argv[1] != None:
         site = [sys.argv[1]]
 except:
     pass
@@ -79,6 +84,7 @@ for j in subject:
             ## article 가져오기
             result = F_common.scrapper(s, url)
             print(result.shape)
+            logging.debug(result.shape)
             if result.shape[0] >= 1:
                 ### 19금 글 제거
                 result = result[~result['title'].str.contains('19')]
@@ -96,14 +102,17 @@ for j in subject:
             log += '-%d %s: %d개 수집\n' % (i+1, s, article_count)
         except Exception as e:
             print(e)
+            logging.error(e)
         ## 프린트 메시지
         print('%s - %s 완료' % (j, s))
+        logging.debug('%s - %s 완료' % (j, s))
     log += '\n'
     # md 파일 생성
     execute_md(j)
 end_time = datetime.now().replace(microsecond=0)
 # log에 동작 시간 추가
 log += '업데이트 동작 시간: ' + str(end_time - start_time)
+logging.info('업데이트 동작 시간: ' + str(end_time - start_time))
 
 # 게시물 수집 log 텔레그램으로 전송
 TelegramBot().log_to_me(log)
