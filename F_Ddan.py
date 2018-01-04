@@ -1,4 +1,4 @@
-# 2017.12.31
+# 2018.01.04
 
 import time
 import requests
@@ -34,7 +34,11 @@ def get_article(url):
     s_result = s.get(url)
     soup = BeautifulSoup(s_result.text, 'html.parser')
     articles = soup.findAll('li', {'class':'notice'})
+    # 게시글이 없는 경우 빈 데이터 프레임 리턴
+    if len(articles) == 0:
+        return(pd.DataFrame())
     # 게시글만 추출
+    articles = [x for x in articles if x.find('span', {'class':'author'}) != None]
     articles = [x for x in articles if x.find('span', {'class':'author'}).text != '죽지않는돌고래']
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
