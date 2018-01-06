@@ -12,7 +12,6 @@ from datetime import datetime
 def sess():
     AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25'
     REFERER = 'http://www.ddanzi.com/'
-
     s = requests.Session()
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
     return(s)
@@ -54,7 +53,10 @@ def get_article(url):
         article_link = a.find('a', {'class':'link'})['href']
         # print(article_link)
         article_id = re.search(r'(\d{9})', article_link).group()
-        reply_num = mod_reply( a.find('span', {'class':'talk'}).text)
+        try: # 리플수가 없을 경우에 발생하는 None type error
+            reply_num = mod_reply( a.find('span', {'class':'talk'}).text)
+        except:
+            reply_num = '0'
         view_num = a.find('span', {'class':'hits'}).text.replace('|', '')
         # 날짜를 구하기 위해 게시글 클릭
         cont = BeautifulSoup(s.get(article_link).text, 'html.parser')
