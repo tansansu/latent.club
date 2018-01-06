@@ -1,4 +1,4 @@
-# 2017.12.31
+# 2018.01.07
 
 import pickle
 import json
@@ -191,11 +191,14 @@ def export_sample(df, object):
 
 # 제목에 트윗이 표시된 것만 추출하는 함수
 def tweet_name_filter(dataframe):
-    cond_1 = dataframe['title'].str.contains('트윗$')
-    cond_2 = dataframe['title'].str.contains('트윗\.')
-    cond_3 = dataframe['title'].str.contains('트위터$')
-    cond_4 = dataframe['title'].str.contains('트위터\.')
-    dataframe = dataframe[cond_1 | cond_2 | cond_3 | cond_4]
+    cond_t1 = dataframe['title'].str.contains('트윗$')
+    cond_t2 = dataframe['title'].str.contains('트윗\.')
+    cond_t3 = dataframe['title'].str.contains('트위터$')
+    cond_t4 = dataframe['title'].str.contains('트위터\.')
+    # 페북조건 추가
+    cond_f1 = dataframe['title'].str.contains('페북$')
+    cond_f2 = dataframe['title'].str.contains('페북\.')
+    dataframe = dataframe[cond_t1 | cond_t2 | cond_t3 | cond_t4 | cond_f1 | cond_f2]
     if dataframe.shape[0] == 0:
         return(None)
     else:
