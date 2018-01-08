@@ -83,7 +83,7 @@ def to_md(dataframe, category, directory, page_num):
             meta = '---\ntitle: ' + category + '\nweight: 40\n---\n\n'
         elif category == '가상화폐':
             meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
-        elif category == '트윗/페북':
+        elif category == '트윗':
             meta = '---\ntitle: ' + category + '\nweight: 60\n---\n\n'
         # md 파일에 추가
         with open(md, 'r+') as f:
