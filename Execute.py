@@ -6,7 +6,6 @@ import pandas as pd
 import logging
 import sys
 sys.path.insert(0, 'latent_info/')
-#sys.path.append('/home/ubuntu/Codes/Telegram_Bot/')
 sys.path.append('/home/ubuntu/Codes/Telegram_Bot/')
 #sys.path.append('/home/jar/Codes/Telegram_Bot/')
 import F_common 
