@@ -17,7 +17,7 @@ def mod_reply(char):
 
 # 게시글 수집
 def get_article(url):
-    base_url = 'http://www.82cook.com/entiz/'
+    base_url = 'http://www.82cook.com/entiz/read.php?bn=15&num='
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
     articles = soup.findAll('tr')[1:]
@@ -35,8 +35,9 @@ def get_article(url):
 
         title = a.find('td', {'class':'title'}).find('a').text
         user_id = a.find('td', {'class':'user_function'}).text
-        article_link = base_url + a.find('a')['href']
+        article_link = a.find('a')['href']
         article_id = re.search(r'\d{6,}', article_link).group()
+        article_link = base_url + article_id
         date = a.find('td', {'class':'regdate'})['title']
         content = ''
         reply_num = mod_reply(a)

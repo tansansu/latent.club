@@ -48,7 +48,7 @@ def execute_md(subject_key):
     F_common.to_md(df_3, subject_key, directory, 3)
 
 # 로깅
-logging.basicConfig(filename='log/test.log',level=logging.DEBUG)
+logging.basicConfig(filename='log/test.log',level=logging.WARNING)
 logging.info('=========================================')
 
 # 기준 정보

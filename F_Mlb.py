@@ -34,6 +34,7 @@ def get_article(url):
         title = a.find('a')['alt']
         user_id = a.find('span', {'class':'nick'}).text
         article_link = a.find('a')['href']
+        article_link = article_link.replace(re.search(r'&query=.+&', article_link).group(), '&')
         article_id = re.search(r'(\d{18})', article_link).group()
         reply_num = mod_reply(a)
         view_num = a.find('span', {'class':'viewV'}).text.replace(',', '')

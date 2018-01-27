@@ -21,7 +21,9 @@ def mod_view(char):
     except:
         return('0')
 
-
+url = 'http://m.ppomppu.co.kr/new/bbs_view.php?id=freeboard&no=5631183&page=1&keyword=%B7%E7%B8%D3'
+url.replace(re.search(r'&keyword=.+', url).group(), '')
+url
 # 게시글 수집
 def get_article(url):
     # url
@@ -40,6 +42,8 @@ def get_article(url):
         l = []
         try: # 삭제된 게시물은 링크가 안남아서 에러가 생김
             article_link = base_url + a.find('a', {'class':'noeffect'})['href']
+            del_keyword = re.search(r'&keyword=.+', article_link).group()
+            article_link = article_link.replace(del_keyword, '')
         except:
             continue
         title = a.find('strong').text

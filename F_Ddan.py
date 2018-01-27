@@ -28,6 +28,7 @@ def mod_reply(char):
 
 # 함수: 게시글 수집
 def get_article(url):
+    base_url = 'http://www.ddanzi.com/free/'
     # 사이트에서 html 가져오기
     s = sess()
     s_result = s.get(url)
@@ -53,6 +54,7 @@ def get_article(url):
         article_link = a.find('a', {'class':'link'})['href']
         # print(article_link)
         article_id = re.search(r'(\d{9})', article_link).group()
+        article_link = base_url + article_id
         try: # 리플수가 없을 경우에 발생하는 None type error
             reply_num = mod_reply( a.find('span', {'class':'talk'}).text)
         except:
