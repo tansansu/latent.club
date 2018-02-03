@@ -1,4 +1,4 @@
-# 2017.06.23
+# 2018.02.03
 
 import time
 from urllib.request import urlopen
@@ -37,7 +37,7 @@ def sess():
 
 # 게시글 수집
 def get_article(url):
-    base_url = 'http://etorrent.co.kr/plugin/mobile/'
+    base_url = 'http://etorrent.co.kr/plugin/mobile/board.php?bo_table=etoboard&wr_id='
     # Get a html
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
@@ -50,9 +50,12 @@ def get_article(url):
     for a in articles:
         l = []
         title = mod_title(a.find('div').text)
-        user_id = mod_user_id(a.find('span', {'class':'name'}).text)
-        article_link = base_url + a.find('a')['href']
-        article_id = re.search(r'\d{3,}', article_link).group()
+        try:
+            user_id = mod_user_id(a.find('span', {'class':'name'}).text)
+        except:
+            continue
+        article_id = re.search(r'\d{3,}', a.find('a')['href']).group()
+        article_link = base_url + article_id
         reply_num = mod_reply(a.find('div').text)
         view_num = re.search(r'[0-9]+', a.findAll('span', {'class':'datetime'})[1].text).group()
         # Gathering the cotent of each article
