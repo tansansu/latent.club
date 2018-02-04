@@ -32,7 +32,7 @@ def execute_md(subject_key):
             subject[subject_key] + ' where result = "Y" order by date_time desc limit 185;'
             df = pd.read_sql_query(query, conn)
     ## 중복글 제거(제목)
-    df.drop_duplicates('title', keep='first', inplace=True)
+    df.drop_duplicates('title', inplace=True)
 
     ### 데이터 프레임을 3개 페이지로 나누기
     df_1 = df.iloc[:60]
