@@ -1,5 +1,6 @@
 # 2018.01.07
 
+#import pdb
 import pickle
 import json
 import pandas as pd
@@ -23,55 +24,9 @@ import F_inven
 
 # 함수: 데이터 프레임을 markdown파일로 변환
 def to_md(dataframe, category, directory, page_num):
-    # html table code
-    html_table = "<table>\n"
-    html_title = "<tr class='title_link'>"
-    html_info = "<tr class='title_info'>"
-    # 사이트명에 다른 컬러를 입히기 위한 사이트-컬러명 dictionary
-    with open('db/site_col.json', 'r') as f:
-        site_col = json.load(f)
-        
-    content = '\n' + html_table
-    for i in range(len(dataframe)):
-        # 제목 줄 생성
-        con_title = "<td><a href='" + dataframe.iloc[i]['article_link'] + "'>" + \
-        dataframe.iloc[i]['title'] + "</a></td></tr>\n"
-        # 제목 줄에 html 코드 추가
-        content += html_title + con_title
-        # 사이트명, 날짜_시간 정보 줄 생성
-        ## 사이트명의 너비를 10칸으로 고정하고 양쪽에 빈공간 생성
-        site_width = len(dataframe.iloc[i]['site'])
-        if (site_width == 6):
-            site_name = ('&nbsp;' * 4) + dataframe.iloc[i]['site'] + ('&nbsp;' * 4)
-        elif site_width == 4:
-            site_name = ('&nbsp;' * 3) + dataframe.iloc[i]['site'] + ('&nbsp;' * 3)
-        elif (site_width == 3) & (dataframe.iloc[i]['site'] != 'SLR'):
-            site_name = ('&nbsp;' * 5) + dataframe.iloc[i]['site'] + ('&nbsp;' * 5)
-        elif site_width == 2:
-            site_name = ('&nbsp;' * 7) + dataframe.iloc[i]['site'] + ('&nbsp;' * 7)
-        elif dataframe.iloc[i]['site'] == 'SLR':
-            site_name = ('&nbsp;' * 7) + dataframe.iloc[i]['site'] + ('&nbsp;' * 8)
-        else:
-            site_name = ('&nbsp;' * 7) + dataframe.iloc[i]['site'] + ('&nbsp;' * 7)
-        # 정보 표시줄(사이트명, 날짜_시간) 생성, 날짜_시간은 분까지만 표시되게 함
-        if dataframe.iloc[i]['view_num'] is None:
-            dataframe.iloc[i]['view_num'] = '  -  '
-        if dataframe.iloc[i]['reply_num'] is None:
-            dataframe.iloc[i]['reply_num'] = ' - '
-            
-        con_info = '<td><span class="' + site_col[dataframe.iloc[i]['site']] + '">' + \
-        site_name + '</span>&nbsp;&nbsp;&nbsp;' + dataframe.iloc[i]['date_time'][:-3] + '&nbsp;&nbsp;' + \
-        '<span class="view">' + dataframe.iloc[i]['view_num'] + '</span>&nbsp;&nbsp;<span class="reply">[' + \
-        dataframe.iloc[i]['reply_num'] + ']</span></td></tr>\n'
-        # 정보 줄에 html 코드 삽입
-        content += html_info + con_info
-
-    content += "</table>\n\n"
-
-    # footer(더보기) 추가하기 위한 html코드
-    html_code_page = '/"><center><b><font color="darkblue" size=4><i class="icon icon-download"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;더 보기&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon icon-download"></i></font></b></center></a>'
-    # 함수: md 파일에 header와 footer 추가하는 함수
-    def make_pageview_comment(md, category, foot_padding):
+    dataframe.reset_index(drop=True, inplace=True)    
+    # 함수: md 파일에 hugo header를 추가하는 함수
+    def make_pageview_comment(category):
         # 헤더 생성
         if category == '부동산':
             meta = '---\ntitle: ' + category + '\nweight: 10\n---\n\n'
@@ -84,39 +39,70 @@ def to_md(dataframe, category, directory, page_num):
         elif category == '가상화폐':
             meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
         elif category == '트윗':
-            meta = '---\ntitle: ' + category + '\nweight: 60\n---\n\n'
-        # md 파일에 추가
-        with open(md, 'r+') as f:
-            content = f.read()
-            f.seek(0, 0)
-            f.write(meta.rstrip('\r\n') + '\n' + content + '\n' + foot_padding)
+            meta = '---\ntitle: ' + category + '\nweight: 60\n---\n\n'        
+        return(meta)
 
-    # md 파일로 데이터 프레임 저장
-    if page_num == 3:
-        md = directory + '/page' + str(page_num) + '.md'
-        # 최종 md 파일 생성
-        with open(md, 'w') as f:
-            f.write(content)
-        # 3번째 페이지는 더보기가 없음
-        foot_padding = '<center><b><font color="darkgray" size=4>마지막 페이지 입니다</font></b></center>'
-        make_pageview_comment(md, category, foot_padding)
+    # 콘텐트에 헤더와 html헤더 추가
+    content = make_pageview_comment(category) + '\n<table>\n'
+
+    # 게시글 table tag
+    html_title = "<tr class='title_link'>"
+    html_info = "<tr class='title_info'>"
+    # 사이트명에 다른 컬러를 입히기 위한 사이트-컬러명 dictionary
+    with open('db/site_col.json', 'r') as f:
+        site_col = json.load(f)
+    for i in range(len(dataframe)):
+        # 제목 줄 생성
+        con_title = '<td colspan="2"><a href="%s">%s</a></td></tr>\n' % \
+        (dataframe.loc[i, 'article_link'], dataframe.loc[i, 'title'])
+        # 제목 줄에 html 코드 추가
+        content += html_title + con_title
+        # 사이트명, 날짜_시간 정보 줄 생성
+        ## 사이트명 생성
+        site_name = "<td width='55px' class=" + site_col[dataframe.loc[i, 'site']] + \
+        ">%s</td>" % dataframe.loc[i, 'site']
+        ## 정보 표시줄(사이트명, 날짜_시간) 생성, 날짜_시간은 분까지만 표시되게 함
+        ## 뷰 수나 리플 수가 없을 때 예외 처리
+        if dataframe.loc[i, 'view_num'] is None:
+            dataframe.loc[i, 'view_num'] = '  -  '
+        if dataframe.loc[i, 'reply_num'] is None:
+            dataframe.loc[i, 'reply_num'] = ' - '
+        con_info = '<td>&nbsp;&nbsp;&nbsp;%s&nbsp;&nbsp;<span class="view">%s</span>&nbsp;&nbsp;<span class="reply">[%s]</span></td></tr>\n' % \
+        (dataframe.loc[i, 'date_time'][:-3], dataframe.loc[i, 'view_num'], dataframe.loc[i, 'reply_num'])
+        # 정보 줄에 html 코드 삽입
+        content += html_info + site_name + con_info
+    content += "</table>"
+
+    # page footer
+    ## footer에 페이지 인덱스 추가하기 위한 html 코드
+    foot_table = '<center><span class="foot_index">'
+
+    if page_num == 1:
+        page = '/index'
+        page1_link = page1_link_end = ' '
+        page2_link = '<a href="./page2">'; page2_link_end = '</a>'
+        page3_link = '<a href="./page3/">'; page3_link_end = '</a>'
     elif page_num == 2:
-        md = directory + '/page' + str(page_num) + '.md'
-        # 최종 md 파일 생성
-        with open(md, 'w') as f:
-            f.write(content)
-        # 마지막 더보기 문구
-        foot_padding = '<a href="../page' + str(page_num+1) + html_code_page
-        make_pageview_comment(md, category, foot_padding)
-    else:
-        md = directory + '/index.md'
-        # 최종 md 파일 생성
-        with open(md, 'w') as f:
-            f.write(content)
-        # 마지막 더보기 문구
-        foot_padding = '<a href="page' + str(page_num+1) + html_code_page
-        make_pageview_comment(md, category, foot_padding)
+        page = '/page2'
+        page2_link = page2_link_end = ' '
+        page1_link = '<a href="../">'; page1_link_end = '</a>'
+        page3_link = '<a href="../page3/">'; page3_link_end = '</a>'
+    elif page_num == 3:
+        page = '/page3'
+        page3_link = page3_link_end = ' '
+        page1_link = '<a href="../">'; page1_link_end = '</a>'
+        page2_link = '<a href="../page2/">'; page2_link_end = '</a>'
 
+    foot_1 = '<td>%s [ 1 - 60 ] %s</td>' % (page1_link, page1_link_end)
+    foot_2 = '<td>%s [ 61 - 120 ] %s</td>' % (page2_link, page2_link_end)
+    foot_3 = '<td>%s [ 121 - 180 ] %s</td></tr></span></center>\n' % (page3_link, page3_link_end)
+
+    content += foot_table + foot_1 + foot_2 + foot_3
+
+    # md 파일 저장
+    path_md = directory + page + '.md'
+    with open(path_md, 'w') as f:
+        f.write(content)
 
 # 함수: 수집한 게시글이 db에 저장된 게시글과 중복인지 확인
 def compare_article(category, site, dataframe):
@@ -127,13 +113,13 @@ def compare_article(category, site, dataframe):
     except:
         pass
     # db에서 게시물 추출
-    conn = sqlite3.connect('db/board.db')
-    query = 'select article_id from ' + category + ' where site = "' + site + \
-    '" order by date_time desc limit 300;'
-    temp = pd.read_sql_query(query, conn)
-    conn.close()
+    with sqlite3.connect('db/board.db') as conn:
+        query = 'select article_id from ' + category + ' where site = "' + site + \
+        '" order by date_time desc limit 300;'
+        temp = pd.read_sql(query, conn)
     try:
         dataframe = dataframe[~dataframe['article_id'].isin(temp['article_id'])]
+        dataframe = dataframe[~dataframe['title'].isin(temp['title'])]
     except:
         pass
     return(dataframe)
@@ -214,3 +200,11 @@ def coin_name_filter(dataframe):
     else:
         dataframe.loc[:, 'result'] = 'Y'
         return(dataframe)
+
+
+def firebase():
+    with open('db/firebase.config', 'r') as f:
+        config = json.load(f)
+    firebase = pyrebase.initialize_app(config)
+    db = firebase.database()
+    return(db)
