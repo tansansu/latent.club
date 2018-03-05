@@ -5,7 +5,6 @@ import sqlite3
 import pandas as pd
 import logging
 import sys
-import pyrebase
 sys.path.insert(0, 'latent_info/')
 sys.path.append('/home/ubuntu/Codes/Telegram_Bot/')
 sys.path.append('/Users/tansansu/Google Drive/Python/Telegram_Bot/')
