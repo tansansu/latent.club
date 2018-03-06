@@ -38,7 +38,7 @@ def to_md(dataframe, category, directory, page_num):
             meta = '---\ntitle: ' + category + '\nweight: 40\n---\n\n'
         elif category == '가상화폐':
             meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
-        elif category == '트윗':
+        elif category == '트윗\페북':
             meta = '---\ntitle: ' + category + '\nweight: 60\n---\n\n'        
         return(meta)
 

@@ -29,6 +29,7 @@ def mod_reply(char):
 
 # 게시글 수집
 def get_article(url):
+    base_url = 'http://m.ruliweb.com/community/board/300148/read/'
     # Get a html
     soup = BeautifulSoup(urlopen(url), 'html.parser')
     # Extracting articles from the html
@@ -48,6 +49,7 @@ def get_article(url):
         article_link = a.findAll('a', {'class':'subject_link'})[0].get('href')
         # print(article_link)
         article_id = re.search(r'(\d{8})', article_link).group()
+        article_link = base_url + article_id # 링크에서 검색어 나오지 않게 수정
         reply_num = mod_reply(a)
         view_num = re.search(r'[0-9]+', a.find('span', {'class':'hit'}).text).group()
         # Gathering the cotent of each article

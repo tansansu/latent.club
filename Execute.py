@@ -16,7 +16,7 @@ from TelegramBot import TelegramBot
 
 
 # 함수: 게시판 md 파일 생성 작업 실행
-def execute_md(subject_key, subject):
+def execute_md(subject_key):
     # db파일에서 게시글 리스트 추출
     conn = sqlite3.connect('db/board.db')
     if subject_key == 'stock': ## 주식 게시판에서 코인 글은 제외
@@ -36,8 +36,8 @@ def execute_md(subject_key, subject):
     df_2 = df.iloc[60:120]
     df_3 = df.iloc[120:180]
     ### 각각의 데이터프레임을 3개의 md파일(페이지)로 만들기
-    directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
-    #directory = '/home/ubuntu/Codes/Web/hugo_latent-info/content/' + subject[subject_key]
+    #directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
+    directory = '/home/ubuntu/Codes/Web/hugo_latent-info/content/' + subject[subject_key]
     F_common.to_md(df_1, subject_key, directory, 1)
     F_common.to_md(df_2, subject_key, directory, 2)
     F_common.to_md(df_3, subject_key, directory, 3)
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     # 특정 사이트만 돌리고 싶은 경우
     try:
-        if sys.argv[1] != None:
+        if sys.argv[1]:
             site = [sys.argv[1]]
     except:
         pass
