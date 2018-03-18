@@ -193,8 +193,7 @@ def tweet_name_filter(dataframe):
 
 # 가상화폐에서 코인노래방 게시글은 제외
 def coin_name_filter(dataframe):
-    condition = dataframe['title'].str.contains('노래방')
-    dataframe = dataframe[~condition]
+    dataframe = dataframe[~dataframe['title'].str.contains('노래방')]
     if dataframe.shape[0] == 0:
         return(None)
     else:
