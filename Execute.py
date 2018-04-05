@@ -6,7 +6,7 @@ import pandas as pd
 import logging
 import sys
 sys.path.insert(0, 'latent_info/')
-sys.path.append('/home/ubuntu/Codes/Telegram_Bot/')
+sys.path.append('/home/revlon/Codes/Telegram_Bot/')
 sys.path.append('/Users/tansansu/Google Drive/Python/Telegram_Bot/')
 #sys.path.append('/home/jar/Codes/Telegram_Bot/')
 import F_common 
@@ -22,11 +22,11 @@ def execute_md(subject_key):
     if subject_key == 'stock': ## 주식 게시판에서 코인 글은 제외
         query = 'select site, title, article_link, date_time, view_num, reply_num from \
         (select site, title, article_link, date_time, view_num, reply_num, article_id from ' +  \
-        subject[subject_key] + 'where result = "Y" order by date_time desc limit 700) \
+        subject[subject_key] + 'where result = "Y" order by date_time desc limit 750) \
         where article_id not in (select article_id from coin order by date_time desc limit 2000) limit 700;'
     else:
         query = 'select site, title, article_link, date_time, view_num, reply_num from ' + \
-        subject[subject_key] + ' where result = "Y" order by date_time desc limit 700;'
+        subject[subject_key] + ' where result = "Y" order by date_time desc limit 750;'
     df = pd.read_sql(query, conn)
     conn.close()
     ## 중복글 제거(제목)
@@ -37,14 +37,14 @@ def execute_md(subject_key):
     df_3 = df.iloc[120:180]
     ### 각각의 데이터프레임을 3개의 md파일(페이지)로 만들기
     #directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
-    directory = '/home/ubuntu/Codes/Web/hugo_latent-info/content/' + subject[subject_key]
+    directory = '/home/revlon/Codes/Web/hugo_latent-info/content/' + subject[subject_key]
     F_common.to_md(df_1, subject_key, directory, 1)
     F_common.to_md(df_2, subject_key, directory, 2)
     F_common.to_md(df_3, subject_key, directory, 3)
 
 if __name__ == '__main__':
     # 로깅
-    logging.basicConfig(filename='log/test.log',level=logging.WARNING)
+    logging.basicConfig(filename='./log/test.log',level=logging.WARNING)
     logging.info('=========================================')
 
     # 기준 정보
