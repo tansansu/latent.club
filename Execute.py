@@ -22,11 +22,11 @@ def execute_md(subject_key):
     if subject_key == 'stock': ## 주식 게시판에서 코인 글은 제외
         query = 'select site, title, article_link, date_time, view_num, reply_num from \
         (select site, title, article_link, date_time, view_num, reply_num, article_id from ' +  \
-        subject[subject_key] + 'where result = "Y" order by date_time desc limit 750) \
+        subject[subject_key] + 'where result = "Y" order by date_time desc limit 900) \
         where article_id not in (select article_id from coin order by date_time desc limit 2000) limit 700;'
     else:
         query = 'select site, title, article_link, date_time, view_num, reply_num from ' + \
-        subject[subject_key] + ' where result = "Y" order by date_time desc limit 750;'
+        subject[subject_key] + ' where result = "Y" order by date_time desc limit 900;'
     df = pd.read_sql(query, conn)
     conn.close()
     ## 중복글 제거(제목)
