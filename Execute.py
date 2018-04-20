@@ -82,7 +82,8 @@ if __name__ == '__main__':
                 logging.debug(result.shape)
                 if result.shape[0] >= 1:
                     ### 19금 글 제거
-                    result = result[~result['title'].str.contains('19')]
+                    result = result[(~result['title'].str.contains('19')) & 
+                    (~result['title'].str.contains('후방'))]
                     ### 머신러닝 분류(트윗 주제는 제목의 글자포함 여부만 필터링함)
                     if j == '트윗':
                         result = F_common.tweet_name_filter(result)
