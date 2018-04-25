@@ -16,31 +16,28 @@ from TelegramBot import TelegramBot
 
 
 # 함수: 게시판 md 파일 생성 작업 실행
-def execute_md(subject_key):
+def execute_md(subject_key, size):
     # db파일에서 게시글 리스트 추출
     conn = sqlite3.connect('db/board.db')
     if subject_key == 'stock': ## 주식 게시판에서 코인 글은 제외
         query = 'select site, title, article_link, date_time, view_num, reply_num from \
         (select site, title, article_link, date_time, view_num, reply_num, article_id from ' +  \
-        subject[subject_key] + 'where result = "Y" order by date_time desc limit 900) \
-        where article_id not in (select article_id from coin order by date_time desc limit 2000) limit 700;'
+        subject[subject_key] + 'where result = "Y" order by date_time desc limit ' + str(size) + \
+        ') where article_id not in (select article_id from coin order by date_time desc limit ' + \
+        str(size*3) + ') limit ' + str(size) + ';'
     else:
         query = 'select site, title, article_link, date_time, view_num, reply_num from ' + \
-        subject[subject_key] + ' where result = "Y" order by date_time desc limit 900;'
+        subject[subject_key] + ' where result = "Y" order by date_time desc limit ' + str(size) + ';'
     df = pd.read_sql(query, conn)
     conn.close()
     ## 중복글 제거(제목)
     df.drop_duplicates('title', inplace=True)
-    ### 데이터 프레임을 3개 페이지로 나누기
-    df_1 = df.iloc[:60]
-    df_2 = df.iloc[60:120]
-    df_3 = df.iloc[120:180]
-    ### 각각의 데이터프레임을 3개의 md파일(페이지)로 만들기
+    ### 데이터 프레임을 5개 페이지로 나누어서 md파일(페이지)로 만들기
     #directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + subject[subject_key]
     directory = '/home/revlon/Codes/Web/hugo_latent-info/content/' + subject[subject_key]
-    F_common.to_md(df_1, subject_key, directory, 1)
-    F_common.to_md(df_2, subject_key, directory, 2)
-    F_common.to_md(df_3, subject_key, directory, 3)
+    for i in range(7):
+        F_common.to_md(df.iloc[30*i:30*(i+1)], subject_key, directory, i+1)
+    
 
 if __name__ == '__main__':
     # 로깅
@@ -104,7 +101,7 @@ if __name__ == '__main__':
             logging.debug('%s - %s 완료' % (j, s))
         log += '\n'
         # md 파일 생성
-        execute_md(j)
+        execute_md(j, size=2000)
     end_time = datetime.now().replace(microsecond=0)
     # log에 동작 시간 추가
     log += '업데이트 동작 시간: ' + str(end_time - start_time)

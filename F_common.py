@@ -76,28 +76,46 @@ def to_md(dataframe, category, directory, page_num):
     # page footer
     ## footer에 페이지 인덱스 추가하기 위한 html 코드
     foot_table = '<center><span class="foot_index">'
+    
+        page1_link = '<a href="../">'; page1_link_end = '</a>'
+        page2_link = '<a href="./page2">'; page2_link_end = '</a>'
+        page3_link = '<a href="../page3/">'; page3_link_end = '</a>'
+        page4_link = '<a href="../page4/">'; page4_link_end = '</a>'
+        page5_link = '<a href="../page5/">'; page5_link_end = '</a>'
+        page6_link = '<a href="../page6/">'; page6_link_end = '</a>'
+        page7_link = '<a href="../page7/">'; page7_link_end = '</a>'
 
     if page_num == 1:
         page = '/index'
         page1_link = page1_link_end = ' '
-        page2_link = '<a href="./page2">'; page2_link_end = '</a>'
-        page3_link = '<a href="./page3/">'; page3_link_end = '</a>'
     elif page_num == 2:
         page = '/page2'
         page2_link = page2_link_end = ' '
-        page1_link = '<a href="../">'; page1_link_end = '</a>'
-        page3_link = '<a href="../page3/">'; page3_link_end = '</a>'
     elif page_num == 3:
         page = '/page3'
         page3_link = page3_link_end = ' '
-        page1_link = '<a href="../">'; page1_link_end = '</a>'
-        page2_link = '<a href="../page2/">'; page2_link_end = '</a>'
+    elif page_num == 4:
+        page = '/page4'
+        page4_link = page4_link_end = ' '
+    elif page_num == 5:
+        page = '/page5'
+        page5_link = page5_link_end = ' '
+    elif page_num == 6:
+        page = '/page6'
+        page6_link = page6_link_end = ' '
+    elif page_num == 7:
+        page = '/page7'
+        page7_link = page7_link_end = ' '
 
-    foot_1 = '<td>%s [ 1 - 60 ] %s</td>' % (page1_link, page1_link_end)
-    foot_2 = '<td>%s [ 61 - 120 ] %s</td>' % (page2_link, page2_link_end)
-    foot_3 = '<td>%s [ 121 - 180 ] %s</td></tr></span></center>\n' % (page3_link, page3_link_end)
+    foot_1 = '<td>|%s&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;%s</td>' % (page1_link, page1_link_end)
+    foot_2 = '<td>|%s&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;%s</td>' % (page2_link, page2_link_end)
+    foot_3 = '<td>|%s&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;%s</td>' % (page3_link, page3_link_end)
+    foot_4 = '<td>|%s&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;%s</td>' % (page4_link, page4_link_end)
+    foot_5 = '<td>|%s&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;%s</td>' % (page5_link, page5_link_end)
+    foot_6 = '<td>|%s&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;%s</td>' % (page6_link, page6_link_end)
+    foot_7 = '<td>|%s&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;%s|</td></tr></span></center>\n' % (page7_link, page7_link_end)
 
-    content += foot_table + foot_1 + foot_2 + foot_3
+    content += foot_table + foot_1 + foot_2 + foot_3 + foot_4 + foot_5 + foot_6 + foot_7
 
     # md 파일 저장
     path_md = directory + page + '.md'
@@ -197,9 +215,13 @@ def tweet_name_filter(dataframe):
         dataframe.loc[:, 'result'] = 'Y'
         return(dataframe)
 
+
 # 가상화폐에서 코인노래방 게시글은 제외
 def coin_name_filter(dataframe):
-    dataframe = dataframe[~dataframe['title'].str.contains('노래방')]
+    cond1 = dataframe['title'].str.contains('노래방')
+    cond2 = dataframe['title'].str.contains('20만')
+    cond3 = dataframe['title'].str.contains('달성')
+    dataframe = dataframe[~(cond1 | cond2 | cond3)]
     if dataframe.shape[0] == 0:
         return(None)
     else:
@@ -207,9 +229,14 @@ def coin_name_filter(dataframe):
         return(dataframe)
 
 
+
+
+'''
+firebase 이용 함수(삭제)
 def firebase():
     with open('db/firebase.config', 'r') as f:
         config = json.load(f)
     firebase = pyrebase.initialize_app(config)
     db = firebase.database()
     return(db)
+'''
