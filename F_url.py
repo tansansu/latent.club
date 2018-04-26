@@ -3,7 +3,7 @@
 '''
 
 # 2017.12.31
-
+# 함수 실행 예: add_keyword(subject='tweet', site='eto', word='abcd', eto_link='')
 def add_keyword(subject=None, site=None, word=None, eto_link=None):
     # 사이트별 추가할 url 패딩 캐릭터
     clien_pad_1 = 'https://www.clien.net/service/search?q='
@@ -38,7 +38,7 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
     
     import re
     # 특정 사이트의 url만 수정 케이스
-    if site != None:
+    if site:
         if site in ['ddan', 'ruli', 'ppom', 'Ou', 'inven', '82cook']:
             # 사이트명에서 숫자 제거한 pad를 붙임(82cook 때문)
             pad = locals()[re.search(r'[^0-9]+', site).group() + '_pad']

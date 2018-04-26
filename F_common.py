@@ -77,13 +77,13 @@ def to_md(dataframe, category, directory, page_num):
     ## footer에 페이지 인덱스 추가하기 위한 html 코드
     foot_table = '<center><span class="foot_index">'
     
-        page1_link = '<a href="../">'; page1_link_end = '</a>'
-        page2_link = '<a href="./page2">'; page2_link_end = '</a>'
-        page3_link = '<a href="../page3/">'; page3_link_end = '</a>'
-        page4_link = '<a href="../page4/">'; page4_link_end = '</a>'
-        page5_link = '<a href="../page5/">'; page5_link_end = '</a>'
-        page6_link = '<a href="../page6/">'; page6_link_end = '</a>'
-        page7_link = '<a href="../page7/">'; page7_link_end = '</a>'
+    page1_link = '<a href="../">'; page1_link_end = '</a>'
+    page2_link = '<a href="./page2">'; page2_link_end = '</a>'
+    page3_link = '<a href="../page3/">'; page3_link_end = '</a>'
+    page4_link = '<a href="../page4/">'; page4_link_end = '</a>'
+    page5_link = '<a href="../page5/">'; page5_link_end = '</a>'
+    page6_link = '<a href="../page6/">'; page6_link_end = '</a>'
+    page7_link = '<a href="../page7/">'; page7_link_end = '</a>'
 
     if page_num == 1:
         page = '/index'
@@ -107,13 +107,13 @@ def to_md(dataframe, category, directory, page_num):
         page = '/page7'
         page7_link = page7_link_end = ' '
 
-    foot_1 = '<td>|%s&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;%s</td>' % (page1_link, page1_link_end)
-    foot_2 = '<td>|%s&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;%s</td>' % (page2_link, page2_link_end)
-    foot_3 = '<td>|%s&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;%s</td>' % (page3_link, page3_link_end)
-    foot_4 = '<td>|%s&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;%s</td>' % (page4_link, page4_link_end)
-    foot_5 = '<td>|%s&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;%s</td>' % (page5_link, page5_link_end)
-    foot_6 = '<td>|%s&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;%s</td>' % (page6_link, page6_link_end)
-    foot_7 = '<td>|%s&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;%s|</td></tr></span></center>\n' % (page7_link, page7_link_end)
+    foot_1 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page1_link, page1_link_end)
+    foot_2 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page2_link, page2_link_end)
+    foot_3 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page3_link, page3_link_end)
+    foot_4 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page4_link, page4_link_end)
+    foot_5 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page5_link, page5_link_end)
+    foot_6 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page6_link, page6_link_end)
+    foot_7 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s|</td></tr></span></center>\n' % (page7_link, page7_link_end)
 
     content += foot_table + foot_1 + foot_2 + foot_3 + foot_4 + foot_5 + foot_6 + foot_7
 
@@ -203,12 +203,10 @@ def tweet_name_filter(dataframe):
     # 페북 조건
     cond_f1 = dataframe['title'].str.contains('페북$')
     cond_f2 = dataframe['title'].str.contains('페북\.')
-    # 인스타그램 조건
-    cond_f1 = dataframe['title'].str.contains('스타그램$')
-    cond_f2 = dataframe['title'].str.contains('스타그램\.')
-    cond_f1 = dataframe['title'].str.contains('스타$')
-    cond_f2 = dataframe['title'].str.contains('스타\.')
-    dataframe = dataframe[cond_t1 | cond_t2 | cond_t3 | cond_t4 | cond_f1 | cond_f2]
+    cond_f3 = dataframe['title'].str.contains('facebook$')
+    cond_f4 = dataframe['title'].str.contains('facebook\.')
+    dataframe = dataframe[cond_t1 | cond_t2 | cond_t3 | cond_t4 | cond_f1 | cond_f2 | \
+    cond_f3 | cond_f4]
     if dataframe.shape[0] == 0:
         return(None)
     else:
