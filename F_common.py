@@ -8,8 +8,8 @@ import sqlite3
 import requests
 import sys
 import time
-sys.path
-sys.path.insert(0, 'latent_info/')
+#sys.path.insert(0, 'latent_info/scrap/')
+sys.path.append('./scrap/')
 import F_clien
 import F_ddan
 import F_ruli
@@ -20,6 +20,8 @@ import F_ppom
 import F_slr
 import F_82cook
 import F_inven
+import F_dvd
+#import F_instiz
 
 
 # 함수: 데이터 프레임을 markdown파일로 변환
@@ -28,22 +30,18 @@ def to_md(dataframe, category, directory, page_num):
     # 함수: md 파일에 hugo header를 추가하는 함수
     def make_pageview_comment(category):
         # 헤더 생성
-        if category == '부동산':
-            meta = '---\ntitle: ' + category + '\nweight: 10\n---\n\n'
-        elif category == '주식':
-            meta = '---\ntitle: ' + category + '\nweight: 20\n---\n\n'
-        elif category == '경제':
-            meta = '---\ntitle: ' + category + '\nweight: 30\n---\n\n'
-        elif category == '찌라시':
-            meta = '---\ntitle: ' + category + '\nweight: 40\n---\n\n'
-        elif category == '가상화폐':
-            meta = '---\ntitle: ' + category + '\nweight: 50\n---\n\n'
-        elif category == '트윗':
-            meta = '---\ntitle: ' + '트윗/페북' + '\nweight: 60\n---\n\n'        
+        meta_weight = {
+            '부동산':10, '주식':20, '경제':30, '찌라시': 40, '가상화폐':50, '트윗':60
+        }
+        if category == '트윗':
+            meta = '---\ntitle: 트윗/페북\nweight: 60\n---\n\n'
+        else:
+            meta = '---\ntitle: %s\nweight: %d\n---\n\n' % (category, meta_weight[category])
+
         return(meta)
 
     # 콘텐트에 헤더와 html헤더 추가
-    content = make_pageview_comment(category) + '\n<table>\n'
+    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td><a href='../notice/'><center><b>알림사항</b></center></a></td></tr>\n"
 
     # 게시글 table tag
     html_title = "<tr class='title_link'>"
@@ -77,43 +75,50 @@ def to_md(dataframe, category, directory, page_num):
     ## footer에 페이지 인덱스 추가하기 위한 html 코드
     foot_table = '<center><span class="foot_index">'
     
-    page1_link = '<a href="../">'; page1_link_end = '</a>'
-    page2_link = '<a href="./page2">'; page2_link_end = '</a>'
-    page3_link = '<a href="../page3/">'; page3_link_end = '</a>'
-    page4_link = '<a href="../page4/">'; page4_link_end = '</a>'
-    page5_link = '<a href="../page5/">'; page5_link_end = '</a>'
-    page6_link = '<a href="../page6/">'; page6_link_end = '</a>'
-    page7_link = '<a href="../page7/">'; page7_link_end = '</a>'
+    page1_link = '<a href="../">'; page_link_end = '</a>'
+    page2_link = '<a href="../page2/">'
+    page3_link = '<a href="../page3/">'
+    page4_link = '<a href="../page4/">'
+    page5_link = '<a href="../page5/">'
+    page6_link = '<a href="../page6/">'
+    page7_link = '<a href="../page7/">'
 
     if page_num == 1:
         page = '/index'
-        page1_link = page1_link_end = ' '
+        page1_link = ' '
+        page2_link = '<a href="./page2/">'
+        page3_link = '<a href="./page3/">'
+        page4_link = '<a href="./page4/">'
+        page5_link = '<a href="./page5/">'
+        page6_link = '<a href="./page6/">'
+        page7_link = '<a href="./page7/">'
     elif page_num == 2:
         page = '/page2'
-        page2_link = page2_link_end = ' '
+        page2_link = ' '
     elif page_num == 3:
         page = '/page3'
-        page3_link = page3_link_end = ' '
+        page3_link = ' '
     elif page_num == 4:
         page = '/page4'
-        page4_link = page4_link_end = ' '
+        page4_link = ' '
     elif page_num == 5:
         page = '/page5'
-        page5_link = page5_link_end = ' '
+        page5_link = ' '
     elif page_num == 6:
         page = '/page6'
-        page6_link = page6_link_end = ' '
+        page6_link = ' '
     elif page_num == 7:
         page = '/page7'
-        page7_link = page7_link_end = ' '
+        page7_link = ' '
 
-    foot_1 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page1_link, page1_link_end)
-    foot_2 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page2_link, page2_link_end)
-    foot_3 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page3_link, page3_link_end)
-    foot_4 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page4_link, page4_link_end)
-    foot_5 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page5_link, page5_link_end)
-    foot_6 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s</td>' % (page6_link, page6_link_end)
-    foot_7 = '<td>|%s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%s|</td></tr></span></center>\n' % (page7_link, page7_link_end)
+    padding = '&nbsp;' * 5
+    foot_1 = '<td>|%s%s1%s%s</td>' % (page1_link, padding, padding, page_link_end)
+    foot_2 = '<td>|%s%s2%s%s</td>' % (page2_link, padding, padding, page_link_end)
+    foot_3 = '<td>|%s%s3%s%s</td>' % (page3_link, padding, padding, page_link_end)
+    foot_4 = '<td>|%s%s4%s%s</td>' % (page4_link, padding, padding, page_link_end)
+    foot_5 = '<td>|%s%s5%s%s</td>' % (page5_link, padding, padding, page_link_end)
+    foot_6 = '<td>|%s%s6%s%s</td>' % (page6_link, padding, padding, page_link_end)
+    foot_7 = '<td>|%s%s7%s%s|</td></tr></span></center>\n' % (page7_link, padding, padding, page_link_end)
 
     content += foot_table + foot_1 + foot_2 + foot_3 + foot_4 + foot_5 + foot_6 + foot_7
 
@@ -122,19 +127,21 @@ def to_md(dataframe, category, directory, page_num):
     with open(path_md, 'w') as f:
         f.write(content)
 
+
 # 함수: 수집한 게시글이 db에 저장된 게시글과 중복인지 확인
-def compare_article(category, site, dataframe):
+def compare_article(category, site, dataframe, connection):
     # 중복 게시글 제거
     try:
         dataframe.drop_duplicates('article_id', inplace=True)
         dataframe.drop_duplicates('title', inplace=True)
     except:
         pass
+    dataframe['article_id'] = dataframe['article_id'].astype('int')
     # db에서 게시물 추출
-    with sqlite3.connect('db/board.db') as conn:
-        query = 'select article_id from ' + category + ' where site = "' + site + \
-        '" order by date_time desc limit 300;'
-        temp = pd.read_sql(query, conn)
+    
+    query = 'select article_id from ' + category + ' where site = "' + site + \
+    '" order by date_time desc limit 200;'
+    temp = pd.read_sql(query, connection)
     try:
         dataframe = dataframe[~dataframe['article_id'].isin(temp['article_id'])]
         dataframe = dataframe[~dataframe['title'].isin(temp['title'])]
@@ -148,13 +155,15 @@ def store_db(subject, site, dataframe):
     if dataframe is None:
         return(0)
     # 수집한 게시물이 db에 이미 있는 것인지 비교
-    new_d = compare_article(subject, site, dataframe)
+    conn = sqlite3.connect('./db/board.db')
+    new_d = compare_article(subject, site, dataframe, conn)
     # 수집한 new 게시글
     article_count = new_d.shape[0]
     if article_count >= 1:
         ## 신규 자료는 DB에 저장
-        with sqlite3.connect('db/board.db') as conn:
-            new_d.to_sql(subject, conn, if_exists='append', index=False)
+        new_d.to_sql(subject, conn, if_exists='append', index=False)
+    
+    conn.close()
     # 수집한 new 게시글 개수 리턴
     return(article_count)
 
@@ -164,7 +173,8 @@ def scrapper(site, urls):
     # 콘텐츠 사이트
     site_link = {'클리앙':'clien', '딴지일보':'ddan', '루리웹':'ruli', \
     '엠팍':'mlb', '오유':'Ou', '이토렌트':'eto', '뽐뿌':'ppom', \
-    'SLR':'slr', '82cook':'82cook', '인벤':'inven'}
+    'SLR':'slr', '82cook':'82cook', '인벤':'inven', 'DVD프라임':'dvd', \
+    '인스티즈':'instiz'}
     # URL 리스트
     url = urls[site_link[site]]
     # 검색어 리스트
@@ -181,20 +191,13 @@ def scrapper(site, urls):
         result = result.append(temp)
         # 1초 지연
         time.sleep(1)
-    result['site'] = site
+    result.loc[:, 'site'] = site
 
     return(result)
 
 
-# 함수: 머신러닝 학습용 샘플데이터 저장
-def export_sample(df, object):
-    from xlsxwriter.utility import xl_rowcol_to_cell
-    writer = pd.ExcelWriter('sample_data/sample_' + object + '_tmp.xlsx', engine='xlsxwriter')
-    df.to_excel(writer, sheet_name='to')
-
-
 # 제목에 트윗이 표시된 것만 추출하는 함수
-def tweet_name_filter(dataframe):
+def tweet_filter(dataframe):
     # 트위터 조건
     cond_t1 = dataframe['title'].str.contains('트윗$')
     cond_t2 = dataframe['title'].str.contains('트윗\.')
@@ -205,8 +208,22 @@ def tweet_name_filter(dataframe):
     cond_f2 = dataframe['title'].str.contains('페북\.')
     cond_f3 = dataframe['title'].str.contains('facebook$')
     cond_f4 = dataframe['title'].str.contains('facebook\.')
-    dataframe = dataframe[cond_t1 | cond_t2 | cond_t3 | cond_t4 | cond_f1 | cond_f2 | \
+    result = dataframe[cond_t1 | cond_t2 | cond_t3 | cond_t4 | cond_f1 | cond_f2 | \
     cond_f3 | cond_f4]
+    if result.shape[0] == 0:
+        return(None)
+    else:
+        result.loc[:, 'result'] = 'Y'
+        return(result)
+
+
+# 가상화폐에서 코인노래방 게시글은 제외
+def coin_filter(dataframe):
+    cond1 = dataframe['title'].str.contains('노래방')
+    cond2 = dataframe['title'].str.contains('20만')
+    cond3 = dataframe['title'].str.contains('달성')
+    cond4 = dataframe['title'].str.contains('페미')
+    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4)]
     if dataframe.shape[0] == 0:
         return(None)
     else:
@@ -214,19 +231,40 @@ def tweet_name_filter(dataframe):
         return(dataframe)
 
 
-# 가상화폐에서 코인노래방 게시글은 제외
-def coin_name_filter(dataframe):
-    cond1 = dataframe['title'].str.contains('노래방')
-    cond2 = dataframe['title'].str.contains('20만')
-    cond3 = dataframe['title'].str.contains('달성')
+# 19금 글 제거 필터
+def adult_filter(dataframe):
+    cond1 = dataframe['title'].str.contains('19')
+    cond2 = dataframe['title'].str.contains('후방')
+    cond3 = dataframe['title'].str.contains('섹스')
     dataframe = dataframe[~(cond1 | cond2 | cond3)]
     if dataframe.shape[0] == 0:
         return(None)
     else:
-        dataframe.loc[:, 'result'] = 'Y'
         return(dataframe)
 
 
+# 찌라시 글 제거 필터
+def tabloid_filter(dataframe):
+    cond1 = dataframe['title'].str.contains('루머의 루머의')
+    cond2 = dataframe['title'].str.contains('루머의루머의')
+    dataframe = dataframe[~(cond1 | cond2)]
+    if dataframe.shape[0] == 0:
+        return(None)
+    else:
+        return(dataframe)
+
+
+# 단어 필터
+def word_filter(dataframe, subject):
+    result = adult_filter(dataframe)
+    # 주제별 특화된 단어 필터링
+    if subject == '트윗':
+        result = tweet_filter(result)
+    elif subject == '가상화폐':
+        result = coin_filter(result)
+    elif subject == '찌라시':
+        result = tabloid_filter(result)
+    return(result)
 
 
 '''

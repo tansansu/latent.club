@@ -6,21 +6,16 @@ import random
 import re
 
 # Choose the subject
-subject = 'estate'
+subject = 'tabloid'
 
 # Import Training Dataset
-filename = 'sample_' + subject + '_tmp.xlsx'
+filename = 'sample_' + subject + '.xlsx'
 filename
 directory = '/Users/tansansu/Google Drive/Python/latent_info/sample_data/'
 raw = pd.read_excel(directory + filename)
 raw = raw[['title', 'result']]
-raw.reset_index(inplace=True, drop=True)
-raw2 = pd.read_excel(directory + 'old/sample_' + subject + '.xlsx')
-raw2 = raw2[['title', 'result']]
-raw2.reset_index(inplace=True, drop=True)
-raw = pd.concat([raw, raw2], axis=0)
-raw.info()
-raw2.info()
+# raw['result'] = raw['result'].astype(int).astype(str)
+raw.head()
 # Data cleansing
 raw.loc[raw['result'] == 1, 'result'] = 'Y'
 raw.loc[(raw['result'] == 0) | (raw['result'].isnull()), 'result'] = 'N'
@@ -58,18 +53,31 @@ len(text.vocab())
 len(set(text))
 selected_word = [w for w in text.vocab()]
 
-def term_exists(doc):
-    return {'exists({})'.format(word): (word in set(doc)) for word in selected_word}
 
-train_xy = [(term_exists(t), r) for t, r in training]
-test_xy = [(term_exists(t), r) for t, r in testing]
+from collections import namedtuple
+TaggedDocument = namedtuple('TaggedDocument', 'words tags')
 
-classifier = nltk.NaiveBayesClassifier.train(train_xy)
-# 성능 확인
-print(nltk.classify.accuracy(classifier, train_xy))
-print(nltk.classify.accuracy(classifier, test_xy))
-classifier.show_most_informative_features(20)
-# classifier.classify(term_exists(test_words[20]))
+tagged_train_docs = [TaggedDocument(d, [c]) for d, c in training]
+tagged_test_docs = [TaggedDocument(d, [c]) for d, c in testing]
+len(tagged_test_docs)
+
+from gensim.models import doc2vec
+
+config = {
+    'size': 300,  # 300차원짜리 벡터스페이스에 embedding
+    'alpha': 0.025, 
+    'min_alpha': 0.025, 
+    'seed': 1234
+}
+model = doc2vec.Doc2Vec(**config)
+model.build_vocab(tagged_train_docs)
+ # Train document vectors!
+for epoch in range(10):
+    model.train(tagged_train_docs, total_examples=700000, epochs=1)
+    model.alpha -= 0.002  # decrease the learning rate
+    model.min_alpha = model.alpha
+
+
 
 # Savting the model
 import pickle

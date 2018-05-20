@@ -21,13 +21,13 @@ def execute_md(subject_key, size):
     conn = sqlite3.connect('db/board.db')
     if subject_key == 'stock': ## 주식 게시판에서 코인 글은 제외
         query = 'select site, title, article_link, date_time, view_num, reply_num from \
-        (select site, title, article_link, date_time, view_num, reply_num, article_id from ' +  \
-        subject[subject_key] + 'where result = "Y" order by date_time desc limit ' + str(size) + \
-        ') where article_id not in (select article_id from coin order by date_time desc limit ' + \
-        str(size*3) + ') limit ' + str(size) + ';'
+        (select site, title, article_link, date_time, view_num, reply_num, article_id from \
+        %s where result = "Y" order by date_time desc limit %d) where article_id not in \
+        (select article_id from coin order by date_time desc limit %d) limit %d;' % \
+        (subject[subject_key], size, size, size)
     else:
-        query = 'select site, title, article_link, date_time, view_num, reply_num from ' + \
-        subject[subject_key] + ' where result = "Y" order by date_time desc limit ' + str(size) + ';'
+        query = 'select site, title, article_link, date_time, view_num, reply_num from \
+        %s where result = "Y" order by date_time desc limit %d;' % (subject[subject_key], size)
     df = pd.read_sql(query, conn)
     conn.close()
     ## 중복글 제거(제목)
@@ -48,12 +48,13 @@ if __name__ == '__main__':
     subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', \
     '경제':'economy', '트윗':'tweet', '가상화폐':'coin'}
     site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
-    '뽐뿌', 'SLR', '82cook', '인벤']
+    '뽐뿌', 'SLR', '82cook', '인벤', 'DVD프라임']
 
     # 코드 동작 시간 측정용
     start_time = datetime.now().replace(microsecond=0)
     # 로깅
     log = 'Start_time: ' + str(datetime.now().replace(microsecond=0)) + '\n'
+    print(log)
     logging.info(log)
 
     # 특정 사이트만 돌리고 싶은 경우
@@ -79,8 +80,7 @@ if __name__ == '__main__':
                 logging.debug(result.shape)
                 if result.shape[0] >= 1:
                     ### 19금 글 제거
-                    result = result[(~result['title'].str.contains('19')) & 
-                    (~result['title'].str.contains('후방'))]
+                    result = F_common.adult_filter(result)
                     ### 머신러닝 분류(트윗 주제는 제목의 글자포함 여부만 필터링함)
                     if j == '트윗':
                         result = F_common.tweet_name_filter(result)
@@ -101,11 +101,11 @@ if __name__ == '__main__':
             logging.debug('%s - %s 완료' % (j, s))
         log += '\n'
         # md 파일 생성
-        execute_md(j, size=2000)
+        execute_md(j, size=300)
     end_time = datetime.now().replace(microsecond=0)
     # log에 동작 시간 추가
-    log += '업데이트 동작 시간: ' + str(end_time - start_time)
-    logging.info('업데이트 동작 시간: ' + str(end_time - start_time))
+    message = '업데이트 동작 시간: ' + str(end_time - start_time)
+    log += message; logging.info(message)
 
     # 게시물 수집 log 텔레그램으로 전송
     TelegramBot().log_to_me(log)

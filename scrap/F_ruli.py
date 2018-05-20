@@ -5,7 +5,6 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
-from datetime import datetime
 
 
 # Modifing user_ids

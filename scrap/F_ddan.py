@@ -16,7 +16,13 @@ def sess():
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
     return(s)
 
-def mod_char(char):
+def mod_char(char, for_title=None):
+    if for_title:
+        try:
+            remove_char = re.search(r'\[.*\] *', char).group()
+            return(char.replace('\n', '').replace('\t', '').replace(remove_char, ''))
+        except:
+            pass
     return(char.replace('\n', '').replace('\t', ''))
 
 def mod_reply(char):
@@ -33,36 +39,36 @@ def get_article(url):
     s = sess()
     s_result = s.get(url)
     soup = BeautifulSoup(s_result.text, 'html.parser')
-    articles = soup.findAll('li', {'class':'notice'})
+    articles = soup.findAll('div', {'class':'titleBox'})
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
         return(pd.DataFrame())
-    # 게시글만 추출
-    articles = [x for x in articles if x.find('span', {'class':'author'}) != None]
-    articles = [x for x in articles if x.find('span', {'class':'author'}).text != '죽지않는돌고래']
+    # 공지글 제거
+    articles = [x for x in articles if x.find('strong') == None]
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
         return(pd.DataFrame())
 
     # 추출 요소
     a_list = []
+    #print(len(articles))
     for a in articles:
         l = []
-
-        title = mod_char(a.find('span', {'class':'title'}).text)
-        user_id = a.find('span', {'class':'author'}).text
-        article_link = a.find('a', {'class':'link'})['href']
+        title = mod_char(a.find('div', {'class':'title'}).text, 'for_title')
+        #print(title)
+        article_id = re.search(r'(\d{9})', a.find('a')['href']).group()
         # print(article_link)
-        article_id = re.search(r'(\d{9})', article_link).group()
         article_link = base_url + article_id
         try: # 리플수가 없을 경우에 발생하는 None type error
             reply_num = mod_reply( a.find('span', {'class':'talk'}).text)
         except:
             reply_num = '0'
-        view_num = a.find('span', {'class':'hits'}).text.replace('|', '')
         # 날짜를 구하기 위해 게시글 클릭
         cont = BeautifulSoup(s.get(article_link).text, 'html.parser')
-        date = cont.find('p', {'class':'time'}).text.replace('|', '')
+        temp = cont.find('div', {'class':'right'})
+        user_id = mod_char(temp.find('a').text)
+        view_num = cont.find('span', {'class':'read'}).text
+        date = cont.find('p', {'class':'time'}).text
         if len(date) < 9:
             date = str(datetime.now()).split(' ')[0] + ' ' + date
         else:

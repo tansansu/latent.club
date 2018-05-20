@@ -1,7 +1,7 @@
 # 2018.02.03
 
 import time
-from urllib.request import urlopen
+import requests
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
@@ -28,22 +28,22 @@ def mod_reply(char):
 
 # Session
 def sess():
-    AGENT = 'Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'
-    REFERER = 'http://etorrent.co.kr/'
-    
+    AGENT = 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Mobile Safari/537.36'
+    REFERER = 'http://www.etoland.co.kr/'    
     s = requests.Session()
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
     return(s)
 
 # 게시글 수집
 def get_article(url):
-    base_url = 'http://etorrent.co.kr/plugin/mobile/board.php?bo_table=etoboard&wr_id='
+    base_url = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard&wr_id='
     # Get a html
-    resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'html.parser')
+    s = sess()
+    resp = s.get(url)
+    soup = BeautifulSoup(resp.text, 'html.parser')
     articles = soup.findAll('li', {'class':'subject'})
     # 게시글이 없으면 리턴
-    if len(articles) <= 1:
+    if len(articles) == 0:
         return(pd.DataFrame())
 
     a_list = []
@@ -59,8 +59,8 @@ def get_article(url):
         reply_num = mod_reply(a.find('div').text)
         view_num = re.search(r'[0-9]+', a.findAll('span', {'class':'datetime'})[1].text).group()
         # Gathering the cotent of each article
-        con = urlopen(article_link)
-        temp = BeautifulSoup(con, 'html.parser')
+        con = s.get(article_link)
+        temp = BeautifulSoup(con.text, 'html.parser')
         try:
             '''
             content = temp.cssselect('td.mw_basic_view_content')[0].\
