@@ -140,7 +140,7 @@ def compare_article(category, site, dataframe, connection):
     # db에서 게시물 추출
     
     query = 'select article_id from ' + category + ' where site = "' + site + \
-    '" order by date_time desc limit 200;'
+    '" order by date_time desc limit 2000;'
     temp = pd.read_sql(query, connection)
     try:
         dataframe = dataframe[~dataframe['article_id'].isin(temp['article_id'])]
@@ -236,7 +236,8 @@ def adult_filter(dataframe):
     cond1 = dataframe['title'].str.contains('19')
     cond2 = dataframe['title'].str.contains('후방')
     cond3 = dataframe['title'].str.contains('섹스')
-    dataframe = dataframe[~(cond1 | cond2 | cond3)]
+    cond4 = dataframe['title'].str.contains('약후')
+    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4)]
     if dataframe.shape[0] == 0:
         return(None)
     else:
@@ -247,7 +248,9 @@ def adult_filter(dataframe):
 def tabloid_filter(dataframe):
     cond1 = dataframe['title'].str.contains('루머의 루머의')
     cond2 = dataframe['title'].str.contains('루머의루머의')
-    dataframe = dataframe[~(cond1 | cond2)]
+    cond3 = dataframe['title'].str.contains('루머의x3')
+    cond4 = dataframe['title'].str.contains('루머의 x3')
+    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4)]
     if dataframe.shape[0] == 0:
         return(None)
     else:
