@@ -41,7 +41,7 @@ def to_md(dataframe, category, directory, page_num):
         return(meta)
 
     # 콘텐트에 헤더와 html헤더 추가
-    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td><a href='../notice/'><center><b>알림사항</b></center></a></td></tr>\n"
+    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://latent.club/notice/'><center><b>알림사항</b></center></a></td></tr>\n"
 
     # 게시글 table tag
     html_title = "<tr class='title_link'>"
@@ -134,6 +134,7 @@ def compare_article(category, site, dataframe, connection):
     try:
         dataframe.drop_duplicates('article_id', inplace=True)
         dataframe.drop_duplicates('title', inplace=True)
+        dataframe.drop_duplicates(['site', 'article_id'], inplace=True)
     except:
         pass
     dataframe['article_id'] = dataframe['article_id'].astype('int')
@@ -223,7 +224,8 @@ def coin_filter(dataframe):
     cond2 = dataframe['title'].str.contains('20만')
     cond3 = dataframe['title'].str.contains('달성')
     cond4 = dataframe['title'].str.contains('페미')
-    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4)]
+    cond5 = dataframe['title'].str.contains('미트')
+    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4 | cond5)]
     if dataframe.shape[0] == 0:
         return(None)
     else:
@@ -250,7 +252,9 @@ def tabloid_filter(dataframe):
     cond2 = dataframe['title'].str.contains('루머의루머의')
     cond3 = dataframe['title'].str.contains('루머의x3')
     cond4 = dataframe['title'].str.contains('루머의 x3')
-    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4)]
+    cond5 = dataframe['title'].str.contains('루머x3')
+    cond6 = dataframe['title'].str.contains('루머X3')
+    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4 | cond5 | cond6)]
     if dataframe.shape[0] == 0:
         return(None)
     else:
