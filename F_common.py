@@ -225,7 +225,8 @@ def coin_filter(dataframe):
     cond3 = dataframe['title'].str.contains('달성')
     cond4 = dataframe['title'].str.contains('페미')
     cond5 = dataframe['title'].str.contains('미트')
-    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4 | cond5)]
+    cond6 = dataframe['title'].str.contains('빨래방')
+    dataframe = dataframe[~(cond1 | cond2 | cond3 | cond4 | cond5 | cond6)]
     if dataframe.shape[0] == 0:
         return(None)
     else:
