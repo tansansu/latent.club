@@ -116,10 +116,10 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
         # SLR은 키워드만 추가
         url = put_link(url, 'slr', word, b_word)
         # 이토렌트는 None이면 공백으로 추가
-        if eto_link:
-            url = put_link(url, 'eto', word, eto_link)
-        else:
+        if not(eto_link):
             url = put_link(url, 'eto', word, '')
+        else:
+            url = put_link(url, 'eto', word, pad.format(eto_link))
         
         
     # url json 파일 저장하기
