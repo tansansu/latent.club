@@ -26,6 +26,8 @@ def execute_md(subject_key, size):
         %s where result = "Y" order by date_time desc limit %d) where article_id not in \
         (select article_id from coin order by date_time desc limit %d) limit %d;' % \
         (subject[subject_key], size, size, size)
+    elif subject_key == 'hot':
+        break
     else:
         query = 'select site, title, article_link, date_time, view_num, reply_num from \
         %s where result = "Y" order by date_time desc limit %d;' % (subject[subject_key], size)
@@ -43,7 +45,7 @@ def execute_md(subject_key, size):
 if __name__ == '__main__':
     # 기준 정보
     subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', \
-    '경제':'economy', '트윗':'tweet', '가상화폐':'coin'}
+    '경제':'economy', '트윗':'tweet', '가상화폐':'coin', '대란':'hot'}
     site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
     '뽐뿌', 'SLR', '82cook', '인벤', 'DVD프라임']
     len_site = len(site)

@@ -119,7 +119,7 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
         if not(eto_link):
             url = put_link(url, 'eto', word, '')
         else:
-            url = put_link(url, 'eto', word, pad.format(eto_link))
+            url = put_link(url, 'eto', word, eto_pad.format(eto_link))
         
         
     # url json 파일 저장하기
