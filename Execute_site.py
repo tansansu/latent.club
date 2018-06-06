@@ -26,8 +26,6 @@ def execute_md(subject_key, size):
         %s where result = "Y" order by date_time desc limit %d) where article_id not in \
         (select article_id from coin order by date_time desc limit %d) limit %d;' % \
         (subject[subject_key], size, size, size)
-    elif subject_key == 'hot':
-        break
     else:
         query = 'select site, title, article_link, date_time, view_num, reply_num from \
         %s where result = "Y" order by date_time desc limit %d;' % (subject[subject_key], size)
@@ -92,7 +90,7 @@ if __name__ == '__main__':
                         ### 단어 필터링
                         result = F_common.word_filter(result, j)
                         ### 주제 적합성 판정(트윗 제외)
-                        if j != '트윗':
+                        if j not in ['트윗', '대란']:
                             result = F_Classifier.predict_Y(result, subject[j])
                         ### DB에 게시글 저장
                         article_count = F_common.store_db(subject[j], s, result)
@@ -104,7 +102,8 @@ if __name__ == '__main__':
                 ## 프린트 메시지
                 print('%s - %s 완료' % (j, s))
             # md 파일 생성
-            execute_md(j, size=300)
+            if j != '대란':
+                execute_md(j, size=300)
         end_time = datetime.now().replace(microsecond=0)
         # log에 동작 시간 추가
         message = '업데이트 동작 시간: %s\n' % str(end_time - start_time)
