@@ -95,13 +95,13 @@ if __name__ == '__main__':
                     article_count = F_common.store_db(subject[subject_key], site, result)
                 else:
                     article_count = 0
-                log += '-%s: %d개 수집\n' % (j, article_count)
+                log += '-%s: %d개 수집\n' % (subject_key, article_count)
             except Exception as e:
                 print(e)
             ## 프린트 메시지
             print('%s - %s 완료' % (subject_key, site))
         # md 파일 생성
-        if j != '대란':
+        if subject_key != '대란':
             execute_md(subject_key, size=300)
         end_time = datetime.now().replace(microsecond=0)
         # log에 동작 시간 추가
