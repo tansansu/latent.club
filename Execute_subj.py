@@ -44,9 +44,9 @@ if __name__ == '__main__':
     # 기준 정보
     subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', \
     '경제':'economy', '트윗':'tweet', '가상화폐':'coin', '대란':'hot'}
-    site = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
+    subjects = list(subject.keys())
+    sites = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
     '뽐뿌', 'SLR', '82cook', '인벤', 'DVD프라임']
-    len_site = len(site)
     
     # Check Status file
     with open('./status.conf', 'r') as f:
@@ -55,55 +55,54 @@ if __name__ == '__main__':
     if opt['status'] == 1:
         print('Running!')
     else:
-        complete_site_idx = site.index(opt['site'])
-        if complete_site_idx == len_site-1:
-            site = site[0]
+        complete_subj_idx = subjects.index(opt['subject'])
+        if complete_subj_idx == len(subjects)-1:
+            subject_key = subjects[0]
         else:
-            site = site[complete_site_idx+1]
-        print(site)
+            subject_key = subjects[complete_subj_idx+1]
+        #print(subject_key)
         # 실행중 상태 기록
         opt['status'] = 1
-        opt['site'] = site
+        opt['subject'] = subject_key
         with open('./status.conf', 'w') as f:
             json.dump(opt, f)
 
         # log 메세지 생성
-        log = '[ %s ]\n' % site
+        log = '[ %s ]\n' % subject_key
         # 코드 동작 시간 측정용
         start_time = datetime.now().replace(microsecond=0)
         # 로깅
         log += 'Start_time: ' + str(start_time) + '\n'
         print(log)
 
-        site = [site] # character를 interate하지 않도록
-        for j in subject:
-            # 검색 url 불러오기
-            with open('./links/' + subject[j] + '.json','r') as f:
-                url = json.load(f)
-            for i, s in enumerate(site):
-                try:
-                    print(j + ' | ' + s)
-                    ## article 가져오기
-                    result = F_common.scrapper(s, url)
-                    print(result.shape)
-                    if result.shape[0] >= 1:
-                        ### 단어 필터링
-                        result = F_common.word_filter(result, j)
-                        ### 주제 적합성 판정(트윗 제외)
-                        if j not in ['트윗', '대란']:
-                            result = F_Classifier.predict_Y(result, subject[j])
-                        ### DB에 게시글 저장
-                        article_count = F_common.store_db(subject[j], s, result)
-                    else:
-                        article_count = 0
-                    log += '-%s: %d개 수집\n' % (j, article_count)
-                except Exception as e:
-                    print(e)
-                ## 프린트 메시지
-                print('%s - %s 완료' % (j, s))
-            # md 파일 생성
-            if j != '대란':
-                execute_md(j, size=300)
+        #subject = [subject] # character를 interate하지 않도록
+        # 검색 url 불러오기
+        with open('./links/' + subject[subject_key] + '.json','r') as f:
+            url = json.load(f)
+        for i, site in enumerate(sites):
+            try:
+                print(subject_key + ' | ' + site)
+                ## article 가져오기
+                result = F_common.scrapper(site, url)
+                print(result.shape)
+                if result.shape[0] >= 1:
+                    ### 단어 필터링
+                    result = F_common.word_filter(result, subject_key)
+                    ### 주제 적합성 판정(트윗 제외)
+                    if j not in ['트윗', '대란']:
+                        result = F_Classifier.predict_Y(result, subject[subject_key])
+                    ### DB에 게시글 저장
+                    article_count = F_common.store_db(subject[subject_key], site, result)
+                else:
+                    article_count = 0
+                log += '-%s: %d개 수집\n' % (j, article_count)
+            except Exception as e:
+                print(e)
+            ## 프린트 메시지
+            print('%s - %s 완료' % (subject_key, site))
+        # md 파일 생성
+        if j != '대란':
+            execute_md(subject_key, size=300)
         end_time = datetime.now().replace(microsecond=0)
         # log에 동작 시간 추가
         message = '업데이트 동작 시간: %s\n' % str(end_time - start_time)
@@ -113,7 +112,7 @@ if __name__ == '__main__':
         with open('./log/scrap.log', 'a') as f:
             f.write(log)
         ## 11개의 사이트가 전부 수집이 될 때만 전송
-        if complete_site_idx == len_site-1:
+        if complete_subj_idx == len(subjects)-1:
             # 과거 log 불러오기
             with open('./log/scrap.log', 'r') as f:
                 scrap_log = ''.join(f.readlines())
