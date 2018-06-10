@@ -262,6 +262,16 @@ def tabloid_filter(dataframe):
         return(dataframe)
 
 
+# 찌라시 글 제거 필터
+def stock_filter(dataframe):
+    cond1 = dataframe['title'].str.contains('무료앱')
+    dataframe = dataframe[~cond1]
+    if dataframe.shape[0] == 0:
+        return(None)
+    else:
+        return(dataframe)
+
+
 # 단어 필터
 def word_filter(dataframe, subject):
     result = adult_filter(dataframe)
@@ -272,6 +282,8 @@ def word_filter(dataframe, subject):
         result = coin_filter(result)
     elif subject == '찌라시':
         result = tabloid_filter(result)
+    elif subject == '주식':
+        result = stock_filter(result)
     return(result)
 
 
