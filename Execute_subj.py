@@ -89,7 +89,7 @@ if __name__ == '__main__':
                     ### 단어 필터링
                     result = F_common.word_filter(result, subject_key)
                     ### 주제 적합성 판정(트윗 제외)
-                    if j not in ['트윗', '대란']:
+                    if subject_key not in ['트윗', '대란']:
                         result = F_Classifier.predict_Y(result, subject[subject_key])
                     ### DB에 게시글 저장
                     article_count = F_common.store_db(subject[subject_key], site, result)
