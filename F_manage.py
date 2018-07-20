@@ -57,7 +57,7 @@ def export_sample(df, object):
 # 중복 데이터 정리 함수
 def clean_dup(path_db):
     # 정리할 테이블
-    tables = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet']
+    tables = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot']
     conn = sqlite3.connect(path_db)
     for table in tables:
         df = pd.read_sql('select * from %s;' % table, conn)
@@ -66,7 +66,7 @@ def clean_dup(path_db):
         after_lines = df.shape[0]
         df.to_sql(table, conn, if_exists='replace', index=False)
         # 결과 출력
-        print('%s | before: %d  after: %d' % (table, before_lines, after_lines))
+        print('%s | before: %d rows after: %d rows' % (table, before_lines, after_lines))
     conn.close()
 
 
@@ -87,6 +87,9 @@ def update_article_result(path_db):
         # 결과 출력
         print('%s | before: %d  after: %d' % (table, before_y, after_y))
     conn.close()
+
+
+    
 
 
 '''

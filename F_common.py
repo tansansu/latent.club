@@ -41,7 +41,7 @@ def to_md(dataframe, category, directory, page_num):
         return(meta)
 
     # 콘텐트에 헤더와 html헤더 추가
-    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://latent.club/notice/'><center><b>알림사항</b></center></a></td></tr>\n"
+    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://latent.club/notice/'><center><b>알림사항(2018.07.11)</b></center></a></td></tr>\n"
 
     # 게시글 table tag
     html_title = "<tr class='title_link'>"

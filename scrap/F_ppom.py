@@ -21,9 +21,7 @@ def mod_view(char):
     except:
         return('0')
 
-url = 'http://m.ppomppu.co.kr/new/bbs_view.php?id=freeboard&no=5631183&page=1&keyword=%B7%E7%B8%D3'
-url.replace(re.search(r'&keyword=.+', url).group(), '')
-url
+
 # 게시글 수집
 def get_article(url):
     # url

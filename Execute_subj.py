@@ -44,7 +44,7 @@ if __name__ == '__main__':
     # 기준 정보
     subject = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', \
     '경제':'economy', '트윗':'tweet', '가상화폐':'coin', '대란':'hot'}
-    subjects = list(subject.keys())
+    subjects = ['부동산', '경제', '주식', '찌라시', '가상화폐', '트윗', '대란']
     sites = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
     '뽐뿌', 'SLR', '82cook', '인벤', 'DVD프라임']
     
@@ -95,7 +95,7 @@ if __name__ == '__main__':
                     article_count = F_common.store_db(subject[subject_key], site, result)
                 else:
                     article_count = 0
-                log += '-%s: %d개 수집\n' % (subject_key, article_count)
+                log += '-%s: %d개 수집\n' % (site, article_count)
             except Exception as e:
                 print(e)
             ## 프린트 메시지
