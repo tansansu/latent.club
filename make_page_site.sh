@@ -1,6 +1,6 @@
 #!/bin/bash
 cd /home/revlon/Codes/Web/latent_info/
-python3 Execute_site.py
+python3 Execute_each.py $1 $2
 cd /home/revlon/Codes/Web/hugo_latent-info
 hugo --theme=hugo-material-docs
 cd /home/revlon/Codes/Web/latent-info.github.io

@@ -18,7 +18,7 @@ def add_site(site, subject=None):
             json.dump(url, f)
         print(url[site])
     else:
-        subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet']
+        subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
         for sub in subjects:
             with open('links/' + sub + '.json','r') as f:
                 url = json.load(f)
@@ -42,7 +42,7 @@ def del_site(site, subject=None):
         with open('links/' + subject + '.json', 'w') as f:
             json.dump(url, f)
     else:
-        subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet']
+        subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
         for sub in subjects:
             with open('links/' + sub + '.json','r') as f:
                 url = json.load(f)
@@ -109,7 +109,7 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
     # 전체 사이트에 키워드 검색 url 추가하기
     else:
         sites = ['clien', 'ddan', 'ruli', 'mlb', 'Ou', 'ppom', '82cook', \
-        'inven', 'dvd', 'instiz']
+        'inven', 'dvd']
         for site in sites:  
             pad = locals()[re.search(r'[^0-9]+', site).group() + '_pad']
             url = put_link(url, site, word, pad.format(b_word))
@@ -133,8 +133,8 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
 def change_url(target='eto'):
     import re
     # url과 변경할 주제
-    subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet']
-    eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard&sca=&sfl=wr_subject%7C%7Cwr_content&stx=%BA%CE%B5%BF%BB%EA{0}'
+    subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
+    eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard&sca=&sfl=wr_subject%7C%7Cwr_content&stx={0}'
     # 키워드 추출
     for subject in subjects:
         # 저장된 url json 파일 열기

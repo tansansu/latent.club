@@ -170,12 +170,11 @@ def store_db(subject, site, dataframe):
 
 
 # 함수: 사이트 스크래핑
-def scrapper(site, urls):
+def scrapper(site, urls, subject):
     # 콘텐츠 사이트
     site_link = {'클리앙':'clien', '딴지일보':'ddan', '루리웹':'ruli', \
     '엠팍':'mlb', '오유':'Ou', '이토렌트':'eto', '뽐뿌':'ppom', \
-    'SLR':'slr', '82cook':'82cook', '인벤':'inven', 'DVD프라임':'dvd', \
-    '인스티즈':'instiz'}
+    'SLR':'slr', '82cook':'82cook', '인벤':'inven', 'DVD프라임':'dvd'}
     # URL 리스트
     url = urls[site_link[site]]
     # 검색어 리스트
@@ -185,7 +184,7 @@ def scrapper(site, urls):
     # 사이트마다 키워드 url 반복
     for u in keywords:
         # 개별 사이트 소스파일의 get_article 함수 실행
-        temp = globals()['F_' + site_link[site]].get_article(url[u])
+        temp = globals()['F_' + site_link[site]].get_article(url[u], subject)
         if temp.shape[0] == 0:
             continue
         temp['keyword'] = u
@@ -272,6 +271,12 @@ def stock_filter(dataframe):
         return(dataframe)
 
 
+# 감동 글 Y값 지정
+def touch_approve(dataframe):
+    dataframe.loc[:, 'result'] = 'Y'
+    return(dataframe)
+
+
 # 단어 필터
 def word_filter(dataframe, subject):
     result = adult_filter(dataframe)
@@ -284,6 +289,8 @@ def word_filter(dataframe, subject):
         result = tabloid_filter(result)
     elif subject == '주식':
         result = stock_filter(result)
+    elif subject == '감동':
+        result = touch_approve(result)
     return(result)
 
 

@@ -26,8 +26,14 @@ def mod_reply(char):
         return('0')
 
 
+def touch_article(soup):
+    ## ㅠ, ㅜ의 개수로 감동스토리 판단
+    tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
+    return(tear_cnt >= 7)
+
+    
 # 게시글 수집
-def get_article(url):
+def get_article(url, subject):
     base_url = 'http://m.ruliweb.com/community/board/300148/read/'
     # Get a html
     soup = BeautifulSoup(urlopen(url), 'html.parser')
@@ -53,6 +59,11 @@ def get_article(url):
         view_num = re.search(r'[0-9]+', a.find('span', {'class':'hit'}).text).group()
         # Gathering the cotent of each article
         con = BeautifulSoup(urlopen(article_link), 'html.parser')
+        # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
+        if subject == 'touching':
+            yn = touch_article(con)
+            if yn == False:
+                continue
         date = mod_date(mod_user_id(con.find('span', {'class':'regdate'}).text))
         content = ''
         
@@ -67,6 +78,9 @@ def get_article(url):
         l.append(view_num)
         a_list.append(l)
         time.sleep(.5)
+
+    if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
+        return(pd.DataFrame())
 
     result = pd.DataFrame(a_list)
     # munging of the dataframe

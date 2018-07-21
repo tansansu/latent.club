@@ -39,8 +39,14 @@ def sess(url):
     return(s)
 
 
+def touch_article(soup):
+    ## ㅠ, ㅜ의 개수로 감동스토리 판단
+    tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
+    return(tear_cnt >= 7)
+
+
 # 게시글 수집
-def get_article(url):
+def get_article(url, subject):
     base_url = 'http://starboard.kr/slr'
     search_url = 'http://starboard.kr/conn/board/search'
     # Get a html
@@ -75,6 +81,11 @@ def get_article(url):
         # 존재하지 않는 게시물 예외 처리
         if con.find('p', {'class':'err_msg'}) is not None:
             continue
+        # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
+        if subject == 'touching':
+            yn = touch_article(con)
+            if yn == False:
+                continue
         member_id = con.find('span', attrs={'class':'lop'})
         if member_id is None:
             member_id = ''
@@ -95,6 +106,9 @@ def get_article(url):
         a_list.append(l)
         time.sleep(.5)
 
+    if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
+        return(pd.DataFrame())
+        
     result = pd.DataFrame(a_list)
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']

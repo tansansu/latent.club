@@ -27,8 +27,15 @@ def mod_date(char):
     return(result)
 
 
+# 감동스토리 게시글 수집/판단 함수
+def touch_article(soup):
+    ## ㅠ, ㅜ의 개수로 감동스토리 판단
+    tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
+    return(tear_cnt >= 7)
+
+
 # 게시글 수집
-def get_article(url):
+def get_article(url, subject):
     base_url = 'https://dvdprime.com/g2/bbs/board.php?bo_table=comm&wr_id='
     # Get a html
     s = sess()
@@ -54,6 +61,11 @@ def get_article(url):
         article_link = base_url + article_id
         ## 게시글 내용 가져오기
         content = BeautifulSoup(s.get(article_link).text, 'html.parser')
+        # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
+        if subject == 'touching':
+            yn = touch_article(content)
+            if yn == False:
+                continue
         user_id = mod_user_id(content.find('span', {'class':'member'}).text)
         view_num = re.search(r'[0-9]+', content.find('div', {'id':'view_hit'}).text).group()
         # Gathering the cotent of each article
@@ -71,6 +83,9 @@ def get_article(url):
         l.append(view_num)
         a_list.append(l)
         time.sleep(.5)
+
+    if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
+        return(pd.DataFrame())
 
     result = pd.DataFrame(a_list)
     # munging of the dataframe

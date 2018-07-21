@@ -22,8 +22,15 @@ def mod_view(char):
         return('0')
 
 
+# 감동스토리 게시글 수집/판단 함수
+def touch_article(soup):
+    ## ㅠ, ㅜ의 개수로 감동스토리 판단
+    tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
+    return(tear_cnt >= 7)
+
+
 # 게시글 수집
-def get_article(url):
+def get_article(url, subject):
     # url
     base_url = 'http://m.ppomppu.co.kr/new/'
     # Get a html
@@ -51,6 +58,11 @@ def get_article(url):
         view_num = mod_view(a)
         # scrapping a date, a time and a content
         cont = BeautifulSoup(urlopen(article_link), 'html.parser')
+        # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
+        if subject == 'touching':
+            yn = touch_article(cont)
+            if yn == False:
+                continue
         date = cont.find('span', {'class':'hi'}).text.replace('  | ', '')
         content = ''
         
@@ -66,6 +78,9 @@ def get_article(url):
         a_list.append(l)
         time.sleep(.5)
 
+    if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
+        return(pd.DataFrame())
+        
     result = pd.DataFrame(a_list)
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
