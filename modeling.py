@@ -6,7 +6,7 @@ import random
 import re
 
 # Choose the subject
-subject = 'estate'
+subject = 'hot'
 
 # Import Training Dataset
 filename = 'sample_' + subject + '_tmp.xlsx'

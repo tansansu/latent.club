@@ -86,9 +86,21 @@ googleAnalytics = "UA-91393131-1"
 
 
 [[menu.main]]
+	name   = "대란"
+	url    = "hot/"
+	weight = 70
+
+
+[[menu.main]]
+	name   = "감동"
+	url    = "touching/"
+	weight = 80
+
+
+[[menu.main]]
 	name   = "About"
 	url    = "about/"
-	weight = 70
+	weight = 890
 
 
 [[menu.main]]

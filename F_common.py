@@ -31,7 +31,8 @@ def to_md(dataframe, category, directory, page_num):
     def make_pageview_comment(category):
         # 헤더 생성
         meta_weight = {
-            '부동산':10, '주식':20, '경제':30, '찌라시': 40, '가상화폐':50, '트윗':60
+            '부동산':10, '주식':20, '경제':30, '찌라시': 40, '가상화폐':50, '트윗':60, \
+            '대란':70, '감동':80
         }
         if category == '트윗':
             meta = '---\ntitle: 트윗/페북\nweight: 60\n---\n\n'

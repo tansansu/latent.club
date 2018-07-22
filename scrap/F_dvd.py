@@ -51,7 +51,10 @@ def get_article(url, subject):
     a_list = []
     for a in articles:
         l = []
-        title = a.find('span', {'class':'list_subject_span_pc'}).text
+        try:
+            title = a.find('span', {'class':'list_subject_span_pc'}).text
+        except:
+            continue
         #print(title)
         article_id = re.search(r'(\d{8})', a['href']).group()
         if a.find('em'):
