@@ -39,14 +39,14 @@ def sess(url):
     return(s)
 
 
-def touch_article(soup):
+def touch_article(soup, tears):
     ## ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
-    return(tear_cnt >= 7)
+    return(tear_cnt >= tears)
 
 
 # 게시글 수집
-def get_article(url, subject):
+def get_article(url, subject, tears=15):
     base_url = 'http://starboard.kr/slr'
     search_url = 'http://starboard.kr/conn/board/search'
     # Get a html
@@ -83,7 +83,7 @@ def get_article(url, subject):
             continue
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
-            yn = touch_article(con)
+            yn = touch_article(con, tears)
             if yn == False:
                 continue
         member_id = con.find('span', attrs={'class':'lop'})

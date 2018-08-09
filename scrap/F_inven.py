@@ -20,16 +20,16 @@ def mod_reply(char):
 
 
 # 감동스토리 게시글 수집/판단 함수
-def touch_article(url):
+def touch_article(url, tears):
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
     ## ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
-    return(tear_cnt >= 7)
+    return(tear_cnt >= tears)
 
 
 # 게시글 수집
-def get_article(url, subject):
+def get_article(url, subject, tears=15):
     base_url = 'http://m.inven.co.kr'
     # Get a html
     resp = urlopen(url)
@@ -59,7 +59,7 @@ def get_article(url, subject):
         view_num = re.search(r'[0-9]+', a.find('span', {'class':'hit'}).text).group()
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
-            yn = touch_article(article_link)
+            yn = touch_article(article_link, tears)
             if yn == False:
                 continue
         # Making the list

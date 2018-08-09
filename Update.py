@@ -24,6 +24,8 @@ class Updater:
         self.sites = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
         '뽐뿌', 'SLR', '82cook', '인벤', 'DVD프라임']
         self.log = '' # 로깅용 스트링
+        self.start_time = 0
+        self.end_time = 0
 
 
     # 함수: 게시판 md 파일 생성 작업 실행
@@ -51,17 +53,12 @@ class Updater:
     
 
     # 텔레그램 메세지 보내는 함수
-    @staticmethod
     def log2telegram(self, message):
         TelegramBot().log_to_me(message)
 
+
     # 업데이트 실행 함수
     def run(self):
-        # 코드 동작 시간 측정용
-        start_time = datetime.now().replace(microsecond=0)
-        self.log += 'Start_time: ' + str(datetime.now().replace(microsecond=0)) + '\n'
-        print(self.log)
-
         # 전체 사이트 실행
         for subject in self.subjects:
             # log 메세지 생성
@@ -93,11 +90,11 @@ class Updater:
                 ## 프린트 메시지
                 print('%s - %s 완료' % (subject, site))
             # md 파일 생성
-            if subject not in ['대란', '감동']:
-                self.execute_md(subject, size=300)
+            #if subject not in ['대란', '감동']:
+            self.execute_md(subject, size=300)
             
-        end_time = datetime.now().replace(microsecond=0)
+        self.end_time = datetime.now().replace(microsecond=0)
         # log에 동작 시간 추가
-        message = '업데이트 동작 시간: ' + str(end_time - start_time)
+        message = '업데이트 동작 시간: %s\n' % str(self.end_time - self.start_time)
         self.log += message; print(message)
 

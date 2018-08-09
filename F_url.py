@@ -57,7 +57,7 @@ def del_site(site, subject=None):
 def add_keyword(subject=None, site=None, word=None, eto_link=None):
     # 사이트별 추가할 url 패딩 캐릭터
     clien_pad = 'https://www.clien.net/service/search?q={0}&sort=recency&boardCd=park&boardName=%EB%AA%A8%EB%91%90%EC%9D%98%EA%B3%B5%EC%9B%90'
-    eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard&sca=&sfl=wr_subject%7C%7Cwr_content&stx={0}'
+    eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard01&sca=&sfl=wr_subject%7C%7Cwr_content&stx={0}'
     mlb_pad = 'http://mlbpark.donga.com/mp/b.php?select=sct&m=search&b=bullpen&select=sct&query={0}&x=0&y=0'
     ddan_pad = 'http://www.ddanzi.com/?_filter=search&act=&vid=&mid=free&category=&search_target=title_content&search_keyword={0}'
     ruli_pad = 'http://m.ruliweb.com/community/board/300148?search_type=subject_content&search_key={0}'
@@ -134,7 +134,7 @@ def change_url(target='eto'):
     import re
     # url과 변경할 주제
     subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
-    eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard&sca=&sfl=wr_subject%7C%7Cwr_content&stx={0}'
+    eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard01&sca=&sfl=wr_subject%7C%7Cwr_content&stx={0}'
     # 키워드 추출
     for subject in subjects:
         # 저장된 url json 파일 열기
@@ -152,3 +152,18 @@ def change_url(target='eto'):
             json.dump(url, f)
         
     
+# URL 구문 수정
+def revise_url(site, before, after):
+    # url과 변경할 주제
+    subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
+
+    for subject in subjects:
+        with open('./links/%s.json' % subject, 'r') as f:
+            url = json.load(f)
+        for k in url[site].keys():
+            link = url[site][k]
+            url[site][k] = link.replace(before, after)
+            print(url[site][k])
+        # URL 재 저장
+        with open('./links/%s.json' % subject, 'w') as f:
+            json.dump(url, f)

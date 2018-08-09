@@ -36,15 +36,15 @@ def sess():
 
 
 # 감동스토리 게시글 수집/판단 함수
-def touch_article(soup):
+def touch_article(soup, tears):
     ## ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
-    return(tear_cnt >= 7)
+    return(tear_cnt >= tears)
 
 
 # 게시글 수집
-def get_article(url, subject):
-    base_url = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard&wr_id='
+def get_article(url, subject, tears=15):
+    base_url = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard01&wr_id='
     # Get a html
     s = sess()
     resp = s.get(url)
@@ -70,7 +70,7 @@ def get_article(url, subject):
         con = s.get(article_link)
         temp = BeautifulSoup(con.text, 'html.parser')
         if subject == 'touching':
-            yn = touch_article(temp)
+            yn = touch_article(temp, tears)
             if yn == False:
                 continue
         try:

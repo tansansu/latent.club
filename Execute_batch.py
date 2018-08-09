@@ -13,6 +13,10 @@ class Roller(Updater):
         
 
 if __name__ == '__main__':
+    # 코드 동작 시간 측정용
+    start_time = datetime.now().replace(microsecond=0)
+    log_tmp = 'Start_time: ' + str(datetime.now().replace(microsecond=0))
+    print(log_tmp)
     # Check Status file
     with open('./status.conf', 'r') as f:
         opt = json.load(f)
@@ -22,9 +26,12 @@ if __name__ == '__main__':
     else:
         ## 업데이트 클래스 초기화
         roller = Roller()
+        roller.log += log_tmp + '\n'
+        roller.start_time = start_time
         ## 스크랩 대상 주제 설정
         complete_subj_idx = roller.subjects.index(opt['subject'])
         subjects_cnt = len(roller.subjects)
+        print('Current Index: %d/%d' % (complete_subj_idx, subjects_cnt))
         if complete_subj_idx == subjects_cnt-1:
             subject = roller.subjects[0]
         else:
@@ -53,13 +60,13 @@ if __name__ == '__main__':
         if complete_subj_idx == subjects_cnt-1:
             # 과거 log 불러오기
             with open('./log/scrap.log', 'r') as f:
-                scrap_log = ''.join(f.readlines())
+                log_tmp = ''.join(f.readlines())
             # 텔레그램으로 발송
-            roller.log2telegram(scrap_log)
+            roller.log2telegram(log_tmp)
             # 로그파일 초기화
             with open('./log/scrap.log', 'w') as f:
                 f.write('')
-
+                
         # 작업 종료 상태 기록
         opt['status'] = 0
         with open('./status.conf', 'w') as f:

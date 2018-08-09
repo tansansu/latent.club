@@ -185,7 +185,7 @@ def scrapper(site, urls, subject):
     # 사이트마다 키워드 url 반복
     for u in keywords:
         # 개별 사이트 소스파일의 get_article 함수 실행
-        temp = globals()['F_' + site_link[site]].get_article(url[u], subject)
+        temp = globals()['F_' + site_link[site]].get_article(url[u], subject, 15)
         if temp.shape[0] == 0:
             continue
         temp['keyword'] = u
@@ -278,6 +278,17 @@ def touch_approve(dataframe):
     return(dataframe)
 
 
+# 특정 단어 제거 필터
+def stopwords_filter(dataframe):
+    cond1 = dataframe['title'].str.contains('프듀')
+    cond1 = dataframe['title'].str.contains('프로듀스48')
+    dataframe = dataframe[~(cond1 | cond2)]
+    if dataframe.shape[0] == 0:
+        return(None)
+    else:
+        return(dataframe)
+
+
 # 단어 필터
 def word_filter(dataframe, subject):
     result = adult_filter(dataframe)
@@ -292,6 +303,7 @@ def word_filter(dataframe, subject):
         result = stock_filter(result)
     elif subject == '감동':
         result = touch_approve(result)
+    result = stopwords_filter(result)
     return(result)
 
 
