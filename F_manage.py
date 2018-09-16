@@ -1,10 +1,13 @@
 # 2018.01.07
 
 #import pdb
-import pickle
-import json
+import pickle, json, sqlite3, sys
 import pandas as pd
-import sqlite3
+sys.path.insert(0, 'latent_info/')
+sys.path.append('/home/revlon/Codes/Telegram_Bot/')
+sys.path.append('/Users/tansansu/Google Drive/Python/Telegram_Bot/')
+sys.path.append('/root/Codes/Telegram_Bot/')
+from TelegramBot import TelegramBot
 
 
 # 함수: 수집한 게시글이 db에 저장된 게시글과 중복인지 확인
@@ -57,7 +60,7 @@ def export_sample(df, object):
 # 중복 데이터 정리 함수
 def clean_dup(path_db):
     # 정리할 테이블
-    tables = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot']
+    tables = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
     conn = sqlite3.connect(path_db)
     for table in tables:
         df = pd.read_sql('select * from %s;' % table, conn)
@@ -85,11 +88,10 @@ def update_article_result(path_db):
         after_y = sum(df.result == 'Y')
         df.to_sql(table, conn, if_exists='replace', index=False)
         # 결과 출력
-        print('%s | before: %d  after: %d' % (table, before_y, after_y))
+        message += '%s | before: %d  after: %d\n' % (table, before_y, after_y)
+        #print(message)
     conn.close()
-
-
-    
+    TelegramBot().log_to_me(message)
 
 
 '''
@@ -101,3 +103,8 @@ def firebase():
     db = firebase.database()
     return(db)
 '''
+
+
+if __name__ == '__main__':
+    path_db = './db/board.db'
+    clean_dup(path_db)

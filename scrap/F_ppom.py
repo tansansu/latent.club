@@ -1,6 +1,6 @@
 # 2017.06.04
 
-import time
+import time, random
 from urllib.request import urlopen
 import re
 import pandas as pd
@@ -57,15 +57,17 @@ def get_article(url, subject, tears=15):
         reply_num = mod_reply(a)
         view_num = mod_view(a)
         # scrapping a date, a time and a content
-        cont = BeautifulSoup(urlopen(article_link), 'html.parser')
+        try:
+            cont = BeautifulSoup(urlopen(article_link, timeout=10), 'html.parser')
+        except:
+            continue
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
             yn = touch_article(cont, tears)
-            if yn == False:
+            if not(yn):
                 continue
         date = cont.find('span', {'class':'hi'}).text.replace('  | ', '')
         content = ''
-        
         # Making the list
         l.append(title)
         l.append(date)
@@ -76,7 +78,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
-        time.sleep(.5)
+        time.sleep(random.randint(2, 7) / 3)
 
     if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         return(pd.DataFrame())

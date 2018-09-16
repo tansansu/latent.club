@@ -8,7 +8,7 @@ import sqlite3
 import requests
 import sys
 import time
-#sys.path.insert(0, 'latent_info/scrap/')
+#from multiprocessing import Pool
 sys.path.append('./scrap/')
 import F_clien
 import F_ddan
@@ -42,7 +42,7 @@ def to_md(dataframe, category, directory, page_num):
         return(meta)
 
     # 콘텐트에 헤더와 html헤더 추가
-    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://latent.club/notice/'><center><b>알림사항(2018.07.11)</b></center></a></td></tr>\n"
+    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://latent.club/notice/'><center><b>알림사항(2018.09.07)</b></center></a></td></tr>\n"
 
     # 게시글 table tag
     html_title = "<tr class='title_link'>"
@@ -169,6 +169,10 @@ def store_db(subject, site, dataframe):
     # 수집한 new 게시글 개수 리턴
     return(article_count)
 
+def pool_work(link, urls, site_link, site, subject, tears=15):
+    result = globals()['F_' + site_link[site]].get_article(link, subject, 15)
+    result.loc[:, 'keyword'] = list(urls[site_link[site]].keys())[list(urls[site_link[site]].values()).index(link)]
+    return(result)
 
 # 함수: 사이트 스크래핑
 def scrapper(site, urls, subject):
@@ -178,22 +182,21 @@ def scrapper(site, urls, subject):
     'SLR':'slr', '82cook':'82cook', '인벤':'inven', 'DVD프라임':'dvd'}
     # URL 리스트
     url = urls[site_link[site]]
-    # 검색어 리스트
     keywords = [x for x in url.keys()]
     # 결과로 리턴할 데이터프레임 생성
     result = pd.DataFrame()
     # 사이트마다 키워드 url 반복
-    for u in keywords:
+    for keyword in keywords:
         # 개별 사이트 소스파일의 get_article 함수 실행
-        temp = globals()['F_' + site_link[site]].get_article(url[u], subject, 15)
-        if temp.shape[0] == 0:
+        df_temp = globals()['F_' + site_link[site]].get_article(url[keyword], subject, 15)
+        if df_temp.shape[0] == 0:
             continue
-        temp['keyword'] = u
-        result = result.append(temp)
+        df_temp.loc[:, 'keyword'] = keyword
+        result = result.append(df_temp)
         # 1초 지연
         time.sleep(1)
+    # 사이트 이름 추가
     result.loc[:, 'site'] = site
-
     return(result)
 
 
@@ -281,7 +284,7 @@ def touch_approve(dataframe):
 # 특정 단어 제거 필터
 def stopwords_filter(dataframe):
     cond1 = dataframe['title'].str.contains('프듀')
-    cond1 = dataframe['title'].str.contains('프로듀스48')
+    cond2 = dataframe['title'].str.contains('프로듀스48')
     dataframe = dataframe[~(cond1 | cond2)]
     if dataframe.shape[0] == 0:
         return(None)

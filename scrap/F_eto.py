@@ -1,6 +1,6 @@
 # 2018.02.03
 
-import time
+import time, random
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -62,7 +62,7 @@ def get_article(url, subject, tears=15):
             user_id = mod_user_id(a.find('span', {'class':'name'}).text)
         except:
             continue
-        article_id = re.search(r'\d{3,}', a.find('a')['href']).group()
+        article_id = re.search(r'\d{2,}', a.find('a')['href']).group()
         article_link = base_url + article_id
         reply_num = mod_reply(a.find('div').text)
         view_num = re.search(r'[0-9]+', a.findAll('span', {'class':'datetime'})[1].text).group()
@@ -71,7 +71,7 @@ def get_article(url, subject, tears=15):
         temp = BeautifulSoup(con.text, 'html.parser')
         if subject == 'touching':
             yn = touch_article(temp, tears)
-            if yn == False:
+            if not(yn):
                 continue
         try:
             '''
@@ -95,8 +95,8 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
-        time.sleep(.5)
-
+        time.sleep(random.randint(2, 7) / 3)
+    print(a_list)
     if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         return(pd.DataFrame())
 

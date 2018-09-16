@@ -1,6 +1,6 @@
 # 2017.06.06
 
-import time
+import time, random
 from urllib.request import urlopen
 import requests
 import re
@@ -70,7 +70,7 @@ def get_article(url, subject, tears=15):
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
             yn = touch_article(article_link, tears)
-            if yn == False:
+            if not(yn):
                 continue
         # Making the list
         l.append(title)
@@ -82,6 +82,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
+        time.sleep(random.randint(2, 7) / 3)
         
     if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         return(pd.DataFrame())

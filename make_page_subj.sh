@@ -1,9 +1,9 @@
 #!/bin/bash
-cd /home/revlon/Codes/Web/latent_info/
+cd /root/Codes/Web/latent_info/
 python3 Execute_batch.py
-cd /home/revlon/Codes/Web/hugo_latent-info
+cd /root/Codes/Web/hugo_latent-info
 hugo --theme=hugo-material-docs
-cd /home/revlon/Codes/Web/latent-info.github.io
+cd /root/Codes/Web/latent-info.github.io
 sudo git add --all
 sudo git commit -m 'regular uploading of articles'
 expect <<EOF

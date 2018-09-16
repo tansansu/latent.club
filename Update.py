@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, 'latent_info/')
 sys.path.append('/home/revlon/Codes/Telegram_Bot/')
 sys.path.append('/Users/tansansu/Google Drive/Python/Telegram_Bot/')
-#sys.path.append('/home/jar/Codes/Telegram_Bot/')
+sys.path.append('/root/Codes/Telegram_Bot/')
 import F_common 
 import F_Classifier
 from datetime import datetime
@@ -47,7 +47,7 @@ class Updater:
         df.drop_duplicates('title', inplace=True)
         ### 데이터 프레임을 5개 페이지로 나누어서 md파일(페이지)로 만들기
         #directory = '/Users/tansansu/Google Drive/blog/latent-info/content/' + self.subjects[subject]
-        directory = '/home/revlon/Codes/Web/hugo_latent-info/content/' + self.subject_dict[subject]
+        directory = '/root/Codes/Web/hugo_latent-info/content/' + self.subject_dict[subject]
         for i in range(7):
             F_common.to_md(df.iloc[30*i:30*(i+1)], subject, directory, i+1)
     
@@ -68,7 +68,7 @@ class Updater:
                 url = json.load(f)
             
             # 사이트별로 게시글 스크래핑 
-            for i, site in enumerate(self.sites):
+            for site in self.sites:
                 try:
                     print(subject + ' | ' + site)
                     ## article 가져오기

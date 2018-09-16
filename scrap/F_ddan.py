@@ -1,6 +1,6 @@
 # 2018.01.04
 
-import time
+import time, random
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -41,7 +41,8 @@ def touch_article(soup, tears):
 
 # 함수: 게시글 수집
 def get_article(url, subject, tears=15):
-    base_url = 'http://www.ddanzi.com/free/'
+    base_url = 'http://www.ddanzi.com/index.php?m=1&document_srl='
+
     # 사이트에서 html 가져오기
     s = sess()
     s_result = s.get(url)
@@ -75,7 +76,7 @@ def get_article(url, subject, tears=15):
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
             yn = touch_article(cont, tears)
-            if yn == False:
+            if not(yn):
                 continue
         temp = cont.find('div', {'class':'right'})
         user_id = mod_char(temp.find('a').text)
@@ -97,7 +98,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
-        time.sleep(1.3)
+        time.sleep(random.randint(2, 7) / 3)
 
     if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         return(pd.DataFrame())
