@@ -10,26 +10,28 @@ import pandas as pd
 # Modifing user_ids
 def mod_user_id(char):
     result = char.replace(" ", '').replace('\r', '').replace('\n', '').replace('\t', '')
-    return(result)
+    return result
+
 
 # 날짜 string 수정 함수
 def mod_date(char):
     result = re.search(r'(\d{4}.{15})', char).group()
     result = result.replace(".", '-').replace('(', ' ')
-    return(result)
+    return result
+
 
 # 리플수 string 수정 함수
 def mod_reply(char):
     try:
-        return(char.find('span', {'class':'num'}).text)
+        return char.find('span', {'class':'num'}).text
     except:
-        return('0')
+        return '0'
 
 
 def touch_article(soup, tears):
-    ## ㅠ, ㅜ의 개수로 감동스토리 판단
+    # ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
-    return(tear_cnt >= tears)
+    return tear_cnt >= tears
 
     
 # 게시글 수집
@@ -38,33 +40,33 @@ def get_article(url, subject, tears=15):
     # Get a html
     soup = BeautifulSoup(urlopen(url), 'html.parser')
     # Extracting articles from the html
-    articles = soup.findAll('tr', {'class':'table_body'})[1:] # 맨 첫글 공지 제외
+    articles = soup.findAll('tr', {'class':'table_body'})[1:]  # 맨 첫글 공지 제외
     # 유동적인 상단 공지글 제외(notice class 제거)
     articles = [a for a in articles if 'notice' not in a.get('class')]
     # 유동적인 결과없음 글이 있으면 리턴
     if articles[0].find('strong').text == '결과없음':
-        return(pd.DataFrame())
+        return pd.DataFrame()
 
     # Extracting elements from articles
     a_list = []
     for a in articles:
         l = []
-        title = a.findAll('a', {'class':'subject_link'})[0].text
-        user_id = mod_user_id(a.findAll('span', {'class':'writer'})[0].text)
-        article_link = a.findAll('a', {'class':'subject_link'})[0].get('href')
+        title = a.findAll('a', {'class': 'subject_link'})[0].text
+        user_id = mod_user_id(a.findAll('span', {'class': 'writer'})[0].text)
+        article_link = a.findAll('a', {'class': 'subject_link'})[0].get('href')
         # print(article_link)
         article_id = re.search(r'(\d{8})', article_link).group()
         article_link = base_url + article_id # 링크에서 검색어 나오지 않게 수정
         reply_num = mod_reply(a)
-        view_num = re.search(r'[0-9]+', a.find('span', {'class':'hit'}).text).group()
+        view_num = re.search(r'[0-9]+', a.find('span', {'class': 'hit'}).text).group()
         # Gathering the cotent of each article
         con = BeautifulSoup(urlopen(article_link), 'html.parser')
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
             yn = touch_article(con, tears)
-            if not(yn):
+            if not yn:
                 continue
-        date = mod_date(mod_user_id(con.find('span', {'class':'regdate'}).text))
+        date = mod_date(mod_user_id(con.find('span', {'class': 'regdate'}).text))
         content = ''
         
         # Making the list
@@ -79,8 +81,8 @@ def get_article(url, subject, tears=15):
         a_list.append(l)
         time.sleep(random.randint(2, 7) / 3)
 
-    if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
-        return(pd.DataFrame())
+    if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
+        return pd.DataFrame()
 
     result = pd.DataFrame(a_list)
     # munging of the dataframe
@@ -90,5 +92,5 @@ def get_article(url, subject, tears=15):
     result = result[~result['title'].str.contains('주식아') & ~result['title'].str.contains('주식이')]
     result.set_index('article_id')
 
-    return(result)
+    return result
 

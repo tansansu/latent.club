@@ -12,15 +12,17 @@ from bs4 import BeautifulSoup
 # cleansing a article title
 def mod_title(char):
     result = re.sub(r' [[0-9]*]', '', char)
-    return(result)
+    return result
+
 
 # 리플 개수 추출 함수
 def mod_reply(char):
     try:
         result = re.search(r'\[[0-9]\]', char).group()
-        return(re.search(r'[0-9]', result).group())
+        return re.search(r'[0-9]', result).group()
     except:
-        return('0')
+        return '0'
+
 
 # 함수: 세션생성
 def sess():
@@ -28,16 +30,17 @@ def sess():
     REFERER = 'http://m.todayhumor.co.kr/'
     s = requests.Session()
     s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
-    return(s)
+    return s
 
 
 # 감동스토리 게시글 수집/판단 함수
 def touch_article(url, tears):
     resp = urlopen(url)
     soup = BeautifulSoup(resp, 'html.parser')
-    ## ㅠ, ㅜ의 개수로 감동스토리 판단
+    # ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
-    return(tear_cnt >= tears)
+    del resp
+    return tear_cnt >= tears
 
 
 # 게시글 수집
@@ -47,30 +50,31 @@ def get_article(url, subject, tears=15):
     s = sess()
     resp = s.get(url)
     soup = BeautifulSoup(resp.text, 'html.parser')
-    articles = soup.findAll('a', {'href':re.compile('view.php?.*')})
+    articles = soup.findAll('a', {'href': re.compile('view.php?.*')})
     # 게시글이 없는 경우 리턴
     if len(articles) == 0:
-        return(pd.DataFrame())
+        s.close()
+        return pd.DataFrame()
 
     a_list = []
     for a in articles:
         l = []
-        title = mod_title(a.find('h2', {'class':'listSubject'}).text)
+        title = mod_title(a.find('h2', {'class': 'listSubject'}).text)
         user_id = ''
         try:
             article_link = base_url + a.get('href')
         except:
-            return(pd.DataFrame())
+            return pd.DataFrame()
         # print(article_link)
-        article_id = a.find('span', {'class':'list_no'}).text
-        date = a.find('span', {'class':'listDate'}).text.replace('/', '-')
+        article_id = a.find('span', {'class': 'list_no'}).text
+        date = a.find('span', {'class': 'listDate'}).text.replace('/', '-')
         content = ''
-        reply_num = mod_reply(a.find('h2', {'class':'listSubject'}).text)
-        view_num = a.find('span', {'class':'list_viewCount'}).text
+        reply_num = mod_reply(a.find('h2', {'class': 'listSubject'}).text)
+        view_num = a.find('span', {'class': 'list_viewCount'}).text
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
             yn = touch_article(article_link, tears)
-            if not(yn):
+            if not yn:
                 continue
         # Making the list
         l.append(title)
@@ -84,14 +88,16 @@ def get_article(url, subject, tears=15):
         a_list.append(l)
         time.sleep(random.randint(2, 7) / 3)
         
-    if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
-        return(pd.DataFrame())
-        
+    if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
+        s.close()
+        return pd.DataFrame()
+
+    s.close()
     result = pd.DataFrame(a_list)
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
     result['date_time'] = pd.to_datetime(result['date_time'])
     result.set_index('article_id')
     
-    return(result)
+    return result
 
