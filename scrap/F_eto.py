@@ -68,7 +68,7 @@ def get_article(url, subject, tears=15):
             user_id = mod_user_id(a.find('span', {'class': 'name'}).text)
         except:
             continue
-        article_id = re.search(r'\d{2,}', a.find('a')['href']).group()
+        article_id = re.search(r'wr_id=\d+', a.find('a')['href']).group().replace('wr_id=', '')
         article_link = base_url + article_id
         reply_num = mod_reply(a.find('div').text)
         view_num = re.search(r'[0-9]+', a.findAll('span', {'class': 'datetime'})[1].text).group()

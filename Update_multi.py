@@ -24,13 +24,12 @@ class Updater:
             '경제': 'economy', '트윗': 'tweet', '가상화폐': 'coin', '대란': 'hot', '감동': 'touching'}
         self.subjects = ['부동산', '경제', '주식', '찌라시', '가상화폐', '트윗', '대란', '감동']
         self.subject = ''
-        self.site_dict = {'클리앙': 'clien', '딴지일보': 'ddan', '루리웹': 'ruli', \
-            '엠팍': 'mlb', '오유': 'Ou', '이토렌트': 'eto', '뽐뿌': 'ppom', \
+        self.site_dict = {'클리앙': 'clien', '딴지일보': 'ddan', '루리웹': 'ruli',
+            '엠팍': 'mlb', '오유': 'Ou', '이토렌트': 'eto', '뽐뿌': 'ppom',
             'SLR': 'slr', '82cook': '82cook', '인벤': 'inven', 'DVD프라임': 'dvd'}
         self.site_dict_rev = dict(zip(self.site_dict.values(), self.site_dict.keys()))
         self.sites = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트',
             '뽐뿌', 'SLR', '82cook', '인벤', 'DVD프라임']
-        self.conn = None
         self.classifier = None
         self.log = ''  # 로깅용 스트링
         self.start_time = 0
@@ -89,7 +88,7 @@ class Updater:
                 print("%s - no duplication articles: %d - %d" % (site, result.shape[0], result.shape[1]))
             if result.shape[0] > 0:
                 file_path = 'temp/%s.pkl' % self.site_dict[site]
-                print("create temp file: " + file_path)
+                #print("create temp file: " + file_path)
                 with open(file_path, 'wb') as f:
                     pickle.dump(result, f)
         except Exception as e:

@@ -4,12 +4,13 @@
 
 import json
 
+
 # 2018.05.05
 # 링크 json에 새로운 사이트 추가
-def add_site(site, subject=None):   
+def add_site(site, subject=None):
     if subject:
         # 저장된 url json 파일 열기
-        with open('links/' + subject + '.json','r') as f:
+        with open('links/' + subject + '.json', 'r') as f:
             url = json.load(f)
         # site 추가
         url[site] = ''
@@ -20,7 +21,7 @@ def add_site(site, subject=None):
     else:
         subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
         for sub in subjects:
-            with open('links/' + sub + '.json','r') as f:
+            with open('links/' + sub + '.json', 'r') as f:
                 url = json.load(f)
             # site 추가
             url[site] = ''
@@ -34,7 +35,7 @@ def add_site(site, subject=None):
 def del_site(site, subject=None):   
     if subject:
         # 저장된 url json 파일 열기
-        with open('links/' + subject + '.json','r') as f:
+        with open('links/' + subject + '.json', 'r') as f:
             url = json.load(f)
         # site 제거
         del(url[site])
@@ -44,7 +45,7 @@ def del_site(site, subject=None):
     else:
         subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
         for sub in subjects:
-            with open('links/' + sub + '.json','r') as f:
+            with open('links/' + sub + '.json', 'r') as f:
                 url = json.load(f)
             # site 제거
             del(url[site])
@@ -81,7 +82,7 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
     print(b_word)
 
     # 저장된 url json 파일 열기
-    with open('links/' + subject + '.json','r') as f:
+    with open('links/' + subject + '.json', 'r') as f:
         url = json.load(f)
     
     import re
@@ -91,10 +92,10 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
         try:
             url_dict[site][word] = url_string
         except KeyError:
-            url_dict[site] = {word:url_string}
+            url_dict[site] = {word: url_string}
         except TypeError:
-            url_dict[site] = {word:url_string}
-        return(url_dict)
+            url_dict[site] = {word: url_string}
+        return url_dict
 
     # 특정 사이트의 url만 수정 케이스
     if site:
@@ -108,19 +109,17 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
             url = put_link(url, site, word, pad.format(b_word))
     # 전체 사이트에 키워드 검색 url 추가하기
     else:
-        sites = ['clien', 'ddan', 'ruli', 'mlb', 'Ou', 'ppom', '82cook', \
-        'inven', 'dvd']
-        for site in sites:  
+        sites = ['clien', 'ddan', 'ruli', 'mlb', 'Ou', 'ppom', '82cook', 'inven', 'dvd']
+        for site in sites:
             pad = locals()[re.search(r'[^0-9]+', site).group() + '_pad']
             url = put_link(url, site, word, pad.format(b_word))
         # SLR은 키워드만 추가
         url = put_link(url, 'slr', word, b_word)
         # 이토렌트는 None이면 공백으로 추가
-        if not(eto_link):
+        if not eto_link:
             url = put_link(url, 'eto', word, '')
         else:
             url = put_link(url, 'eto', word, eto_pad.format(eto_link))
-        
         
     # url json 파일 저장하기
     with open('links/' + subject + '.json', 'w') as f:
@@ -143,7 +142,7 @@ def change_url(target='eto'):
         target_url = url[target]
         for k in target_url.keys():
             word = target_url[k]
-            b_word = re.search(r'=%.+&', test).group().replace('=', '').replace('&x0&', '')
+            b_word = re.search(r'=%.+&', word).group().replace('=', '').replace('&x0&', '')
             target_url[k] = eto_pad.format(b_word)
         url[target] = target_url
         print(url[target])
