@@ -70,7 +70,7 @@ def get_article(url, subject, tears=15):
         # print(article_link)
         article_link = base_url + article_id
         try:  # 리플수가 없을 경우에 발생하는 None type error
-            reply_num = mod_reply( a.find('span', {'class': 'talk'}).text)
+            reply_num = mod_reply(a.find('span', {'class': 'talk'}).text)
         except:
             reply_num = '0'
         # 날짜를 구하기 위해 게시글 클릭
@@ -102,7 +102,7 @@ def get_article(url, subject, tears=15):
         a_list.append(l)
         time.sleep(random.randint(2, 7) / 3)
 
-    if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
+    if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         s.close()
         return pd.DataFrame()
 
@@ -110,9 +110,9 @@ def get_article(url, subject, tears=15):
     # 결과 데이터 프레임 생성
     result = pd.DataFrame(a_list)
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
-    ## Excepting the particular articles by '펌쟁이'
+    # Excepting the particular articles by '펌쟁이'
     result = result[result['member_id'] != '펌쟁이']
-    result['date_time'] = pd.to_datetime(result['date_time'])
+    result.loc[:, 'date_time'] = pd.to_datetime(result['date_time'])
     result.set_index('article_id')
 
     return result

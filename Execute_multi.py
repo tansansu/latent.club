@@ -2,19 +2,12 @@
 
 # 업데이트 클래스 임포트
 from Update_multi import Updater
-from multiprocessing import Process
+from F_Classifier import Classifier
 from datetime import datetime
 import json
-
-
-def multi_operation(roller_class, input_sites):
-    procs = []
-    for index, number in enumerate(input_sites):
-        proc = Process(target=roller_class.run, args=(number,))
-        procs.append(proc)
-        proc.start()
-    for proc in procs:
-        proc.join()
+import time
+import os
+import pandas as pd
 
 
 class Roller(Updater):
@@ -59,21 +52,36 @@ if __name__ == '__main__':
         with open('./links/' + roller.subject_dict[subject] + '.json', 'r') as f:
             url = json.load(f)
 
-        # 업데이트 실행(하나의 카테고리에 대해서 각 사이트를 여러개의 프로세스로 실행)
-        roller.subject = subject  # 카테고리 설정(랜덤한 3개를 설정함)
+        roller.subject = subject  # 카테고리 설정
+        if roller.subject not in ['트윗', '감동']:
+            roller.classifier = Classifier(roller.subject_dict[roller.subject])
         # 카테고리와 시작 시간 기록
         roller.log = '[ %s ]\nStart_time: %s\n' % (subject, roller.start_time)
         with open('./log/scrap.log', 'a') as f:
             f.write(roller.log)
-        # site는 11개를 3개씩 순차적으로 실행
-        multi_operation(roller, roller.sites[:3])
-        print('Step1 completed')
-        multi_operation(roller, roller.sites[3:6])
-        print('Step2 completed')
-        multi_operation(roller, roller.sites[6:9])
-        print('Step3 completed')
-        multi_operation(roller, roller.sites[9:])
-        print('Step4 completed')
+
+        # 업데이트 실행(하나의 카테고리에 대해서 각 사이트를 여러개의 프로세스로 실행)
+        roller.multi_operation(roller.sites)
+
+        # 사이트별로 스크랩이 데이터프레임을 읽은 후 주제 적합성 판정(트윗 제외)
+        result = pd.DataFrame()
+        for fname in os.listdir('./temp'):
+            df_tmp = pd.read_pickle('./temp/' + fname)
+            site_name = roller.site_dict_rev[fname.replace('.pkl', '')]
+            article_count = df_tmp.shape[0]
+            # 프린트 메시지
+            tmp_log = '-%s: %d개 수집' % (site_name, article_count)
+            print(tmp_log)
+            tmp_log += '\n'  # 텔레그램 메세징 용으로
+            result = result.append(df_tmp)
+            # 게시물 수집 log 텔레그램으로 전송하기 위해 파일로 저장
+            with open('./log/scrap.log', 'a') as f:
+                f.write(tmp_log)
+        # 분류 및 DB 저장
+        roller.predict_store(result)
+
+        # md 파일 생성
+        roller.execute_md(size=300)
 
         roller.end_time = datetime.now().replace(microsecond=0)
         # log에 동작 시간 추가
@@ -92,9 +100,16 @@ if __name__ == '__main__':
             # 로그파일 초기화
             with open('./log/scrap.log', 'w') as f:
                 f.write('')
-                
+
         # 작업 종료 상태 기록
         opt['status'] = 0
         with open('./status.conf', 'w') as f:
             json.dump(opt, f)
+
+        # hugo 페이지 생성 및 Git Push
+        print('Make pages with hugo!')
+        roller.run_hugo('/home/revlon/Codes/Web/hugo_latent-info')
+        time.sleep(8)
+        roller.git_commit('/home/revlon/Codes/Web/latent-info.github.io')
+
 

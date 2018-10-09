@@ -40,7 +40,7 @@ def get_article(url, subject, tears=15):
     # Get a html
     soup = BeautifulSoup(urlopen(url), 'html.parser')
     # Extracting articles from the html
-    articles = soup.findAll('tr', {'class':'table_body'})[1:]  # 맨 첫글 공지 제외
+    articles = soup.findAll('tr', {'class': 'table_body'})[1:]  # 맨 첫글 공지 제외
     # 유동적인 상단 공지글 제외(notice class 제거)
     articles = [a for a in articles if 'notice' not in a.get('class')]
     # 유동적인 결과없음 글이 있으면 리턴
@@ -56,7 +56,7 @@ def get_article(url, subject, tears=15):
         article_link = a.findAll('a', {'class': 'subject_link'})[0].get('href')
         # print(article_link)
         article_id = re.search(r'(\d{8})', article_link).group()
-        article_link = base_url + article_id # 링크에서 검색어 나오지 않게 수정
+        article_link = base_url + article_id  # 링크에서 검색어 나오지 않게 수정
         reply_num = mod_reply(a)
         view_num = re.search(r'[0-9]+', a.find('span', {'class': 'hit'}).text).group()
         # Gathering the cotent of each article
@@ -68,7 +68,6 @@ def get_article(url, subject, tears=15):
                 continue
         date = mod_date(mod_user_id(con.find('span', {'class': 'regdate'}).text))
         content = ''
-        
         # Making the list
         l.append(title)
         l.append(date)
@@ -87,7 +86,7 @@ def get_article(url, subject, tears=15):
     result = pd.DataFrame(a_list)
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
-    result['date_time'] = pd.to_datetime(result['date_time'])
+    result.loc[:, 'date_time'] = pd.to_datetime(result['date_time'])
     # 루리웹 도배글 삭제
     result = result[~result['title'].str.contains('주식아') & ~result['title'].str.contains('주식이')]
     result.set_index('article_id')

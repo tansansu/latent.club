@@ -58,7 +58,6 @@ def get_article(url, subject, tears=15):
         date = con.findAll('span', {'class': 'val'})[3].text
         # date = mod_user_id(date)
         content = ''
-        
         # Making the list
         l.append(title)
         l.append(date)
@@ -71,7 +70,7 @@ def get_article(url, subject, tears=15):
         a_list.append(l)
         time.sleep(random.randint(2, 7) / 3)
 
-    if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
+    if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         del resp
         return pd.DataFrame()
 
@@ -79,7 +78,7 @@ def get_article(url, subject, tears=15):
     result = pd.DataFrame(a_list)
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
-    result['date_time'] = pd.to_datetime(result['date_time'])
+    result.loc[:, 'date_time'] = pd.to_datetime(result['date_time'])
     result.set_index('article_id')
 
     return result

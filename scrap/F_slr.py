@@ -98,7 +98,6 @@ def get_article(url, subject, tears=15):
             member_id = con.find('span', attrs={'class': 'lop'}).text
         view_num = mod_view(con.find('div', {'class': 'info-wrap'}).text)
         content = ''
-
         # Making the list
         l.append(title)
         l.append(date)
@@ -123,7 +122,7 @@ def get_article(url, subject, tears=15):
     result = pd.DataFrame(a_list)
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
-    result['date_time'] = pd.to_datetime(result['date_time'])
+    result.loc[:, 'date_time'] = pd.to_datetime(result['date_time'])
     result = result[result['member_id'] != '']
     result.set_index('article_id')
 

@@ -77,7 +77,6 @@ def get_article(url, subject, tears=15):
         # Gathering the cotent of each article
         date = mod_date(content.find('div', {'id': 'view_datetime'}).text)
         content = ''
-        
         # Making the list
         l.append(title)
         l.append(date)
@@ -98,7 +97,7 @@ def get_article(url, subject, tears=15):
     result = pd.DataFrame(a_list)
     # munging of the dataframe
     result.columns = ['title', 'date_time', 'article_id', 'member_id', 'article_link', 'content', 'reply_num', 'view_num']
-    result['date_time'] = pd.to_datetime(result['date_time'])
+    result.loc[:, 'date_time'] = pd.to_datetime(result['date_time'])
 
     return result
 
