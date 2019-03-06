@@ -50,6 +50,16 @@ def store_db(subject, site, dataframe):
     return(article_count)
 
 
+# 학습을 위한 데이터 생성 함수
+def create_training_data(db_path):
+    conn = sqlite3.connect(db_path)
+    tables = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
+    for table in tables:
+        df_tmp = pd.read_sql('select * from %s order by date_time desc limit 500;' % table, conn)
+        export_sample(df_tmp, table)
+    conn.close()
+
+
 # 함수: 머신러닝 학습용 샘플데이터 저장
 def export_sample(df, object):
     from xlsxwriter.utility import xl_rowcol_to_cell
@@ -80,6 +90,7 @@ def update_article_result(path_db):
     conn = sqlite3.connect(path_db)
     # 모델 파일 로딩 패키지
     import F_Classifier
+    message = ''
     for table in tables:
         print(table)
         df = pd.read_sql('select * from %s;' % table, conn)
@@ -106,5 +117,5 @@ def firebase():
 
 
 if __name__ == '__main__':
-    path_db = './db/board.db'
+    path_db = '/home/revlon/Codes/Web/latent_info/db/board.db'
     clean_dup(path_db)

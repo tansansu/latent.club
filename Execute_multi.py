@@ -18,14 +18,19 @@ class Roller(Updater):
 if __name__ == '__main__':
     # 코드 동작 시간 측정용
     start_time = datetime.now().replace(microsecond=0)
-    log_tmp = 'Start_time: ' + str(datetime.now().replace(microsecond=0))
-    print(log_tmp)
+    log_tmp = 'Start_time: ' + str(start_time)
+    print("=====%s" % log_tmp)
     # Check Status file
     with open('./status.conf', 'r') as f:
         opt = json.load(f)
 
     if opt['status'] == 1:
-        print('Running!')
+        old_time = datetime.strptime(opt['date_time'], '%Y-%m-%d %H:%M:%S')
+        time_delta = start_time - old_time
+        print("=====time delta: %f" % (time_delta.seconds / 3600))
+        if time_delta.seconds / 3600 >= 5:
+            opt['status'] = 0
+        print('=====Running!')
     else:
         # 업데이트 클래스 초기화
         roller = Roller()
@@ -35,7 +40,7 @@ if __name__ == '__main__':
         # 스크랩 대상 주제 설정
         complete_subj_idx = roller.subjects.index(opt['subject'])
         subjects_cnt = len(roller.subjects)
-        print('Current Index: %d/%d' % (complete_subj_idx, subjects_cnt))
+        print('=====Current Index: %d/%d' % (complete_subj_idx, subjects_cnt))
         if complete_subj_idx == subjects_cnt-1:
             subject = roller.subjects[0]
         else:
@@ -53,7 +58,7 @@ if __name__ == '__main__':
             url = json.load(f)
 
         roller.subject = subject  # 카테고리 설정
-        if roller.subject not in ['트윗', '감동']:
+        if roller.subject not in ['트윗', '감동', '근황']:
             roller.classifier = Classifier(roller.subject_dict[roller.subject])
         # 카테고리와 시작 시간 기록
         roller.log = '[ %s ]\nStart_time: %s\n' % (subject, roller.start_time)
@@ -86,7 +91,7 @@ if __name__ == '__main__':
         roller.end_time = datetime.now().replace(microsecond=0)
         # log에 동작 시간 추가
         message = '업데이트 동작 시간: %s\n' % str(roller.end_time - roller.start_time)
-        print(message)
+        print("=====%s" % message)
         with open('./log/scrap.log', 'a') as f:
             f.write(message)
 
@@ -103,13 +108,12 @@ if __name__ == '__main__':
 
         # 작업 종료 상태 기록
         opt['status'] = 0
+        opt['date_time'] = str(roller.end_time)
         with open('./status.conf', 'w') as f:
             json.dump(opt, f)
 
         # hugo 페이지 생성 및 Git Push
-        print('Make pages with hugo!')
+        print('=====Make pages with hugo!')
         roller.run_hugo('/home/revlon/Codes/Web/hugo_latent-info')
         time.sleep(8)
         roller.git_commit('/home/revlon/Codes/Web/latent-info.github.io')
-
-

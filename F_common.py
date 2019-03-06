@@ -29,7 +29,7 @@ def to_md(df, category, directory, page_num):
         # 헤더 생성
         meta_weight = {
             '부동산': 10, '주식': 20, '경제': 30, '찌라시': 40, '가상화폐': 50, '트윗': 60, \
-            '대란': 70, '감동': 80
+            '대란': 70, '감동': 80, '근황': 90
         }
         if category == '트윗':
             meta = '---\ntitle: 트윗/페북\nweight: 60\n---\n\n'
@@ -39,7 +39,9 @@ def to_md(df, category, directory, page_num):
         return meta
 
     # 콘텐트에 헤더와 html헤더 추가
-    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://latent.club/notice/'><center><b>알림사항(2018.09.07)</b></center></a></td></tr>\n"
+    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://latent.club/notice/'><center><b>알림사항(2019.01.05)</b></center></a></td></tr>\n"
+    ## 다른 서비스 노티 공지 추가
+    content += "<tr class='notice'><td colspan='2'><a href='http://latent.club/others4android/'><center><b>Latent CLUB 다른 서비스 보기</b></center></a></td></tr>\n"
 
     # 게시글 table tag
     html_title = "<tr class='title_link'>"
@@ -210,6 +212,18 @@ def tweet_filter(df):
         return result
 
 
+# 제목에 근황이 것만 추출하는 함수
+def tidings_filter(df):
+    # 트위터 조건
+    cond_t1 = df['title'].str.contains('근황')
+    cond_t2 = df['title'].str. contains('대한민국')
+    result = df[cond_t1 & ~cond_t2]
+    if result.shape[0] == 0:
+        return None
+    else:
+        result.loc[:, 'result'] = 'Y'
+        return result
+
 # 가상화폐에서 코인노래방 게시글은 제외
 def coin_filter(df):
     cond1 = df['title'].str.contains('노래방')
@@ -294,6 +308,8 @@ def word_filter(df, subject):
         result = stock_filter(result)
     elif subject == '감동':
         result = touch_approve(result)
+    elif subject == '근황':
+        result = tidings_filter(result)
     result = stopwords_filter(result)
     return result
 

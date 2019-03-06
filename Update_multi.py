@@ -21,8 +21,9 @@ class Updater:
     def __init__(self):
         # 기준 정보
         self.subject_dict = {'부동산': 'estate', '찌라시': 'tabloid', '주식': 'stock',
-            '경제': 'economy', '트윗': 'tweet', '가상화폐': 'coin', '대란': 'hot', '감동': 'touching'}
-        self.subjects = ['부동산', '경제', '주식', '찌라시', '가상화폐', '트윗', '대란', '감동']
+                             '경제': 'economy', '트윗': 'tweet', '가상화폐': 'coin',
+                             '대란': 'hot', '감동': 'touching', '근황': 'tidings'}
+        self.subjects = ['부동산', '경제', '주식', '찌라시', '가상화폐', '트윗', '대란', '감동', '근황']
         self.subject = ''
         self.site_dict = {'클리앙': 'clien', '딴지일보': 'ddan', '루리웹': 'ruli',
             '엠팍': 'mlb', '오유': 'Ou', '이토렌트': 'eto', '뽐뿌': 'ppom',
@@ -98,7 +99,7 @@ class Updater:
 
     # 주제 적합성 판정(트윗, 감동 제외) 후 DB 저장
     def predict_store(self, df):
-        if self.subject not in ['트윗', '감동']:
+        if self.subject not in ['트윗', '감동', '근황']:
             result = self.classifier.predict_Y(df)
         else:
             result = df

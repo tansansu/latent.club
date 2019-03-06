@@ -14,19 +14,18 @@ from datetime import datetime
 from TelegramBot import TelegramBot
 
 
-
 class Updater:
     def __init__(self):
         # 기준 정보
-        self.subject_dict = {'부동산':'estate', '찌라시':'tabloid', '주식':'stock', \
-        '경제':'economy', '트윗':'tweet', '가상화폐':'coin', '대란':'hot', '감동':'touching'}
-        self.subjects = ['부동산', '경제', '주식', '찌라시', '가상화폐', '트윗', '대란', '감동']
-        self.sites = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트', \
-        '뽐뿌', 'SLR', '82cook', '인벤', 'DVD프라임']
+        self.subject_dict = {'부동산': 'estate', '찌라시': 'tabloid', '주식': 'stock',
+                            '경제': 'economy', '트윗': 'tweet', '가상화폐': 'coin',
+                             '대란': 'hot', '감동': 'touching', '근황': 'tidings'}
+        self.subjects = ['부동산', '경제', '주식', '찌라시', '가상화폐', '트윗', '대란', '감동', '근황']
+        self.sites = ['클리앙', '딴지일보', '루리웹', '엠팍', '오유', '이토렌트',
+                      '뽐뿌', 'SLR', '82cook', '인벤', 'DVD프라임']
         self.log = '' # 로깅용 스트링
         self.start_time = 0
         self.end_time = 0
-
 
     # 함수: 게시판 md 파일 생성 작업 실행
     def execute_md(self, subject, size):
@@ -50,12 +49,11 @@ class Updater:
         directory = '/root/Codes/Web/hugo_latent-info/content/' + self.subject_dict[subject]
         for i in range(7):
             F_common.to_md(df.iloc[30*i:30*(i+1)], subject, directory, i+1)
-    
 
     # 텔레그램 메세지 보내는 함수
-    def log2telegram(self, message):
+    @staticmethod
+    def log2telegram(message):
         TelegramBot().log_to_me(message)
-
 
     # 업데이트 실행 함수
     def run(self):
@@ -64,7 +62,7 @@ class Updater:
             # log 메세지 생성
             self.log += '[ %s ]\n' % subject
             # 검색 url 불러오기
-            with open('links/' + self.subject_dict[subject] + '.json','r') as f:
+            with open('links/' + self.subject_dict[subject] + '.json', 'r') as f:
                 url = json.load(f)
             
             # 사이트별로 게시글 스크래핑 
@@ -78,7 +76,7 @@ class Updater:
                         ### 단어 필터링
                         result = F_common.word_filter(result, subject)
                         ### 주제 적합성 판정(트윗 제외)
-                        if subject not in ['트윗', '감동']:
+                        if subject not in ['트윗', '감동', '근황']:
                             result = F_Classifier.predict_Y(result, self.subject_dict[subject])
                         ### DB에 게시글 저장
                         article_count = F_common.store_db(self.subject_dict[subject], site, result)
@@ -97,4 +95,3 @@ class Updater:
         # log에 동작 시간 추가
         message = '업데이트 동작 시간: %s\n' % str(self.end_time - self.start_time)
         self.log += message; print(message)
-

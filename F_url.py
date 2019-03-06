@@ -3,6 +3,10 @@
 '''
 
 import json
+import os
+
+
+subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching', 'tidings']
 
 
 # 2018.05.05
@@ -19,7 +23,6 @@ def add_site(site, subject=None):
             json.dump(url, f)
         print(url[site])
     else:
-        subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
         for sub in subjects:
             with open('links/' + sub + '.json', 'r') as f:
                 url = json.load(f)
@@ -43,7 +46,6 @@ def del_site(site, subject=None):
         with open('links/' + subject + '.json', 'w') as f:
             json.dump(url, f)
     else:
-        subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
         for sub in subjects:
             with open('links/' + sub + '.json', 'r') as f:
                 url = json.load(f)
@@ -82,8 +84,11 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
     print(b_word)
 
     # 저장된 url json 파일 열기
-    with open('links/' + subject + '.json', 'r') as f:
-        url = json.load(f)
+    if subject + '.json' in os.listdir('links'):
+        with open('links/' + subject + '.json', 'r') as f:
+            url = json.load(f)
+    else:
+        url = {}
     
     import re
     
@@ -132,7 +137,6 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
 def change_url(target='eto'):
     import re
     # url과 변경할 주제
-    subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
     eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard01&sca=&sfl=wr_subject%7C%7Cwr_content&stx={0}'
     # 키워드 추출
     for subject in subjects:
@@ -153,9 +157,6 @@ def change_url(target='eto'):
     
 # URL 구문 수정
 def revise_url(site, before, after):
-    # url과 변경할 주제
-    subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
-
     for subject in subjects:
         with open('./links/%s.json' % subject, 'r') as f:
             url = json.load(f)

@@ -98,6 +98,12 @@ googleAnalytics = "UA-91393131-1"
 
 
 [[menu.main]]
+	name   = "근황"
+	url    = "tidings/"
+	weight = 90
+
+
+[[menu.main]]
 	name   = "About"
 	url    = "about/"
 	weight = 890
