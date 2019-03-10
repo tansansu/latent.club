@@ -99,7 +99,9 @@ class Updater:
 
     # 주제 적합성 판정(트윗, 감동 제외) 후 DB 저장
     def predict_store(self, df):
-        if self.subject not in ['트윗', '감동', '근황']:
+        if self.subject == "찌라시":
+            result = self.classifier.predict_ddan(df)
+        elif self.subject not in ['트윗', '감동', '근황']:
             result = self.classifier.predict_Y(df)
         else:
             result = df

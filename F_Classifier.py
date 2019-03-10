@@ -31,3 +31,12 @@ class Classifier:
         # Prediction
         df.loc[:, 'result'] = [self.model.classify(self.term_exists(self.text, word)) for word in words]
         return df
+
+    def predict_ddan(self, df):
+        words = df['title'].apply(self.tokenizer).tolist()
+        #print("words cnt: %d" % len(words))
+        # Prediction
+        df.loc[:, 'result'] = [self.model.classify(self.term_exists(self.text, word)) for word in words]
+        # 찌라시의 딴지일보의 헤에취 글은 Y로 수정
+        df.loc[(df['site'] == "딴지일보") & (df['member_id'] == "헤에취"), "result"] = "Y"
+        return df
