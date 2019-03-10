@@ -42,9 +42,9 @@ def get_article(url, subject, tears=15):
     # Get a html
     s = sess()
     s_result = s.get(url)
-    soup = BeautifulSoup(s_result.text, 'html.parser')
+    soup = BeautifulSoup(s_result.text, 'lxml')
     # Extracting articles from the html
-    articles = soup.findAll('a', {'class': 'list_subject_a'})
+    articles = soup.find_all('a', {'class': 'list_subject_a'})
 
     if len(articles) == 0:
         s.close()

@@ -60,8 +60,8 @@ def get_article(url, subject, tears=15):
     payload = {'search_text':url}
     s_result = s.post(search_url, data=payload)
 
-    soup = BeautifulSoup(s_result.text, 'html.parser')
-    articles = soup.findAll('div', attrs={'class': 'ItemContent Discussion'})
+    soup = BeautifulSoup(s_result.text, 'lxml')
+    articles = soup.find_all('div', attrs={'class': 'ItemContent Discussion'})
     if len(articles) == 0:
         s.close()
         return pd.DataFrame()

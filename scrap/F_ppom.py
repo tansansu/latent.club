@@ -37,8 +37,8 @@ def get_article(url, subject, tears=15):
     base_url = 'http://m.ppomppu.co.kr/new/'
     # Get a html
     resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'html.parser')
-    articles = soup.findAll('ul', {'class':'bbsList'})[0].findAll('li')
+    soup = BeautifulSoup(resp, 'lxml')
+    articles = soup.find_all('ul', {'class':'bbsList'})[0].find_all('li')
     articles = [x for x in articles if not x.find('strike')]
     # Return empty dataframe if no articles
     if len(articles) == 0:

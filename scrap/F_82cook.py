@@ -19,7 +19,7 @@ def mod_reply(char):
 # 감동스토리 게시글 수집/판단 함수
 def touch_article(url, tears):
     resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'html.parser')
+    soup = BeautifulSoup(resp, 'lxml')
     ## ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
     return tear_cnt >= tears
@@ -29,8 +29,8 @@ def touch_article(url, tears):
 def get_article(url, subject, tears=15):
     base_url = 'http://www.82cook.com/entiz/read.php?bn=15&num='
     resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'html.parser')
-    articles = soup.findAll('tr')[1:]
+    soup = BeautifulSoup(resp, 'lxml')
+    articles = soup.find_all('tr')[1:]
     # 게시글이 없으면 리턴
     if (len(articles) == 0) | (articles[0].find('td', {'class': 'title'}) is None):
         del resp
@@ -52,7 +52,7 @@ def get_article(url, subject, tears=15):
         date = a.find('td', {'class': 'regdate'})['title']
         content = ''
         reply_num = mod_reply(a)
-        view_num = a.findAll('td', {'class':'numbers'})[2].text.replace(',', '')
+        view_num = a.find_all('td', {'class':'numbers'})[2].text.replace(',', '')
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
             yn = touch_article(article_link, tears)

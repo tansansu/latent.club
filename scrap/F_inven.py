@@ -24,7 +24,7 @@ def mod_reply(char):
 # 감동스토리 게시글 수집/판단 함수
 def touch_article(url, tears):
     resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'html.parser')
+    soup = BeautifulSoup(resp, 'lxml')
     # ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
     return tear_cnt >= tears
@@ -35,8 +35,8 @@ def get_article(url, subject, tears=15):
     base_url = 'http://m.inven.co.kr'
     # Get a html
     resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'html.parser')
-    articles = soup.findAll('li', {'class': 'articleSubject'})
+    soup = BeautifulSoup(resp, 'lxml')
+    articles = soup.find_all('li', {'class': 'articleSubject'})
     # 배너 광고 삭제
     articles = [x for x in articles if x.find('em') is not None]
     # Return empty dataframe if no articles

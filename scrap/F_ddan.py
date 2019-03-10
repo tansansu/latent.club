@@ -48,8 +48,8 @@ def get_article(url, subject, tears=15):
     # 사이트에서 html 가져오기
     s = sess()
     s_result = s.get(url)
-    soup = BeautifulSoup(s_result.text, 'html.parser')
-    articles = soup.findAll('div', {'class': 'titleBox'})
+    soup = BeautifulSoup(s_result.text, 'lxml')
+    articles = soup.find_all('div', {'class': 'titleBox'})
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
         return pd.DataFrame()

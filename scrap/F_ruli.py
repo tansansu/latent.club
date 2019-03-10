@@ -38,9 +38,9 @@ def touch_article(soup, tears):
 def get_article(url, subject, tears=15):
     base_url = 'http://m.ruliweb.com/community/board/300148/read/'
     # Get a html
-    soup = BeautifulSoup(urlopen(url), 'html.parser')
+    soup = BeautifulSoup(urlopen(url), 'lxml')
     # Extracting articles from the html
-    articles = soup.findAll('tr', {'class': 'table_body'})[1:]  # 맨 첫글 공지 제외
+    articles = soup.find_all('tr', {'class': 'table_body'})[1:]  # 맨 첫글 공지 제외
     # 유동적인 상단 공지글 제외(notice class 제거)
     articles = [a for a in articles if 'notice' not in a.get('class')]
     # 유동적인 결과없음 글이 있으면 리턴
@@ -51,9 +51,9 @@ def get_article(url, subject, tears=15):
     a_list = []
     for a in articles:
         l = []
-        title = a.findAll('a', {'class': 'subject_link'})[0].text
-        user_id = mod_user_id(a.findAll('span', {'class': 'writer'})[0].text)
-        article_link = a.findAll('a', {'class': 'subject_link'})[0].get('href')
+        title = a.find_all('a', {'class': 'subject_link'})[0].text
+        user_id = mod_user_id(a.find_all('span', {'class': 'writer'})[0].text)
+        article_link = a.find_all('a', {'class': 'subject_link'})[0].get('href')
         # print(article_link)
         article_id = re.search(r'(\d{8})', article_link).group()
         article_link = base_url + article_id  # 링크에서 검색어 나오지 않게 수정

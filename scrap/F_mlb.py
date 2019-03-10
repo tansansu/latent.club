@@ -27,8 +27,8 @@ def touch_article(soup, tears):
 def get_article(url, subject, tears=15):
     # Get a html
     resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'html.parser')
-    articles = soup.findAll('tr')[1:]
+    soup = BeautifulSoup(resp, 'lxml')
+    articles = soup.find_all('tr')[1:]
     # 게시글만 추출
     articles = [a for a in articles if a.find('td', {'class': 't_left'}) is not None]
     # 게시글이 없으면 리턴
@@ -55,7 +55,7 @@ def get_article(url, subject, tears=15):
             yn = touch_article(con, tears)
             if not yn:
                 continue
-        date = con.findAll('span', {'class': 'val'})[3].text
+        date = con.find_all('span', {'class': 'val'})[3].text
         # date = mod_user_id(date)
         content = ''
         # Making the list

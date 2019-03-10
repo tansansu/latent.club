@@ -53,8 +53,8 @@ def get_article(url, subject, tears=15):
     # Get a html
     s = sess()
     resp = s.get(url)
-    soup = BeautifulSoup(resp.text, 'html.parser')
-    articles = soup.findAll('li', {'class': 'subject'})
+    soup = BeautifulSoup(resp.text, 'lxml')
+    articles = soup.find_all('li', {'class': 'subject'})
     # 게시글이 없으면 리턴
     if len(articles) == 0:
         s.close()
@@ -71,7 +71,7 @@ def get_article(url, subject, tears=15):
         article_id = re.search(r'wr_id=\d+', a.find('a')['href']).group().replace('wr_id=', '')
         article_link = base_url + article_id
         reply_num = mod_reply(a.find('div').text)
-        view_num = re.search(r'[0-9]+', a.findAll('span', {'class': 'datetime'})[1].text).group()
+        view_num = re.search(r'[0-9]+', a.find_all('span', {'class': 'datetime'})[1].text).group()
         # Gathering the cotent of each article
         con = s.get(article_link)
         temp = BeautifulSoup(con.text, 'html.parser')

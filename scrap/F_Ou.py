@@ -36,7 +36,7 @@ def sess():
 # 감동스토리 게시글 수집/판단 함수
 def touch_article(url, tears):
     resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'html.parser')
+    soup = BeautifulSoup(resp, 'lxml')
     # ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
     del resp
@@ -49,8 +49,8 @@ def get_article(url, subject, tears=15):
     # Get a html
     s = sess()
     resp = s.get(url)
-    soup = BeautifulSoup(resp.text, 'html.parser')
-    articles = soup.findAll('a', {'href': re.compile('view.php?.*')})
+    soup = BeautifulSoup(resp.text, 'lxml')
+    articles = soup.find_all('a', {'href': re.compile('view.php?.*')})
     # 게시글이 없는 경우 리턴
     if len(articles) == 0:
         s.close()
