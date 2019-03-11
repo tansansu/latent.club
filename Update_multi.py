@@ -83,7 +83,7 @@ class Updater:
                 # 단어 필터링
                 result = F_common.word_filter(result, self.subject)
                 print("%s - filtered aritcles: %d - %d" % (site, result.shape[0], result.shape[1]))
-            if result.shape[0] > 0:
+            if result is not None:
                 # 수집한 게시물이 db에 이미 있는 것인지 비교
                 result = F_common.compare_article(self.subject_dict[self.subject], site, result)
                 print("%s - no duplication articles: %d - %d" % (site, result.shape[0], result.shape[1]))

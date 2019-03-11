@@ -105,6 +105,25 @@ def update_article_result(path_db):
     TelegramBot().log_to_me(message)
 
 
+# 주제별로 잘못된 키워드가 포함된 데이터 삭제 함수
+def clean_keyword_error(path_db):
+    # 정리할 테이블
+    tables = ['tidings', 'tweet', 'estate', 'tabloid', 'economy', 'stock', 'touching', 'hot', 'coin']
+    conn = sqlite3.connect(path_db)
+    for table in tables:
+        print(table)
+        # 주제별 키워드 불러오기
+        with open("./links/%s.json" % table, "r") as f:
+            url = json.load(f)
+        keywords = list(url['clien'].keys())
+        # 테이블 전체 불러오기
+        df = pd.read_sql('select * from %s;' % table, conn)
+        print(df.shape)
+        df_new = df[df['keyword'].isin(keywords)]
+        print(df_new.shape)
+        df_new.to_sql(table, conn, if_exists='replace', index=False)
+    conn.close()
+
 '''
 firebase 이용 함수(삭제)
 def firebase():
@@ -118,4 +137,7 @@ def firebase():
 
 if __name__ == '__main__':
     path_db = '/home/revlon/Codes/Web/latent_info/db/board.db'
-    clean_dup(path_db)
+    if sys.argv[1] == "dup":
+        clean_dup(path_db)
+    elif sys.argv[1] == "key":
+        clean_keyword_error(path_db)

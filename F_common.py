@@ -297,20 +297,22 @@ def stopwords_filter(df):
 # 단어 필터
 def word_filter(df, subject):
     result = adult_filter(df)
-    # 주제별 특화된 단어 필터링
-    if subject == '트윗':
-        result = tweet_filter(result)
-    elif subject == '가상화폐':
-        result = coin_filter(result)
-    elif subject == '찌라시':
-        result = tabloid_filter(result)
-    elif subject == '주식':
-        result = stock_filter(result)
-    elif subject == '감동':
-        result = touch_approve(result)
-    elif subject == '근황':
-        result = tidings_filter(result)
-    result = stopwords_filter(result)
+    if result is not None:
+        result = stopwords_filter(result)
+    if result is not None:
+        # 주제별 특화된 단어 필터링
+        if subject == '트윗':
+            result = tweet_filter(result)
+        elif subject == '가상화폐':
+            result = coin_filter(result)
+        elif subject == '찌라시':
+            result = tabloid_filter(result)
+        elif subject == '주식':
+            result = stock_filter(result)
+        elif subject == '감동':
+            result = touch_approve(result)
+        elif subject == '근황':
+            result = tidings_filter(result)
     return result
 
 

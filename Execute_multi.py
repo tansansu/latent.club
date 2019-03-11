@@ -58,6 +58,7 @@ if __name__ == '__main__':
             url = json.load(f)
 
         roller.subject = subject  # 카테고리 설정
+        roller.keywords = list(url['clien'].keys()) # 카테고리의 키워드들 저장
         if roller.subject not in ['트윗', '감동', '근황']:
             roller.classifier = Classifier(roller.subject_dict[roller.subject])
         # 카테고리와 시작 시간 기록
@@ -71,22 +72,24 @@ if __name__ == '__main__':
         # 사이트별로 스크랩이 데이터프레임을 읽은 후 주제 적합성 판정(트윗 제외)
         result = pd.DataFrame()
         for fname in os.listdir('./temp'):
-            df_tmp = pd.read_pickle('./temp/' + fname)
             site_name = roller.site_dict_rev[fname.replace('.pkl', '')]
+            df_tmp = pd.read_pickle('./temp/' + fname)
+            # 해당 주제가 아닌 데이터는 제외
+            df_tmp = df_tmp[df_tmp['keyword'].isin(roller.keywords)]
             article_count = df_tmp.shape[0]
             # 프린트 메시지
             tmp_log = '-%s: %d개 수집' % (site_name, article_count)
             print(tmp_log)
             tmp_log += '\n'  # 텔레그램 메세징 용으로
-            result = result.append(df_tmp)
             # 게시물 수집 log 텔레그램으로 전송하기 위해 파일로 저장
             with open('./log/scrap.log', 'a') as f:
                 f.write(tmp_log)
         # 분류 및 DB 저장
-        roller.predict_store(result)
-
-        # md 파일 생성
-        roller.execute_md(size=300)
+        if article_count > 0:
+            result = result.append(df_tmp)
+            roller.predict_store(result)
+            # md 파일 생성
+            roller.execute_md(size=300)
 
         roller.end_time = datetime.now().replace(microsecond=0)
         # log에 동작 시간 추가
