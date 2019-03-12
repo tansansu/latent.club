@@ -19,6 +19,8 @@ from TelegramBot import TelegramBot
 
 class Updater:
     def __init__(self):
+        # pandas warinng off
+        pd.options.mode.chained_assignment = None
         # 기준 정보
         self.subject_dict = {'부동산': 'estate', '찌라시': 'tabloid', '주식': 'stock',
                              '경제': 'economy', '트윗': 'tweet', '가상화폐': 'coin',
@@ -78,20 +80,23 @@ class Updater:
             print(self.subject + ' | ' + site)
             # article 가져오기
             result = F_common.scrapper(site, url, self.subject_dict[self.subject], self.site_dict)
-            print("%s - scraped articles: %d - %d" % (site, result.shape[0], result.shape[1]))
             if result.shape[0] > 0:
+                print("%s - scraped articles: %d - %d" % (site, result.shape[0], result.shape[1]))
                 # 단어 필터링
                 result = F_common.word_filter(result, self.subject)
-                print("%s - filtered aritcles: %d - %d" % (site, result.shape[0], result.shape[1]))
-            if result is not None:
-                # 수집한 게시물이 db에 이미 있는 것인지 비교
-                result = F_common.compare_article(self.subject_dict[self.subject], site, result)
-                print("%s - no duplication articles: %d - %d" % (site, result.shape[0], result.shape[1]))
-            if result.shape[0] > 0:
-                file_path = 'temp/%s.pkl' % self.site_dict[site]
-                #print("create temp file: " + file_path)
-                with open(file_path, 'wb') as f:
-                    pickle.dump(result, f)
+                if result is not None:
+                    print("%s - filtered aritcles: %d - %d" % (site, result.shape[0], result.shape[1]))
+                    # 수집한 게시물이 db에 이미 있는 것인지 비교
+                    result = F_common.compare_article(self.subject_dict[self.subject], site, result)
+                if result is not None and result.shape[0] > 0:
+                    print("%s - no duplication articles: %d - %d" % (site, result.shape[0], result.shape[1]))
+                    #print("create temp file: " + file_path)
+                    with open('temp/%s.pkl' % self.site_dict[site], 'wb') as f:
+                        pickle.dump(result, f)
+                else:
+                    print("%s - final scraped articles: 0" % site)
+            else:
+                print("%s - final scraped articles: 0" % site)
         except Exception as e:
             print("run error", e.args)
         # 임시파일로 저장

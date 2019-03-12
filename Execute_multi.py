@@ -18,8 +18,8 @@ class Roller(Updater):
 if __name__ == '__main__':
     # 코드 동작 시간 측정용
     start_time = datetime.now().replace(microsecond=0)
-    log_tmp = 'Start_time: ' + str(start_time)
-    print("=====%s" % log_tmp)
+    log_tmp = 'LOG1 | Start Time: ' + str(start_time)
+    print("===== %s" % log_tmp)
     # Check Status file
     with open('./status.conf', 'r') as f:
         opt = json.load(f)
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     if opt['status'] == 1:
         old_time = datetime.strptime(opt['date_time'], '%Y-%m-%d %H:%M:%S')
         time_delta = start_time - old_time
-        print("=====time delta: %f" % (time_delta.seconds / 3600))
+        print("LOG2 | =====time delta: %f" % (time_delta.seconds / 3600))
         if time_delta.seconds / 3600 >= 5:
             opt['status'] = 0
         print('=====Running!')
@@ -40,7 +40,7 @@ if __name__ == '__main__':
         # 스크랩 대상 주제 설정
         complete_subj_idx = roller.subjects.index(opt['subject'])
         subjects_cnt = len(roller.subjects)
-        print('=====Current Index: %d/%d' % (complete_subj_idx, subjects_cnt))
+        print('===== LOG3 | Current Index: %d/%d' % (complete_subj_idx, subjects_cnt))
         if complete_subj_idx == subjects_cnt-1:
             subject = roller.subjects[0]
         else:
@@ -71,16 +71,18 @@ if __name__ == '__main__':
 
         # 사이트별로 스크랩이 데이터프레임을 읽은 후 주제 적합성 판정(트윗 제외)
         result = pd.DataFrame()
+        article_count = 0
+        print("===== LOG4 | %s 수집내역" % roller.subject)
         for fname in os.listdir('./temp'):
             site_name = roller.site_dict_rev[fname.replace('.pkl', '')]
             df_tmp = pd.read_pickle('./temp/' + fname)
             # 해당 주제가 아닌 데이터는 제외
             df_tmp = df_tmp[df_tmp['keyword'].isin(roller.keywords)]
-            article_count = df_tmp.shape[0]
             # 프린트 메시지
-            tmp_log = '-%s: %d개 수집' % (site_name, article_count)
+            tmp_log = '-%s: %d개 수집' % (site_name, df_tmp.shape[0])
             print(tmp_log)
             tmp_log += '\n'  # 텔레그램 메세징 용으로
+            article_count += df_tmp.shape[0]
             # 게시물 수집 log 텔레그램으로 전송하기 위해 파일로 저장
             with open('./log/scrap.log', 'a') as f:
                 f.write(tmp_log)
@@ -93,8 +95,8 @@ if __name__ == '__main__':
 
         roller.end_time = datetime.now().replace(microsecond=0)
         # log에 동작 시간 추가
-        message = '업데이트 동작 시간: %s\n' % str(roller.end_time - roller.start_time)
-        print("=====%s" % message)
+        message = 'LOG5 | 업데이트 동작 시간: %s\n' % str(roller.end_time - roller.start_time)
+        print("===== %s" % message)
         with open('./log/scrap.log', 'a') as f:
             f.write(message)
 
@@ -116,7 +118,7 @@ if __name__ == '__main__':
             json.dump(opt, f)
 
         # hugo 페이지 생성 및 Git Push
-        print('=====Make pages with hugo!')
+        print('===== LOG6 | Make pages with hugo!')
         roller.run_hugo('/home/revlon/Codes/Web/hugo_latent-info')
         time.sleep(8)
         roller.git_commit('/home/revlon/Codes/Web/latent-info.github.io')
