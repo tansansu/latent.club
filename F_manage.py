@@ -70,7 +70,7 @@ def export_sample(df, object):
 # 중복 데이터 정리 함수
 def clean_dup(path_db):
     # 정리할 테이블
-    tables = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching']
+    tables = ['tidings', 'tweet', 'estate', 'tabloid', 'economy', 'stock', 'touching', 'hot', 'coin']
     conn = sqlite3.connect(path_db)
     for table in tables:
         df = pd.read_sql('select * from %s;' % table, conn)
