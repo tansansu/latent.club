@@ -34,9 +34,9 @@ def sess():
 
 
 # 감동스토리 게시글 수집/판단 함수
-def touch_article(url, tears):
-    resp = urlopen(url)
-    soup = BeautifulSoup(resp, 'lxml')
+def touch_article(conn, url, tears):
+    resp = conn.get(url)
+    soup = BeautifulSoup(resp.text, 'lxml')
     # ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
     del resp
@@ -73,7 +73,7 @@ def get_article(url, subject, tears=15):
         view_num = a.find('span', {'class': 'list_viewCount'}).text
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
-            yn = touch_article(article_link, tears)
+            yn = touch_article(s, article_link, tears)
             if not yn:
                 continue
         # Making the list
@@ -86,7 +86,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
-        time.sleep(random.randint(2, 7) / 3)
+        time.sleep(random.randint(5, 14))
         
     if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         s.close()
