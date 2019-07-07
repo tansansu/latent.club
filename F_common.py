@@ -32,7 +32,7 @@ def to_md(df, category, directory, page_num):
             '대란': 70, '감동': 80, '근황': 90
         }
         if category == '트윗':
-            meta = '---\ntitle: 트윗/페북\nweight: 60\n---\n\n'
+            meta = '---\ntitle: 소셜\nweight: 60\n---\n\n'
         else:
             meta = '---\ntitle: %s\nweight: %d\n---\n\n' % (category, meta_weight[category])
 
@@ -203,8 +203,11 @@ def tweet_filter(df):
     cond_f2 = df['title'].str.contains('페북\.')
     cond_f3 = df['title'].str.contains('facebook$')
     cond_f4 = df['title'].str.contains('facebook\.')
+    # 인스타 조건
+    cond_i1 = df['title'].str.contains('인스타$')
+    cond_i2 = df['title'].str.contains('인스타\.')
     result = df[cond_t1 | cond_t2 | cond_t3 | cond_t4 | cond_f1 | cond_f2 | \
-    cond_f3 | cond_f4]
+    cond_f3 | cond_f4 | cond_i1 | cond_i2]
     if result.shape[0] == 0:
         return None
     else:

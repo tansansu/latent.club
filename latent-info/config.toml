@@ -68,19 +68,22 @@ googleAnalytics = "UA-91393131-1"
 	weight = 30
 
 [[menu.main]]
+	name   = "암호화폐"
+	url    = "coin/"
+	weight = 50
+
+[[menu.main]]
+	name   = "근황"
+	url    = "tidings/"
+	weight = 90
+
+[[menu.main]]
 	name   = "찌라시"
 	url    = "tabloid/"
 	weight = 40
 
-
 [[menu.main]]
-	name   = "가상화폐"
-	url    = "coin/"
-	weight = 50
-
-
-[[menu.main]]
-	name   = "트윗/페북"
+	name   = "소셜"
 	url    = "tweet/"
 	weight = 60
 
@@ -95,13 +98,6 @@ googleAnalytics = "UA-91393131-1"
 	name   = "감동"
 	url    = "touching/"
 	weight = 80
-
-
-[[menu.main]]
-	name   = "근황"
-	url    = "tidings/"
-	weight = 90
-
 
 [[menu.main]]
 	name   = "About"

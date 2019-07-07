@@ -86,7 +86,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
-        time.sleep(random.randint(5, 14))
+        time.sleep(random.randint(12, 23))
         
     if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         s.close()
@@ -100,4 +100,3 @@ def get_article(url, subject, tears=15):
     result.set_index('article_id')
     
     return result
-
