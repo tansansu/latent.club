@@ -1,3 +1,4 @@
 {
-    "python.promptToInstallJupyter": false
+    "python.promptToInstallJupyter": false,
+    "workbench.colorCustomizations": {}
 }

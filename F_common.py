@@ -39,9 +39,7 @@ def to_md(df, category, directory, page_num):
         return meta
 
     # 콘텐트에 헤더와 html헤더 추가
-    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://latent.club/notice/'><center><b>알림사항(2019.01.05)</b></center></a></td></tr>\n"
-    ## 다른 서비스 노티 공지 추가
-    content += "<tr class='notice'><td colspan='2'><a href='https://www.notion.so/tansan/Brilliant-Lime-Apps-e2cc6d9e7d214571ba66e9c2be57972d'><center><b>Latent CLUB 다른 서비스 보기</b></center></a></td></tr>\n"
+    content = make_pageview_comment(category) + '\n<table>\n' + "<tr class='notice'><td colspan='2'><a href='http://bit.ly/brilliantlimeapps'><center><b>Latent CLUB 모바일앱 보기</b></center></a></center></a></td></tr>\n"
 
     # 게시글 table tag
     html_title = "<tr class='title_link'>"
