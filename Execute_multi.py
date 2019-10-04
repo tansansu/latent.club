@@ -30,7 +30,9 @@ if __name__ == '__main__':
         print("===== LOG1-1 | time delta: %f" % (time_delta.seconds / 3600))
         if time_delta.seconds / 3600 >= 5:
             opt['status'] = 0
-        print('===== Running!')
+        with open('./status.conf', 'w') as f:
+            json.dump(opt, f)
+        print('===== Long time Running and correct it!')
     else:
         # 업데이트 클래스 초기화
         roller = Roller()
