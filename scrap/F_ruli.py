@@ -51,7 +51,7 @@ def get_article(url, subject, tears=15):
     a_list = []
     for a in articles:
         l = []
-        title = a.find_all('a', {'class': 'subject_link'})[0].text
+        title = a.find_all('a', {'class': 'subject_link'})[0].text.strip()
         user_id = mod_user_id(a.find_all('span', {'class': 'writer'})[0].text)
         article_link = a.find_all('a', {'class': 'subject_link'})[0].get('href')
         # print(article_link)
