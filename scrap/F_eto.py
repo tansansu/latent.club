@@ -1,7 +1,7 @@
 # 2018.02.03
 
 import time, random
-import requests
+import utils
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
@@ -31,15 +31,6 @@ def mod_reply(char):
         return '0'
 
 
-# Session
-def sess():
-    AGENT = 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Mobile Safari/537.36'
-    REFERER = 'http://www.etoland.co.kr/'    
-    s = requests.Session()
-    s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
-    return s
-
-
 # 감동스토리 게시글 수집/판단 함수
 def touch_article(soup, tears):
     # ㅠ, ㅜ의 개수로 감동스토리 판단
@@ -51,7 +42,7 @@ def touch_article(soup, tears):
 def get_article(url, subject, tears=15):
     base_url = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard01&wr_id='
     # Get a html
-    s = sess()
+    s = utils.sess('http://www.etoland.co.kr/')
     resp = s.get(url)
     soup = BeautifulSoup(resp.text, 'lxml')
     articles = soup.find_all('li', {'class': 'subject'})

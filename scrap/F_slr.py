@@ -1,7 +1,7 @@
 # 2017.06.22
 
 import time, random
-import requests
+import utils
 import urllib
 import re
 import pandas as pd
@@ -32,16 +32,6 @@ def mod_view(char):
     return result.replace('조회 ', '')
 
 
-# Session
-def sess(url):
-    AGENT = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Mobile Safari/537.36'
-    REFERER = url
-
-    s = requests.Session()
-    s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
-    return s
-
-
 def touch_article(soup, tears):
     # ㅠ, ㅜ의 개수로 감동스토리 판단
     tear_cnt = soup.text.count('ㅜ') + soup.text.count('ㅠ')
@@ -53,7 +43,7 @@ def get_article(url, subject, tears=15):
     base_url = 'http://starboard.kr/slr'
     search_url = 'http://starboard.kr/conn/board/search'
     # Get a html
-    s = sess('http://starboard.kr/')
+    s = utils.sess('http://starboard.kr/')
     base = s.get(base_url)
     # s_result.encoding = 'euc-kr' # Revising the encoding
     # Extracting articles from the html

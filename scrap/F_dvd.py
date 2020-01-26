@@ -1,19 +1,10 @@
 # 2018.05.05
 
 import time, random
-import requests
+import utils
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
-
-
-# 함수: 세션생성
-def sess():
-    AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36'
-    REFERER = 'https://dvdprime.com/'
-    s = requests.Session()
-    s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
-    return s
 
 
 # Modifing user_ids
@@ -40,7 +31,7 @@ def touch_article(soup, tears):
 def get_article(url, subject, tears=15):
     base_url = 'https://dvdprime.com/g2/bbs/board.php?bo_table=comm&wr_id='
     # Get a html
-    s = sess()
+    s = utils.sess('https://dvdprime.com/')
     s_result = s.get(url)
     soup = BeautifulSoup(s_result.text, 'lxml')
     # Extracting articles from the html

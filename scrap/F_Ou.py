@@ -2,7 +2,7 @@
 
 import time, random
 from urllib.request import urlopen
-import requests
+import utils
 import re
 import pandas as pd
 from datetime import datetime
@@ -24,15 +24,6 @@ def mod_reply(char):
         return '0'
 
 
-# 함수: 세션생성
-def sess():
-    AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1'
-    REFERER = 'http://m.todayhumor.co.kr/'
-    s = requests.Session()
-    s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
-    return s
-
-
 # 감동스토리 게시글 수집/판단 함수
 def touch_article(conn, url, tears):
     resp = conn.get(url)
@@ -47,7 +38,7 @@ def touch_article(conn, url, tears):
 def get_article(url, subject, tears=15):
     base_url = 'http://m.todayhumor.co.kr/'
     # Get a html
-    s = sess()
+    s = utils.sess('http://m.todayhumor.co.kr/')
     resp = s.get(url)
     soup = BeautifulSoup(resp.text, 'lxml')
     articles = soup.find_all('a', {'href': re.compile('view.php?.*')})

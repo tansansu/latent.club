@@ -1,20 +1,11 @@
 # 2018.01.04
 
 import time, random
-import requests
+import utils
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
 from datetime import datetime
-
-
-# 함수: 세션생성
-def sess():
-    AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25'
-    REFERER = 'http://www.ddanzi.com/'
-    s = requests.Session()
-    s.headers.update({'User-Agent': AGENT, 'Referer': REFERER})
-    return s
 
 
 def mod_char(char, for_title=None):
@@ -46,7 +37,7 @@ def get_article(url, subject, tears=15):
     base_url = 'http://www.ddanzi.com/index.php?m=1&document_srl='
 
     # 사이트에서 html 가져오기
-    s = sess()
+    s = utils.sess('http://www.ddanzi.com/')
     s_result = s.get(url)
     soup = BeautifulSoup(s_result.text, 'lxml')
     articles = soup.find_all('div', {'class': 'titleBox'})
