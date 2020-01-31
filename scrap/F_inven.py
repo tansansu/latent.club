@@ -52,6 +52,9 @@ def get_article(url, subject, tears=15):
     for a in articles:
         l = []
         article_link = base_url + a.find('a', {'class': 'subject'})['href']
+        # 링크에서 검색어 제거
+        keyword_padding = re.search(r'svalue=.*&', article_link).group()
+        article_link.replace(keyword_padding, '')
         title = a.find('span', {'class': 'title'}).text
         user_id = a.find('em', {'class': 'writer'}).text
         user_id = mod_id(user_id)

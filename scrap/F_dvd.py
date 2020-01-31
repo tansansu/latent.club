@@ -32,8 +32,8 @@ def get_article(url, subject, tears=15):
     base_url = 'https://dvdprime.com/g2/bbs/board.php?bo_table=comm&wr_id='
     # Get a html
     s = utils.sess('https://dvdprime.com/')
-    s_result = s.get(url)
-    soup = BeautifulSoup(s_result.text, 'lxml')
+    resp = s.get(url)
+    soup = BeautifulSoup(resp.text, 'lxml')
     # Extracting articles from the html
     articles = soup.find_all('a', {'class': 'list_subject_a'})
 

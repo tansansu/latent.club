@@ -58,7 +58,7 @@ def get_article(url, subject, tears=15):
         
     # print(articles)
     s.close()  # starboard session 종료
-    s = sess('http://www.slrclub.com/')
+    s = utils.sess('http://www.slrclub.com/')
     a_list = []
     for a in articles:
         l = []

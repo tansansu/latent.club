@@ -1,5 +1,5 @@
 # 2017.06.14
-
+import utils
 import time, random
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
@@ -38,7 +38,9 @@ def touch_article(soup, tears):
 def get_article(url, subject, tears=15):
     base_url = 'http://m.ruliweb.com/community/board/300148/read/'
     # Get a html
-    soup = BeautifulSoup(urlopen(url), 'lxml')
+    s = utils.sess(base_url)
+    resp = s.get(url)
+    soup = BeautifulSoup(resp.text, 'lxml')
     # Extracting articles from the html
     articles = soup.find_all('tr', {'class': 'table_body'})[1:]  # 맨 첫글 공지 제외
     # 유동적인 상단 공지글 제외(notice class 제거)
@@ -60,7 +62,8 @@ def get_article(url, subject, tears=15):
         reply_num = mod_reply(a)
         view_num = re.search(r'[0-9]+', a.find('span', {'class': 'hit'}).text).group()
         # Gathering the cotent of each article
-        con = BeautifulSoup(urlopen(article_link), 'html.parser')
+        resp = s.get(article_link)
+        con = BeautifulSoup(resp.text, 'html.parser')
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
             yn = touch_article(con, tears)

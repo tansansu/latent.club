@@ -6,7 +6,7 @@ import pandas as pd
 import sys
 sys.path.insert(0, 'latent_info/')
 sys.path.append('/home/revlon/Codes/Telegram_Bot/')
-sys.path.append('/Users/tansansu/Google Drive/Python/Telegram_Bot/')
+sys.path.append('/Users/tansansu/Storage/Bot/Telegram_Bot')
 sys.path.append('/root/Codes/Telegram_Bot/')
 import F_common 
 import F_Classifier

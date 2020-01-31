@@ -38,14 +38,18 @@ def get_article(url, subject, tears=15):
 
     # 사이트에서 html 가져오기
     s = utils.sess('http://www.ddanzi.com/')
-    s_result = s.get(url)
-    soup = BeautifulSoup(s_result.text, 'lxml')
-    articles = soup.find_all('div', {'class': 'titleBox'})
-    # 게시글이 없는 경우 빈 데이터 프레임 리턴
-    if len(articles) == 0:
-        return pd.DataFrame()
+    resp = s.get(url)
+    soup = BeautifulSoup(resp.text, 'lxml')
+    table = soup.select('table > tbody')[1]
+    articles_total = table.select('tr')
     # 공지글 제거
-    articles = [x for x in articles if x.find('strong') is None]
+    articles = []
+    for article in articles_total:
+        try:
+            if article['class'][0] == 'notice':
+                continue
+        except:
+            articles.append(article)
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
         return pd.DataFrame()
@@ -55,7 +59,7 @@ def get_article(url, subject, tears=15):
     # print(len(articles))
     for a in articles:
         l = []
-        title = mod_char(a.find('div', {'class': 'title'}).text, 'for_title')
+        title = mod_char(a.select_one('td.title > a').text, 'for_title')
         # print(title)
         article_id = re.search(r'(\d{9})', a.find('a')['href']).group()
         # print(article_link)
