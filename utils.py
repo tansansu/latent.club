@@ -1,4 +1,5 @@
 import requests
+import json
 
 
 # 함수: 세션생성
@@ -13,3 +14,16 @@ def sess(referer: str):
 def print_log(verbose, category, obj):
     if verbose:
         print('===== catch %s: ' % category, obj)
+
+
+# URL json 파일 불러오기
+def get_url(subject: str) -> dict:
+    with open('./links/%s.json' % subject, 'r') as f:
+        url = json.load(f)
+    return url
+
+
+# URL json 파일 저장
+def save_url(subject: str, url:dict):
+    with open('./links/%s.json' % subject, 'w') as f:
+        json.dump(url, f)

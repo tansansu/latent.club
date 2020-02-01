@@ -36,33 +36,44 @@ def touch_article(conn, url, tears):
 
 # 게시글 수집
 def get_article(url, subject, tears=15, verbose=False):
-    base_url = 'http://m.todayhumor.co.kr/'
+    base_url = 'http://starboard.kr/todayhumor'
+    search_url = 'http://starboard.kr/conn/board/search'
     # Get a html
-    s = utils.sess('http://m.todayhumor.co.kr/')
-    resp = s.get(url)
-    soup = BeautifulSoup(resp.text, 'lxml')
-    articles = soup.find_all('a', {'href': re.compile('view.php?.*')})
+    s = utils.sess('http://starboard.kr/')
+    payload = {'search_text':url}
+    resp = s.post(search_url, data=payload)
+    articles = soup.find_all('div', attrs={'class': 'ItemContent Discussion'})
     utils.print_log(verbose, "articles cnt", len(articles))
     # 게시글이 없는 경우 리턴
     if len(articles) == 0:
         s.close()
         return pd.DataFrame()
-
+    
     a_list = []
     for a in articles:
         l = []
-        title = mod_title(a.find('h2', {'class': 'listSubject'}).text)
+        title = mod_title(a.find('div', attrs={'class': 'Title'}).find('a').text)
+        utils.print_log(verbose, "1 article title", title)
         user_id = ''
         try:
-            article_link = base_url + a.get('href')
+            article_link = a.find('div', attrs={'class': 'Title'}).find('a')['href']
+            utils.print_log(verbose, "2 article link", article_link)
         except:
             return pd.DataFrame()
         # print(article_link)
-        article_id = a.find('span', {'class': 'list_no'}).text
-        date = a.find('span', {'class': 'listDate'}).text.replace('/', '-')
+        article_id = re.search(r's_no=(\d+)', article_link).group(1)
+        utils.print_log(verbose, "3 article id", article_id)
+        date = a.find('time')['datetime']
+        utils.print_log(verbose, "4 article date", date)
         content = ''
-        reply_num = mod_reply(a.find('h2', {'class': 'listSubject'}).text)
-        view_num = a.find('span', {'class': 'list_viewCount'}).text
+        try:
+            reply_num = re.search(r'\[([0-9]+)\]', title).group(1)
+        except:
+            reply_num = '0'
+        utils.print_log(verbose, "5 article reply cnt", reply_num)
+        view_num = a.select_one('div.Meta.Meta-Discussion > span.MItem.MCount.ViewCount').text
+        utils.print_log(verbose, "6 article view cnt", view_num)
+        user_id = ''
         # 감동 주제일 경우 Y값을 판단해서 Y가 아니면 next loop
         if subject == 'touching':
             yn = touch_article(s, article_link, tears)

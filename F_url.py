@@ -3,10 +3,12 @@
 '''
 
 import json
+import utils
 import os
+from urllib.parse import quote_plus
 
 
-subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching', 'tidings']
+SUBJECTS = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'touching', 'tidings']
 
 
 # 2018.05.05
@@ -14,23 +16,19 @@ subjects = ['estate', 'stock', 'economy', 'tabloid', 'coin', 'tweet', 'hot', 'to
 def add_site(site, subject=None):
     if subject:
         # 저장된 url json 파일 열기
-        with open('links/' + subject + '.json', 'r') as f:
-            url = json.load(f)
+        url = utils.get_url(subject)
         # site 추가
         url[site] = ''
         # url json 파일 저장하기
-        with open('links/' + subject + '.json', 'w') as f:
-            json.dump(url, f)
+        utils.save_url(subject, url)
         print(url[site])
     else:
-        for sub in subjects:
-            with open('links/' + sub + '.json', 'r') as f:
-                url = json.load(f)
+        for sub in SUBJECTS:
+            url = utils.get_url(sub)
             # site 추가
             url[site] = ''
             # url json 파일 저장하기
-            with open('links/' + sub + '.json', 'w') as f:
-                json.dump(url, f)
+            utils.save_url(sub, url)
             print(url[site])
     
 
@@ -38,22 +36,29 @@ def add_site(site, subject=None):
 def del_site(site, subject=None):   
     if subject:
         # 저장된 url json 파일 열기
-        with open('links/' + subject + '.json', 'r') as f:
-            url = json.load(f)
+        url = utils.get_url(subject)
         # site 제거
         del(url[site])
         # url json 파일 저장하기
-        with open('links/' + subject + '.json', 'w') as f:
-            json.dump(url, f)
+        utils.save_url(subject, url)
     else:
-        for sub in subjects:
-            with open('links/' + sub + '.json', 'r') as f:
-                url = json.load(f)
+        for subject in SUBJECTS:
+            url = utils.get_url(subject)
             # site 제거
             del(url[site])
             # url json 파일 저장하기
-            with open('links/' + sub + '.json', 'w') as f:
-                json.dump(url, f)
+            utils.save_url(subject, url)
+
+
+# url dictionary에 url에 추가하는 함수
+def put_link(url_dict, site, word, url_string):
+    try:
+        url_dict[site][word] = url_string
+    except KeyError:
+        url_dict[site] = {word: url_string}
+    except TypeError:
+        url_dict[site] = {word: url_string}
+    return url_dict
 
 
 # 함수 실행 예: add_keyword(subject='tweet', site='eto', word='abcd', eto_link='')
@@ -72,54 +77,37 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
     dvd_pad = 'https://dvdprime.com/g2/bbs/board.php?bo_table=comm&sca=&scrap_mode=&sfl=wr_subject%7C%7Cwr_content&sop=and&stx={0}'
     instiz_pad = 'https://www.instiz.net/bbs/list.php?starttime=&endtime=&k={0}&id=pt'
     
-    '''
-    b_word = word.encode('utf-8')
-    import re
-    b_word = str(b_word).replace('\\x', '%').replace("\'", '').upper()
-    b_word = re.sub(r'^B', '', b_word)
-    '''
     # 입력된 단어의 urlencoding
-    from urllib.parse import quote_plus
     b_word = quote_plus(word)
     print(b_word)
 
     # 저장된 url json 파일 열기
     if subject + '.json' in os.listdir('links'):
-        with open('links/' + subject + '.json', 'r') as f:
-            url = json.load(f)
+        url = utils.get_url(subject)
     else:
         url = {}
     
     import re
-    
-    # url dictionary에 url에 추가하는 함수
-    def put_link(url_dict, site, word, url_string):
-        try:
-            url_dict[site][word] = url_string
-        except KeyError:
-            url_dict[site] = {word: url_string}
-        except TypeError:
-            url_dict[site] = {word: url_string}
-        return url_dict
 
     # 특정 사이트의 url만 수정 케이스
     if site:
         if site == 'eto':
             eto_link = eto_pad.format(eto_link)
             url = put_link(url, site, word, eto_link)
-        elif site == 'slr':
+        elif site in ['slr', 'Ou']:
             url = put_link(url, site, word, b_word)
         else:
             pad = locals()[re.search(r'[^0-9]+', site).group() + '_pad']
             url = put_link(url, site, word, pad.format(b_word))
     # 전체 사이트에 키워드 검색 url 추가하기
     else:
-        sites = ['clien', 'ddan', 'ruli', 'mlb', 'Ou', 'ppom', '82cook', 'inven', 'dvd']
+        sites = ['clien', 'ddan', 'ruli', 'mlb', 'ppom', '82cook', 'inven', 'dvd']
         for site in sites:
             pad = locals()[re.search(r'[^0-9]+', site).group() + '_pad']
             url = put_link(url, site, word, pad.format(b_word))
-        # SLR은 키워드만 추가
+        # SLR/오유는 키워드만 추가
         url = put_link(url, 'slr', word, b_word)
+        url = put_link(url, 'Ou', word, b_word)
         # 이토렌트는 None이면 공백으로 추가
         if not eto_link:
             url = put_link(url, 'eto', word, '')
@@ -127,9 +115,7 @@ def add_keyword(subject=None, site=None, word=None, eto_link=None):
             url = put_link(url, 'eto', word, eto_pad.format(eto_link))
         
     # url json 파일 저장하기
-    with open('links/' + subject + '.json', 'w') as f:
-        json.dump(url, f)
-    
+    utils.save_url(subject, url)
     print(url)
 
 
@@ -139,10 +125,9 @@ def change_url(target='eto'):
     # url과 변경할 주제
     eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard01&sca=&sfl=wr_subject%7C%7Cwr_content&stx={0}'
     # 키워드 추출
-    for subject in subjects:
+    for subject in SUBJECTS:
         # 저장된 url json 파일 열기
-        with open('links/' + subject + '.json', 'r') as f:
-            url = json.load(f)
+        url = utils.get_url(subject)
         target_url = url[target]
         for k in target_url.keys():
             word = target_url[k]
@@ -151,19 +136,23 @@ def change_url(target='eto'):
         url[target] = target_url
         print(url[target])
         # URL 파일 저장
-        with open('links/' + subject + '.json', 'w') as f:
-            json.dump(url, f)
+        utils.save_url(subject, url)
         
     
 # URL 구문 수정
 def revise_url(site, before, after):
-    for subject in subjects:
-        with open('./links/%s.json' % subject, 'r') as f:
-            url = json.load(f)
+    for subject in SUBJECTS:
+        url = utils.get_url(subject)
         for k in url[site].keys():
             link = url[site][k]
-            url[site][k] = link.replace(before, after)
+            if before is None and after is None:
+                # 스타보드 검색으로 변경하기 위해서 URL을 키워드로만 변경
+                b_word = quote_plus(k)
+                url[site][k] = b_word
+            else:
+                url[site][k] = link.replace(before, after)
             print(url[site][k])
         # URL 재 저장
-        with open('./links/%s.json' % subject, 'w') as f:
-            json.dump(url, f)
+        utils.save_url(subject, url)
+
+

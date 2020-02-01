@@ -74,8 +74,13 @@ def get_article(url, subject, tears=15, verbose=False):
         utils.print_log(verbose, "3 article id", article_id)
         date = a.find('time')['datetime']
         utils.print_log(verbose, "4 article date", date)
-        reply_num = mod_reply(a.select_one('div.Meta.Meta-Discussion > span.MItem.MCount.ViewCount').text)
+        try:
+            reply_num = re.search(r'\[([0-9]+)\]', title).group(1)
+        except:
+            reply_num = '0'
         utils.print_log(verbose, "5 article reply cnt", reply_num)
+        view_num = a.select_one('div.Meta.Meta-Discussion > span.MItem.MCount.ViewCount').text
+        utils.print_log(verbose, "6 article view cnt", view_num)
         # Get a content of the article
         con = BeautifulSoup(s.get(article_link).text, 'html.parser')
         # 존재하지 않는 게시물 예외 처리
@@ -91,8 +96,7 @@ def get_article(url, subject, tears=15, verbose=False):
             member_id = ''
         else:
             member_id = con.find('span', attrs={'class': 'lop'}).text
-        view_num = mod_view(con.find('td', {'class': 'click bbs_ct_small'}).text)
-        utils.print_log(verbose, "6 article view cnt", view_num)
+
         content = ''
         # Making the list
         l.append(title)
