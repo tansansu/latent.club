@@ -39,13 +39,14 @@ def touch_article(soup, tears):
 
 
 # 게시글 수집
-def get_article(url, subject, tears=15):
+def get_article(url, subject, tears=15, verbose=False):
     base_url = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard01&wr_id='
     # Get a html
     s = utils.sess('http://www.etoland.co.kr/')
     resp = s.get(url)
     soup = BeautifulSoup(resp.text, 'lxml')
     articles = soup.find_all('li', {'class': 'subject'})
+    utils.print_log(verbose, "articles cnt", len(articles))
     # 게시글이 없으면 리턴
     if len(articles) == 0:
         s.close()
@@ -91,6 +92,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
+        utils.print_log(verbose, "article line 1", l)
         time.sleep(random.randint(2, 7) / 3)
     if len(a_list) == 0: # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
         s.close()

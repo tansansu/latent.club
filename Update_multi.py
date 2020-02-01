@@ -7,11 +7,10 @@ import time
 from multiprocessing import Pool
 import pickle
 import sqlite3
-from sh import git, cd
 import sys
 sys.path.insert(0, 'latent_info/')
 sys.path.append('/home/revlon/Codes/Telegram_Bot/')
-sys.path.append('/Users/tansansu/Google Drive/Python/Telegram_Bot/')
+sys.path.append('/Users/tansansu/Storage/Bot/Telegram_Bot/')
 sys.path.append('/root/Codes/Telegram_Bot/')
 import F_common
 from TelegramBot import TelegramBot
@@ -72,14 +71,14 @@ class Updater:
         pool.map(self.run, input_sites)
 
     # 업데이트 실행 함수
-    def run(self, site):
+    def run(self, site, keyword=None, verbose=False):
         # 검색 url 불러오기
-        with open('links/' + self.subject_dict[self.subject] + '.json', 'r') as f:
+        with open('links/%s.json' % self.subject_dict[self.subject], 'r') as f:
             url = json.load(f)
         try:
             print(self.subject + ' | ' + site)
             # article 가져오기
-            result = F_common.scrapper(site, url, self.subject_dict[self.subject], self.site_dict)
+            result = F_common.scrapper(site, url, self.subject_dict[self.subject], self.site_dict, keyword, verbose)
             if result.shape[0] > 0:
                 print("%s - scraped articles: %d - %d" % (site, result.shape[0], result.shape[1]))
                 # 단어 필터링
@@ -119,16 +118,3 @@ class Updater:
     @staticmethod
     def run_hugo(path):
         os.system('cd %s && hugo --theme=hugo-material-docs' % path)
-
-    # Git commit 실행
-    @staticmethod
-    def git_commit(path):
-        cd(path)
-        git.add('--all')
-        print('git add --all')
-        time.sleep(8)
-        git.commit(m='regular uploading of articles')
-        print('git commit -m message')
-        time.sleep(8)
-        git.push('origin', 'master')
-        print('git push origin master')

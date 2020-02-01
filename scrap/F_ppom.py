@@ -32,7 +32,7 @@ def touch_article(soup, tears):
 
 
 # 게시글 수집
-def get_article(url, subject, tears=15):
+def get_article(url, subject, tears=15, verbose=False):
     # url
     base_url = 'http://m.ppomppu.co.kr/new/'
     # Get a html
@@ -40,6 +40,7 @@ def get_article(url, subject, tears=15):
     soup = BeautifulSoup(resp, 'lxml')
     articles = soup.find_all('ul', {'class':'bbsList'})[0].find_all('li')
     articles = [x for x in articles if not x.find('strike')]
+    utils.print_log(verbose, "articles cnt", len(articles))
     # Return empty dataframe if no articles
     if len(articles) == 0:
         del resp
@@ -81,6 +82,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
+        utils.print_log(verbose, "article line 1", l)
         time.sleep(random.randint(2, 7) / 3)
 
     if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환

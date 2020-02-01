@@ -165,22 +165,28 @@ def store_db(subject, df):
 
 
 # 함수: 사이트 스크래핑
-def scrapper(site, urls, subject, site_dict):
+def scrapper(site, urls, subject, site_dict, keyword, verbose):
     # URL 리스트
     url = urls[site_dict[site]]
-    keywords = [x for x in url.keys()]
+    if keyword is not None:
+        keywords = [keyword]
+    else:
+        keywords = [x for x in url.keys()]
     # 결과로 리턴할 데이터프레임 생성
     result = pd.DataFrame()
     # 사이트마다 키워드 url 반복
     for keyword in keywords:
+        if verbose:
+            print('scarpping keyword: %s' % keyword)
         # 개별 사이트 소스파일의 get_article 함수 실행
-        df_temp = globals()['F_' + site_dict[site]].get_article(url[keyword], subject, 15)
+        df_temp = globals()['F_' + site_dict[site]].get_article(url[keyword], subject, 15, verbose)
+        print('scrapped df', df_temp.shape)
         if df_temp.shape[0] == 0:
             continue
         df_temp.loc[:, 'keyword'] = keyword
         result = result.append(df_temp)
         # 1초 지연
-        time.sleep(2)
+        time.sleep(3)
     # 사이트 이름 추가
     if result.shape[0] == 0:
         return pd.DataFrame()

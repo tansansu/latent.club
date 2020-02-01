@@ -39,7 +39,7 @@ def touch_article(soup, tears):
 
 
 # 게시글 수집
-def get_article(url, subject, tears=15):
+def get_article(url, subject, tears=15, verbose=False):
     base_url = 'http://starboard.kr/slr'
     search_url = 'http://starboard.kr/conn/board/search'
     # Get a html
@@ -48,10 +48,10 @@ def get_article(url, subject, tears=15):
     # s_result.encoding = 'euc-kr' # Revising the encoding
     # Extracting articles from the html
     payload = {'search_text':url}
-    s_result = s.post(search_url, data=payload)
-
-    soup = BeautifulSoup(s_result.text, 'lxml')
+    resp = s.post(search_url, data=payload)
+    soup = BeautifulSoup(resp.text, 'lxml')
     articles = soup.find_all('div', attrs={'class': 'ItemContent Discussion'})
+    utils.print_log(verbose, "articles cnt", len(articles))
     if len(articles) == 0:
         s.close()
         return pd.DataFrame()
@@ -63,14 +63,19 @@ def get_article(url, subject, tears=15):
     for a in articles:
         l = []
         title = mod_title(a.find('div', attrs={'class': 'Title'}).find('a').text)
+        utils.print_log(verbose, "1 article title", title)
         try:
             article_link = a.find('div', attrs={'class': 'Title'}).find('a')['href']
+            utils.print_log(verbose, "2 article link", article_link)
         except:
             continue
         # print(article_link)
         article_id = re.search(r'(\d{8})', article_link).group()
+        utils.print_log(verbose, "3 article id", article_id)
         date = a.find('time')['datetime']
-        reply_num = mod_reply(a.find('div', attrs={'class': 'Title'}).find('a').text)
+        utils.print_log(verbose, "4 article date", date)
+        reply_num = mod_reply(a.select_one('div.Meta.Meta-Discussion > span.MItem.MCount.ViewCount').text)
+        utils.print_log(verbose, "5 article reply cnt", reply_num)
         # Get a content of the article
         con = BeautifulSoup(s.get(article_link).text, 'html.parser')
         # 존재하지 않는 게시물 예외 처리
@@ -86,7 +91,8 @@ def get_article(url, subject, tears=15):
             member_id = ''
         else:
             member_id = con.find('span', attrs={'class': 'lop'}).text
-        view_num = mod_view(con.find('div', {'class': 'info-wrap'}).text)
+        view_num = mod_view(con.find('td', {'class': 'click bbs_ct_small'}).text)
+        utils.print_log(verbose, "6 article view cnt", view_num)
         content = ''
         # Making the list
         l.append(title)
@@ -98,6 +104,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
+        utils.print_log(verbose, "article line 1", l)
         time.sleep(random.randint(2, 7) / 3)
 
     if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환

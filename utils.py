@@ -8,3 +8,8 @@ def sess(referer: str):
     s.headers.update({'User-Agent': agent, 'Referer': referer})
     return s
 
+
+# verbose printing
+def print_log(verbose, category, obj):
+    if verbose:
+        print('===== catch %s: ' % category, obj)

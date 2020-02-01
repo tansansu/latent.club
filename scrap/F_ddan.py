@@ -33,7 +33,7 @@ def touch_article(soup, tears):
 
 
 # 함수: 게시글 수집
-def get_article(url, subject, tears=15):
+def get_article(url, subject, tears=15, verbose=False):
     base_url = 'http://www.ddanzi.com/index.php?m=1&document_srl='
 
     # 사이트에서 html 가져오기
@@ -50,6 +50,7 @@ def get_article(url, subject, tears=15):
                 continue
         except:
             articles.append(article)
+    utils.print_log(verbose, "articles cnt", len(articles))
     # 게시글이 없는 경우 빈 데이터 프레임 리턴
     if len(articles) == 0:
         return pd.DataFrame()
@@ -95,6 +96,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
+        utils.print_log(verbose, "article line 1", l)
         time.sleep(random.randint(2, 7) / 3)
 
     if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환

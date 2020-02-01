@@ -35,7 +35,7 @@ def touch_article(soup, tears):
 
     
 # 게시글 수집
-def get_article(url, subject, tears=15):
+def get_article(url, subject, tears=15, verbose=False):
     base_url = 'http://m.ruliweb.com/community/board/300148/read/'
     # Get a html
     s = utils.sess(base_url)
@@ -45,6 +45,7 @@ def get_article(url, subject, tears=15):
     articles = soup.find_all('tr', {'class': 'table_body'})[1:]  # 맨 첫글 공지 제외
     # 유동적인 상단 공지글 제외(notice class 제거)
     articles = [a for a in articles if 'notice' not in a.get('class')]
+    utils.print_log(verbose, "articles cnt", len(articles))
     # 유동적인 결과없음 글이 있으면 리턴
     if articles[0].find('strong').text == '결과없음':
         return pd.DataFrame()
@@ -81,6 +82,7 @@ def get_article(url, subject, tears=15):
         l.append(reply_num)
         l.append(view_num)
         a_list.append(l)
+        utils.print_log(verbose, "article line 1", l)
         time.sleep(random.randint(2, 7) / 3)
 
     if len(a_list) == 0:  # 감동 주제일 경우 적합 게시물이 없을 경우 빈 DF 반환
