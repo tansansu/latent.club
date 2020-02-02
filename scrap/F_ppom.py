@@ -3,6 +3,7 @@
 import time, random
 from urllib.request import urlopen
 import re
+import utils
 import pandas as pd
 from datetime import datetime
 from bs4 import BeautifulSoup
