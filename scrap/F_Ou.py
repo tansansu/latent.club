@@ -42,6 +42,7 @@ def get_article(url, subject, tears=15, verbose=False):
     s = utils.sess('http://starboard.kr/')
     payload = {'search_text':url}
     resp = s.post(search_url, data=payload)
+    soup = BeautifulSoup(resp.text, 'lxml')
     articles = soup.find_all('div', attrs={'class': 'ItemContent Discussion'})
     utils.print_log(verbose, "articles cnt", len(articles))
     # 게시글이 없는 경우 리턴
