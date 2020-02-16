@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 import os
 import pandas as pd
+import F_common
 
 
 class Roller(Updater):
@@ -22,6 +23,7 @@ def scrap_test(subject: str, site: str, keyword: str=None):
     complete_subj_idx = roller.subjects.index(subject)
 
     roller.subject = subject  # 카테고리 설정
-    roller.run(site, True, keyword)
-
+    with open('links/%s.json' % roller.subject_dict[subject], 'r') as f:
+        url = json.load(f)
+    result = F_common.scrapper(site, url, roller.subject_dict[subject], roller.site_dict, keyword, True)
 

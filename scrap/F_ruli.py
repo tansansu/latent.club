@@ -9,14 +9,13 @@ import pandas as pd
 
 # Modifing user_ids
 def mod_user_id(char):
-    result = char.replace(" ", '').replace('\r', '').replace('\n', '').replace('\t', '')
-    return result
+    return char.replace(" ", '').replace('\r', '').replace('\n', '').replace('\t', '')
 
 
 # 날짜 string 수정 함수
 def mod_date(char):
-    result = re.search(r'(\d{4}.{15})', char).group()
-    result = result.replace(".", '-').replace('(', ' ')
+    result = "20" + char
+    result = result.replace(".", '-').replace('(', '').replace(')', '')
     return result
 
 
@@ -42,9 +41,8 @@ def get_article(url, subject, tears=15, verbose=False):
     resp = s.get(url)
     soup = BeautifulSoup(resp.text, 'lxml')
     # Extracting articles from the html
-    articles = soup.find_all('tr', {'class': 'table_body'})[1:]  # 맨 첫글 공지 제외
-    # 유동적인 상단 공지글 제외(notice class 제거)
-    articles = [a for a in articles if 'notice' not in a.get('class')]
+    articles = soup.select('tr.table_body')
+    articles = [x for x in articles if len(x.get('class')) < 2] # 공지글/베스트 제외
     utils.print_log(verbose, "articles cnt", len(articles))
     # 유동적인 결과없음 글이 있으면 리턴
     if articles[0].find('strong').text == '결과없음':
@@ -70,7 +68,7 @@ def get_article(url, subject, tears=15, verbose=False):
             yn = touch_article(con, tears)
             if not yn:
                 continue
-        date = mod_date(mod_user_id(con.find('span', {'class': 'regdate'}).text))
+        date = mod_date(con.find('span', {'class': 'regdate'}).text)
         content = ''
         # Making the list
         l.append(title)
