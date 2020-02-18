@@ -49,6 +49,8 @@ def get_article(url, subject, tears=15, verbose=False):
 
     a_list = []
     for a in articles:
+        if verbose:
+            print(a.decode_contents())
         l = []
         try:  # 삭제된 게시물은 링크가 안남아서 에러가 생김
             article_link = base_url + a.find('a', {'class': 'noeffect'})['href']
@@ -57,7 +59,10 @@ def get_article(url, subject, tears=15, verbose=False):
         except:
             continue
         title = a.find('strong').text
-        user_id = a.find('span', {'class': 'ct'}).text
+        try:
+            user_id = a.select_one('span.ct').text
+        except:
+            continue
         article_id = re.search(r'(\d{7})', article_link).group()
         reply_num = mod_reply(a)
         view_num = mod_view(a)

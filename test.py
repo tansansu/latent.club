@@ -1,5 +1,5 @@
 from Update_multi import Updater
-from F_Classifier import Classifier
+#from F_Classifier import Classifier
 from datetime import datetime
 import json
 import os

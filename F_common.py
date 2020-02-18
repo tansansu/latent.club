@@ -177,7 +177,7 @@ def scrapper(site, urls, subject, site_dict, keyword, verbose):
     # 사이트마다 키워드 url 반복
     for keyword in keywords:
         if verbose:
-            print('scarpping keyword: %s' % keyword)
+            print('scarpping keyword: %s | %s' % (keyword, url[keyword]))
         # 개별 사이트 소스파일의 get_article 함수 실행
         df_temp = globals()['F_' + site_dict[site]].get_article(url[keyword], subject, 15, verbose)
         print('scrapped df', df_temp.shape)
