@@ -17,6 +17,12 @@ def mod_user_id(char):
 def mod_date(char):
     result = re.search(r'\d{4}.+', char).group()
     result = result.replace("\t", '')
+    # ip주소 지우기
+    try:
+        ip_padding = re.search(r'\(.*\)', result).group()
+        result = result.replace(ip_padding, '')
+    except:
+        pass
     return result
 
 
@@ -48,6 +54,9 @@ def get_article(url, subject, tears=15, verbose=False):
         try:
             title = a.find('span', {'class': 'list_subject_span_pc'}).text
         except:
+            continue
+        if title.find('알림]') != -1:
+            # 공지글은 넘어가기
             continue
         # print(title)
         article_id = re.search(r'(\d{8})', a['href']).group()
