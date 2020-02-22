@@ -60,9 +60,9 @@ def get_article(url, subject, tears=15, verbose=False):
             continue
         # print(title)
         article_id = re.search(r'(\d{8})', a['href']).group()
-        if a.find('em'):
-            reply_num = a.find('em').text
-        else:
+        try:
+            reply_num = a.select_one('span > span > span > span.list_comment_num_a > em').text
+        except:
             reply_num = '0'
         article_link = base_url + article_id
         # 게시글 내용 가져오기
