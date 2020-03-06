@@ -62,7 +62,7 @@ def put_link(url_dict, site, word, url_string):
 
 
 # 함수 실행 예: add_keyword(subject='tweet', site='eto', word='abcd', eto_link='')
-def add_keyword(subject=None, site=None, word=None, eto_link=None):
+def add_keyword(subject, site=None, word=None, eto_link=None):
     # 사이트별 추가할 url 패딩 캐릭터
     clien_pad = 'https://www.clien.net/service/search?q={0}&sort=recency&boardCd=park&boardName=%EB%AA%A8%EB%91%90%EC%9D%98%EA%B3%B5%EC%9B%90'
     eto_pad = 'http://www.etoland.co.kr/plugin/mobile/board.php?bo_table=etoboard01&sca=&sfl=wr_subject%7C%7Cwr_content&stx={0}'
